@@ -1,0 +1,7 @@
+#ifndef CGAL_SHAPE_DETECTION_RANSAC_ON_POINTS_3_PROPERTY_MAPS_H
+#define CGAL_SHAPE_DETECTION_RANSAC_ON_POINTS_3_PROPERTY_MAPS_H
+
+#include <CGAL/Shape_detection/RANSAC_on_points_3/Property_maps/Plane_map.h>
+#include <CGAL/Shape_detection/RANSAC_on_points_3/Property_maps/Point_to_shape_index_map.h>
+
+#endif // CGAL_SHAPE_DETECTION_RANSAC_ON_POINTS_3_PROPERTY_MAPS_H

@@ -17,7 +17,7 @@
 // SPDX-License-Identifier: GPL-3.0+
 //
 //
-// Author(s)     : Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez, Thien Hoang, Dmitry Anisimov
+// Author(s) : Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez
 //
 
 /**
@@ -31,22 +31,24 @@
 
 #include <CGAL/license/Shape_detection.h>
 
-#include <CGAL/Shape_detection/RANSAC_on_points_3/Efficient_RANSAC.h>
 #include <CGAL/Shape_detection/RANSAC_on_points_3/Efficient_RANSAC_traits.h>
-
-#include <CGAL/Shape_detection/RANSAC_on_points_3/Primitives.h>
-#include <CGAL/Shape_detection/RANSAC_on_points_3/Primitives/Cone.h>
-#include <CGAL/Shape_detection/RANSAC_on_points_3/Primitives/Plane.h>
-#include <CGAL/Shape_detection/RANSAC_on_points_3/Primitives/Torus.h>
-#include <CGAL/Shape_detection/RANSAC_on_points_3/Primitives/Sphere.h>
-#include <CGAL/Shape_detection/RANSAC_on_points_3/Primitives/Cylinder.h>
-#include <CGAL/Shape_detection/RANSAC_on_points_3/Primitives/Shape_base.h>
-
+#include <CGAL/Shape_detection/RANSAC_on_points_3/Efficient_RANSAC.h>
 #include <CGAL/Shape_detection/RANSAC_on_points_3/Octree.h>
-
+#include <CGAL/Shape_detection/RANSAC_on_points_3/Primitives.h>
 #include <CGAL/Shape_detection/RANSAC_on_points_3/Property_maps.h>
-#include <CGAL/Shape_detection/RANSAC_on_points_3/Property_maps/Plane_map.h>
-#include <CGAL/Shape_detection/RANSAC_on_points_3/Property_maps/Point_to_shape_index_map.h>
+
+#include <CGAL/Region_growing/Region_growing.h>
+#include <CGAL/Region_growing/Region_growing_traits.h>
+#include <CGAL/Region_growing/Region_growing_on_points.h>
+#include <CGAL/Region_growing/Region_growing_on_mesh.h>
+
+// #include <CGAL/Region_growing/Region_growing_on_points/Fuzzy_sphere_connectivity.h>
+// #include <CGAL/Region_growing/Region_growing_on_points/Nearest_neighbor_connectivity.h>
+// #include <CGAL/Region_growing/Region_growing_on_points/Propagation_conditions_2.h>
+// #include <CGAL/Region_growing/Region_growing_on_points/Propagation_conditions_3.h>
+
+// #include <CGAL/Region_growing/Region_growing_on_mesh/Mesh_connectivity.h>
+// #include <CGAL/Region_growing/Region_growing_on_mesh/Propagation_conditions.h>
 
 #include <CGAL/Shape_detection/regularize_planes.h>
 
