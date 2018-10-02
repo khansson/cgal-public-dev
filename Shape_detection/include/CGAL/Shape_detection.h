@@ -40,15 +40,7 @@
 #include <CGAL/Region_growing/Region_growing.h>
 #include <CGAL/Region_growing/Region_growing_traits.h>
 #include <CGAL/Region_growing/Region_growing_on_points.h>
-#include <CGAL/Region_growing/Region_growing_on_mesh.h>
-
-// #include <CGAL/Region_growing/Region_growing_on_points/Fuzzy_sphere_connectivity.h>
-// #include <CGAL/Region_growing/Region_growing_on_points/Nearest_neighbor_connectivity.h>
-// #include <CGAL/Region_growing/Region_growing_on_points/Propagation_conditions_2.h>
-// #include <CGAL/Region_growing/Region_growing_on_points/Propagation_conditions_3.h>
-
-// #include <CGAL/Region_growing/Region_growing_on_mesh/Mesh_connectivity.h>
-// #include <CGAL/Region_growing/Region_growing_on_mesh/Propagation_conditions.h>
+#include <CGAL/Region_growing/Region_growing_on_surface_mesh.h>
 
 #include <CGAL/Shape_detection/regularize_planes.h>
 
