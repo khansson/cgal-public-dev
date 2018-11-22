@@ -1,10 +1,10 @@
 #ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_ON_POINTS_H
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_ON_POINTS_H
 
-#include <CGAL/Shape_detection/Region_growing_on_points/Fuzzy_sphere_connectivity.h>
-#include <CGAL/Shape_detection/Region_growing_on_points/Nearest_neighbor_connectivity.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_points/Fuzzy_sphere_connectivity_on_points.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_points/Nearest_neighbor_connectivity_on_points.h>
 
-#include <CGAL/Shape_detection/Region_growing_on_points/Propagation_conditions_2.h>
-#include <CGAL/Shape_detection/Region_growing_on_points/Propagation_conditions_3.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_points/Propagation_conditions_on_points_2.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_points/Propagation_conditions_on_points_3.h>
 
 #endif // CGAL_SHAPE_DETECTION_REGION_GROWING_ON_POINTS_H

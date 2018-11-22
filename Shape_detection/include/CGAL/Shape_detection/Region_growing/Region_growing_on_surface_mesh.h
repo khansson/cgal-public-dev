@@ -1,7 +1,7 @@
 #ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_ON_SURFACE_MESH_H
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_ON_SURFACE_MESH_H
 
-#include <CGAL/Shape_detection/Region_growing_on_surface_mesh/Propagation_conditions.h>
-#include <CGAL/Shape_detection/Region_growing_on_surface_mesh/Surface_mesh_connectivity.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_surface_mesh/Propagation_conditions_on_surface_mesh.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_surface_mesh/Connectivity_on_surface_mesh.h>
 
 #endif // CGAL_SHAPE_DETECTION_REGION_GROWING_ON_SURFACE_MESH_H
