@@ -13,6 +13,7 @@
 // Reduce to one queue? - no, because we have to know when we need to update the shape.
 // Change Element to Element_with_properties in m_visited? - this may be fixed with unordered_map, because it does not have dependency on < operator.
 // Element_with_properties neighbor = *it; and Element_with_properties ewp = ewp_queue[depth_index].front(); - add const and reference.
+// Add access to all unclassified elements.
 
 namespace CGAL {
 
@@ -25,7 +26,6 @@ namespace CGAL {
             \tparam Connectivity Model of `RegionGrowingConnectivity`
             \tparam Conditions Model of `RegionGrowingPropagationConditions`
         */
-
         template<class RegionGrowingTraits, class Connectivity, class Conditions>
         class Region_growing {
 
@@ -107,6 +107,8 @@ namespace CGAL {
             }
 
         private:
+
+            // Functions.
             void grow_region(const Element_with_properties &seed, Region &region) {
                 region.clear();
 
@@ -162,7 +164,7 @@ namespace CGAL {
                     m_visited[get(m_elem_map, *it)] = false;
             }
 
-        private:
+            // Fields.
             const Input_range              &m_input_range;
             Connectivity                   &m_connectivity;
             Conditions                     &m_conditions;

@@ -12,9 +12,9 @@ namespace CGAL {
                 \tparam ElementMap
                 \tparam GeomTraits
             */
-
             template<class InputRange, class ElementMap, class GeomTraits>
             class Region_growing_traits {
+                
             public:
 
                 using Input_range             = InputRange;

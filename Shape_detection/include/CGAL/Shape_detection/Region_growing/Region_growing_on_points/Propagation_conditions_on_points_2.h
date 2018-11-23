@@ -1,10 +1,11 @@
-#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_PROPAGATION_CONDITIONS_ON_POINTS_2
-#define CGAL_SHAPE_DETECTION_REGION_GROWING_PROPAGATION_CONDITIONS_ON_POINTS_2
+#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_PROPAGATION_CONDITIONS_ON_POINTS_2_H
+#define CGAL_SHAPE_DETECTION_REGION_GROWING_PROPAGATION_CONDITIONS_ON_POINTS_2_H
 
 // STL includes.
 #include <vector>
 
 // CGAL includes.
+#include <CGAL/number_utils.h>
 #include <CGAL/squared_distance_2.h>
 #include <CGAL/Cartesian_converter.h>
 #include <CGAL/linear_least_squares_fitting_2.h>
@@ -14,6 +15,8 @@
 // Add default values to the constructor. Also specify preconditions on these parameters.
 // Change global CGAL functions like squared_distance to their counterparts from the Kernel.
 // Change m_line_of_best_fit and m_normal_of_best_fit to the FT type? - Does it actually work with exact Kernel?
+// Add const to normal_unassigned.
+// Add const to normal.
 
 namespace CGAL {
 
@@ -21,12 +24,11 @@ namespace CGAL {
 
         /*! 
             \ingroup PkgShapeDetection
-            \brief Local and global conditions for the region growing algorithm on a 3D point cloud.
-            \tparam RegionGrowingTraits CGAL::Shape_detection::Region_growing_traits.
+            \brief Local and global conditions for the region growing algorithm on a 2D point cloud.
+            \tparam RegionGrowingTraits CGAL::Shape_detection::Region_growing_traits
             \tparam NormalMap An `LvaluePropertyMap` that maps to a vector, representing the normal associated with the point.
             \cgalModels `RegionGrowingPropagationConditions`
         */
-
         template<class RegionGrowingTraits, class NormalMap>
         class Propagation_conditions_on_points_2 {
 
@@ -48,27 +50,30 @@ namespace CGAL {
             Kernel::Sqrt 
             { };
 
-            public:
-            using Kernel                  = typename RegionGrowingTraits::Kernel;
-            using Element_map             = typename RegionGrowingTraits::Element_map;
-            using Normal_map              = NormalMap;
+        public:
+
+            using Kernel = typename RegionGrowingTraits::Kernel;
+            
+            using Normal_map = NormalMap;
+            
+            using Element_map = typename RegionGrowingTraits::Element_map;
 
             using Element_with_properties = typename Element_map::key_type;
             ///< Value type of the iterator in the input range.
 
-            using Point_2                 = typename Kernel::Point_2;  ///< Point type
-            using Line_2                  = typename Kernel::Line_2;   ///< Line type
-            using Vector_2                = typename Kernel::Vector_2; ///< Vector type
-            using FT                      = typename Kernel::FT;       ///< Number type
+            using FT       = typename Kernel::FT;       ///< Number type
+            using Point_2  = typename Kernel::Point_2;  ///< Point type
+            using Vector_2 = typename Kernel::Vector_2; ///< Vector type
+            using Line_2   = typename Kernel::Line_2;   ///< Line type
 
             ///< \cond SKIP_IN_MANUAL
-            using Sqrt                    = Get_sqrt<Kernel>;
-            using Local_kernel            = Exact_predicates_inexact_constructions_kernel;
-            using Local_point_2           = typename Local_kernel::Point_2;
-            using Local_line_2            = typename Local_kernel::Line_2;
-            using Local_vector_2          = typename Local_kernel::Vector_2;
-            using Local_FT                = typename Local_kernel::FT;
-            using To_local_converter      = Cartesian_converter<Kernel, Local_kernel>;
+            using Sqrt               = Get_sqrt<Kernel>;
+            using Local_kernel       = Exact_predicates_inexact_constructions_kernel;
+            using Local_FT           = typename Local_kernel::FT;
+            using Local_point_2      = typename Local_kernel::Point_2;
+            using Local_vector_2     = typename Local_kernel::Vector_2;
+            using Local_line_2       = typename Local_kernel::Line_2;
+            using To_local_converter = Cartesian_converter<Kernel, Local_kernel>;
             ///< \endcond
 
             /*!
@@ -83,12 +88,13 @@ namespace CGAL {
 
             /*!
                 Local conditions that check if a new point in `unassigned_element` is similar to the point `assigned_element` and its enclosing region. Each item in `Region` has the same structure as in the input range, i.e. has the type `Element_with_properties`.
-                \tparam Region CGAL::Shape_detection::Region_growing::Region.
+                \tparam Region CGAL::Shape_detection::Region_growing::Region
             */
             template<class Region>
-            bool is_in_same_region(const Element_with_properties &assigned_element,
-                                   const Element_with_properties &unassigned_element,
-                                   const Region &region) {
+            bool is_in_same_region(
+                                const Element_with_properties &assigned_element,
+                                const Element_with_properties &unassigned_element,
+                                const Region &region) {
 
                 const Point_2  &point_unassigned = get(m_elem_map  , unassigned_element);
                 const Vector_2 &normal           = get(m_normal_map, unassigned_element);
@@ -96,7 +102,7 @@ namespace CGAL {
                 const FT normal_length     = m_sqrt(normal.squared_length());
                 Vector_2 normal_unassigned = normal / normal_length;
 
-                // Must use Local_FT because fit line is of local kernel.
+                // Must use Local_FT, because fit line is of local kernel.
                 const Local_FT distance_to_fit_line = CGAL::sqrt(CGAL::squared_distance(m_to_local_converter(point_unassigned), m_line_of_best_fit));
                 const Local_FT cos_angle            = CGAL::abs(m_to_local_converter(normal_unassigned) * m_normal_of_best_fit);
 
@@ -108,7 +114,7 @@ namespace CGAL {
 
             /*!
                 Global conditions that check if a region size is large enough to be accepted.
-                \tparam Region CGAL::Shape_detection::Region_growing::Region.
+                \tparam Region CGAL::Shape_detection::Region_growing::Region
             */
             template<class Region>
             inline bool is_valid(const Region &region) const {
@@ -118,8 +124,8 @@ namespace CGAL {
             }
 
             /*!
-                Update the class's best fit plane that will be used later by local conditions.
-                \tparam Region CGAL::Shape_detection::Region_growing::Region.
+                Update the class's best fit line that will be used later by local conditions.
+                \tparam Region CGAL::Shape_detection::Region_growing::Region
             */
             template<class Region>
             void update_shape(const Region &region) {
@@ -149,9 +155,9 @@ namespace CGAL {
                     Local_point_2 centroid;
 
                     #ifndef CGAL_EIGEN2_ENABLED
-                        linear_least_squares_fitting_2(points.begin(), points.end(), m_line_of_best_fit, centroid, CGAL::Dimension_tag<0>(), Local_kernel(), Default_diagonalize_traits<Local_FT, 2>());
+                        linear_least_squares_fitting_2(points.begin(), points.end(), m_line_of_best_fit, centroid, CGAL::Dimension_tag<0>(), Local_kernel(), CGAL::Default_diagonalize_traits<Local_FT, 2>());
                     #else 
-                        linear_least_squares_fitting_2(points.begin(), points.end(), m_line_of_best_fit, centroid, CGAL::Dimension_tag<0>(), Local_kernel(), Eigen_diagonalize_traits<Local_FT, 2>());
+                        linear_least_squares_fitting_2(points.begin(), points.end(), m_line_of_best_fit, centroid, CGAL::Dimension_tag<0>(), Local_kernel(), CGAL::Eigen_diagonalize_traits<Local_FT, 2>());
                     #endif
 
                     Local_vector_2 normal = m_line_of_best_fit.perpendicular(m_line_of_best_fit.point(0)).to_vector();
@@ -162,20 +168,26 @@ namespace CGAL {
                 }
             }
 
-            private:
-                const FT                        m_epsilon;
-                const FT                        m_normal_threshold;
-                const size_t                    m_min_region_size;
-                const Sqrt                      m_sqrt;
-                const Normal_map                m_normal_map = Normal_map();
-                const Element_map               m_elem_map   = Element_map();
-                const To_local_converter        m_to_local_converter;
-                Local_line_2                    m_line_of_best_fit;
-                Local_vector_2                  m_normal_of_best_fit;
-            };
+        private:
+        
+            // Fields.
+            const FT                        m_epsilon;
+            const FT                        m_normal_threshold;
+            const size_t                    m_min_region_size;
+
+            const Sqrt                      m_sqrt;
+
+            const Normal_map                m_normal_map = Normal_map();
+            const Element_map               m_elem_map   = Element_map();
+
+            const To_local_converter        m_to_local_converter;
+
+            Local_line_2                    m_line_of_best_fit;
+            Local_vector_2                  m_normal_of_best_fit;
+        };
 
     } // namespace Shape_detection
 
 } // namespace CGAL
 
-#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_PROPAGATION_CONDITIONS_ON_POINTS_2
+#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_PROPAGATION_CONDITIONS_ON_POINTS_2_H
