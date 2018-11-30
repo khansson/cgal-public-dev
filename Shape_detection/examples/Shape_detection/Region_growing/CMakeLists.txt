@@ -19,9 +19,9 @@ if (CGAL_FOUND)
 
     include_directories(BEFORE "include")
 
-    create_single_source_cgal_program("region_growing_on_points_2.cpp")
-    create_single_source_cgal_program("region_growing_on_points_3.cpp")
-    create_single_source_cgal_program("region_growing_on_surface_mesh.cpp")
+    create_single_source_cgal_program("example_region_growing_on_points_2.cpp")
+    create_single_source_cgal_program("example_region_growing_on_points_3.cpp")
+    create_single_source_cgal_program("example_region_growing_on_surface_mesh.cpp")
 
 else ()
     message(WARNING "This program requires the CGAL library, and will not be compiled.")

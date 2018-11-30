@@ -17,6 +17,7 @@
 // Change m_line_of_best_fit and m_normal_of_best_fit to the FT type? - Does it actually work with exact Kernel?
 // Add const to normal_unassigned.
 // Add const to normal.
+// Rename Element_with_properties to Point_with_properties or any better way, because this class is related to points.
 
 namespace CGAL {
 
@@ -86,18 +87,28 @@ namespace CGAL {
             m_sqrt(Sqrt()) 
             { }
 
+            Propagation_conditions_on_points_3(const FT epsilon, const FT normal_threshold, const size_t min_region_size, 
+            const Element_map &element_map, const Normal_map &normal_map) :
+            m_epsilon(epsilon),
+            m_normal_threshold(normal_threshold),
+            m_min_region_size(min_region_size),
+            m_sqrt(Sqrt()),
+            m_element_map(element_map),
+            m_normal_map(normal_map)
+            { }
+
             /*!
                 Local conditions that check if a new point in `unassigned_element` is similar to the point `assigned_element` and its enclosing region. Each item in `Region` has the same structure as in the input range, i.e. has the type `Element_with_properties`.
                 \tparam Region CGAL::Shape_detection::Region_growing::Region
             */
             template<class Region>
-            bool is_in_same_region(
+            bool are_in_same_region(
                                 const Element_with_properties &assigned_element,
                                 const Element_with_properties &unassigned_element,
                                 const Region &region) {
 
-                const Point_3  &point_unassigned = get(m_elem_map  , unassigned_element);
-                const Vector_3 &normal           = get(m_normal_map, unassigned_element);
+                const Point_3  &point_unassigned = get(m_element_map, unassigned_element);
+                const Vector_3 &normal           = get(m_normal_map , unassigned_element);
 
                 const FT normal_length     = m_sqrt(normal.squared_length());
                 Vector_3 normal_unassigned = normal / normal_length;
@@ -117,7 +128,7 @@ namespace CGAL {
                 \tparam Region CGAL::Shape_detection::Region_growing::Region
             */
             template<class Region>
-            inline bool is_valid(const Region &region) const {
+            inline bool are_valid(const Region &region) const {
                 
                 CGAL_precondition(m_min_region_size >= 3);
                 return ( region.size() >= m_min_region_size );
@@ -128,14 +139,14 @@ namespace CGAL {
                 \tparam Region CGAL::Shape_detection::Region_growing::Region
             */
             template<class Region>
-            void update_shape(const Region &region) {
+            void update(const Region &region) {
 
                 CGAL_precondition(region.end() != region.begin());
                 if (region.size() == 1) {
                     
                     // The best fit plane will be a plane through this point with its normal being the point's normal.
-                    const Point_3  &point  = get(m_elem_map  , *region.begin());
-                    const Vector_3 &normal = get(m_normal_map, *region.begin());
+                    const Point_3  &point  = get(m_element_map, *region.begin());
+                    const Vector_3 &normal = get(m_normal_map , *region.begin());
                     
                     const FT normal_length = m_sqrt(normal.squared_length());
 
@@ -149,7 +160,7 @@ namespace CGAL {
                     std::vector<Local_point_3> points(region.size());
 
                     for (auto it = region.begin(); it != region.end(); ++it, ++i)
-                        points[i] = m_to_local_converter(get(m_elem_map, *it));
+                        points[i] = m_to_local_converter(get(m_element_map, *it));
 
                     // Fit the region to a plane
                     Local_point_3 centroid;
@@ -177,8 +188,8 @@ namespace CGAL {
             
             const Sqrt                      m_sqrt;
 
-            const Normal_map                m_normal_map = Normal_map();
-            const Element_map               m_elem_map = Element_map();
+            const Element_map               m_element_map;
+            const Normal_map                m_normal_map;
 
             const To_local_converter        m_to_local_converter;
 

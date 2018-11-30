@@ -1,95 +1,113 @@
-#include <iostream>
+
+// STL includes.
+#include <string>
 #include <fstream>
-#include <CGAL/Simple_cartesian.h>
-#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
-#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
-#include <CGAL/Region_growing.h>
-#include <CGAL/property_map.h>
-#include <CGAL/Iterator_range.h>
+#include <iostream>
+
+// CGAL includes.
 #include <CGAL/Surface_mesh.h>
-#include <CGAL/Timer.h>
 
-std::ifstream in;
+#include <CGAL/Simple_cartesian.h>
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 
-template < class Kernel >
-bool test_region_growing_with_mesh(double epsilon = 5.0, double normal_threshold = 0.7) { 
-    // default param value for car_mesh.inp
+#include <CGAL/Shape_detection/Region_growing/Region_growing.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_traits.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_surface_mesh.h>
 
-    // rewind to the beginning of the data file
-    in.clear();
-    in.seekg(0, std::ios::beg);
+template<class Kernel>
+bool test_region_growing_on_surface_mesh() {
 
-    using Point_3           = typename Kernel::Point_3;
-    using Vector_3          = typename Kernel::Vector_3;
-    using Mesh              = CGAL::Surface_mesh<Point_3>;
-    using Vertex_index      = typename Mesh::Vertex_index;
-    using Face_index        = typename Mesh::Face_index;
-    using Faces             = std::vector<Face_index>;
-    using Input_range       = CGAL::Iterator_range<typename Faces::iterator>;
-    using Element_map       = CGAL::Identity_property_map<Face_index>;
-    using Traits            = CGAL::Region_growing::Region_growing_traits<Input_range, Element_map, Kernel>;
-    using Conditions        = CGAL::Region_growing::Region_growing_with_mesh::Mesh_conditions<Traits, Mesh>;
-    using Connectivity      = CGAL::Region_growing::Region_growing_with_mesh::Mesh_connectivity<Traits, Mesh>;
-    using Region_growing    = CGAL::Region_growing::Generalized_region_growing<Traits, Connectivity, Conditions>;
+    using FT      = typename Kernel::FT;
+    using Point_3 = typename Kernel::Point_3;
 
-    Mesh m;
+    using Mesh           = CGAL::Surface_mesh<Point_3>;
+    using Input_range    = typename Mesh::Face_range;
+    using Vertex_index   = typename Mesh::Vertex_index;
+    using Face_index     = typename Mesh::Face_index;
+    using Face_index_map = CGAL::Identity_property_map<Face_index>;
 
-    int vertex_count, face_count;
-    in >> vertex_count;
-    std::vector<typename Mesh::Vertex_index> vv;
-    for (int i = 0; i < vertex_count; ++i) {
-        double x, y, z;
-        in >> x >> y >> z;
-        vv.push_back(m.add_vertex(Point_3(x, y, z)));
-    }
-    in >> face_count;
-    Faces faces;
-    for (int i = 0; i < face_count; ++i) {
-        int v1, v2, v3;
-        in >> v1 >> v2 >> v3;
-        if (CGAL::collinear(m.point(vv[v1-1]), m.point(vv[v2-1]), m.point(vv[v3-1]))) continue;
-        faces.push_back(m.add_face(vv[v1-1], vv[v2-1], vv[v3-1]));
-    }
+    using Traits         = CGAL::Shape_detection::Region_growing_traits<Input_range, Face_index_map, Kernel>;
+    using Connectivity   = CGAL::Shape_detection::Connectivity_on_surface_mesh<Traits, Mesh>;
+    using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_surface_mesh<Traits, Mesh>;
+    using Region_growing = CGAL::Shape_detection::Region_growing<Traits, Connectivity, Conditions>;
+    using Regions        = typename Region_growing::Region_range;
 
-    Input_range input_range(faces.begin(), faces.end());
-    Connectivity connectivity(m);
-    Conditions conditions(m, epsilon, normal_threshold);
+    // Default parameter values for the cube mesh below.
+    const FT max_distance_to_plane = FT(1) / FT(10);
+    const FT normal_threshold      = FT(9) / FT(10);
+    
+    // Create a cube mesh.
+    Mesh mesh;
 
-    Region_growing rg(input_range, connectivity, conditions);
-    rg.find_regions();
-    typename Region_growing::Region_range all_regions = rg.regions();
+    const Vertex_index v0 = mesh.add_vertex(Point_3(0, 0, 0));
+    const Vertex_index v1 = mesh.add_vertex(Point_3(0, 1, 0));
+    const Vertex_index v2 = mesh.add_vertex(Point_3(1, 0, 0));
+    const Vertex_index v3 = mesh.add_vertex(Point_3(1, 1, 0));
+    const Vertex_index v4 = mesh.add_vertex(Point_3(0, 0, 1));
+    const Vertex_index v5 = mesh.add_vertex(Point_3(0, 1, 1));
+    const Vertex_index v6 = mesh.add_vertex(Point_3(1, 0, 1));
+    const Vertex_index v7 = mesh.add_vertex(Point_3(1, 1, 1));
 
-    for (typename Region_growing::Region_range::iterator it = all_regions.begin(); it != all_regions.end(); ++it) {
-        if (!conditions.is_valid(*it)) return false;
-    }
+    mesh.add_face(v0, v3, v2);
+    mesh.add_face(v0, v3, v1);
+    mesh.add_face(v0, v6, v2);
+    mesh.add_face(v0, v6, v4);
+    mesh.add_face(v0, v5, v1);
+    mesh.add_face(v0, v5, v4);
+    mesh.add_face(v7, v2, v3);
+    mesh.add_face(v7, v2, v6);
+    mesh.add_face(v7, v1, v3);
+    mesh.add_face(v7, v1, v5);
+    mesh.add_face(v7, v4, v5);
+    mesh.add_face(v7, v4, v6);
+
+    const Input_range &input_range = mesh.faces();
+
+    CGAL_assertion(input_range.size() == 6);
+    if (input_range.size() != 6) return false;
+
+    // Create connectivity and conditions.
+    Connectivity connectivity(mesh);
+    Conditions   conditions(mesh, max_distance_to_plane, normal_threshold);
+
+    // Run region growing.
+    Region_growing region_growing(input_range, connectivity, conditions);
+    region_growing.find_regions();
+
+    const Regions &regions = region_growing.regions();
+
+    CGAL_assertion(regions.size() == 6);
+    if (regions.size() != 6) return false;
+
+    for (auto region = regions.begin(); region != regions.end(); ++region)
+        if (!conditions.are_valid(*region)) return false;
     return true;
 }
 
-
 int main(int argc, char *argv[]) {
-    in = std::ifstream(argc > 1 ? argv[1] : "../data/car_mesh.inp");
-    bool success = true;
-    std::cout << "test_region_growing_with_mesh<CGAL::Exact_predicates_inexact_constructions_kernel>... ";
-    if (!test_region_growing_with_mesh<CGAL::Exact_predicates_inexact_constructions_kernel>()) {
-        success = false;
-        std::cout << "failed\n";
-    } else std::cout << "succeeded\n";
 
-    std::cout << "test_region_growing_with_mesh<CGAL::Exact_predicates_exact_constructions_kernel>... ";
-    if (!test_region_growing_with_mesh<CGAL::Exact_predicates_exact_constructions_kernel>()) {
-        success = false;
-        std::cout << "failed\n";
-    } else std::cout << "succeeded\n";
+    // ------>
 
-    std::cout << "test_region_growing_with_mesh<CGAL::Simple_cartesian<float> >... ";
-    if (!test_region_growing_with_mesh<CGAL::Simple_cartesian<float> >()) {
-        success = false;
-        std::cout << "failed\n";
-    } else std::cout << "succeeded\n";
+    bool cartesian_double_test_success = true;
+    if (!test_region_growing_on_surface_mesh< CGAL::Simple_cartesian<double> >()) cartesian_double_test_success = false;
+    
+    std::cout << "cartesian_double_test_success: " << cartesian_double_test_success << std::endl;
+    CGAL_assertion(cartesian_double_test_success);
 
-    std::cout << "test_region_growing_with_mesh<CGAL::Simple_cartesian<double> >... ";
-    if (!test_region_growing_with_mesh<CGAL::Simple_cartesian<double> >()) {
-        success = false;
-        std::cout << "failed\n";
-    } else std::cout << "succeeded\n";
+    // ------>
+
+    bool exact_inexact_test_success = true;
+    if (!test_region_growing_on_surface_mesh<CGAL::Exact_predicates_inexact_constructions_kernel>()) exact_inexact_test_success = false;
+    
+    std::cout << "exact_inexact_test_success: " << exact_inexact_test_success << std::endl;
+    CGAL_assertion(exact_inexact_test_success);
+
+    // ------>
+
+    bool exact_exact_test_success = true;
+    if (!test_region_growing_on_surface_mesh<CGAL::Exact_predicates_exact_constructions_kernel>()) exact_exact_test_success = false;
+    
+    std::cout << "exact_exact_test_success: " << exact_exact_test_success << std::endl;
+    CGAL_assertion(exact_exact_test_success);
 }

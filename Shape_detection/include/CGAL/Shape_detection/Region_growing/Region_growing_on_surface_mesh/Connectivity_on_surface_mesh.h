@@ -46,6 +46,12 @@ namespace CGAL {
             m_mesh(mesh) 
             { }
 
+            Connectivity_on_surface_mesh(const Mesh &mesh,
+            const Element_map &element_map) :
+            m_mesh(mesh),
+            m_element_map(element_map)
+            { }
+
             /*!
                 From a query element `face_index`, this function retrieves the face via the element map and uses `CGAL::faces_around_face` to get a list of neighbor faces. The result is returned in `neighbors`.
                 \tparam Neighbors CGAL::Shape_detection::Region_growing::Neighbors
@@ -53,7 +59,7 @@ namespace CGAL {
             template<class Neighbors>
             void get_neighbors(const Element_with_properties &face_index, Neighbors &neighbors) {
                     
-                Face face = get(m_elem_map, face_index);
+                Face face = get(m_element_map, face_index);
                 neighbors.clear();
                     
                 const Face_range &local_faces = faces_around_face(m_mesh.halfedge(face), m_mesh);
@@ -65,8 +71,8 @@ namespace CGAL {
         private:
 
             // Fields.
-            const Mesh &m_mesh;
-            const Element_map m_elem_map = Element_map();
+            const Mesh             &m_mesh;
+            const Element_map       m_element_map;
         };
 
     } // namespace Shape_detection

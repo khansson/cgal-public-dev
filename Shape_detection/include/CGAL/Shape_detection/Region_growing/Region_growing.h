@@ -11,9 +11,12 @@
 
 // Todo:
 // Reduce to one queue? - no, because we have to know when we need to update the shape.
-// Change Element to Element_with_properties in m_visited? - this may be fixed with unordered_map, because it does not have dependency on < operator.
+// Can we improve m_visited? If we can, we could possibly remove m_elem_map, too. Yes, we can use m_visited[i], where
+// i is the index coming from the loop (m_input_range.begin() ... m_input_range.end(), ++it, ++i). In that case, we can use unordered_map, too.
+// In that case, we also use get(m_input_range.point_map(), *(m_input_range.begin() + i)) to get an element.
 // Element_with_properties neighbor = *it; and Element_with_properties ewp = ewp_queue[depth_index].front(); - add const and reference.
 // Add access to all unclassified elements.
+// Add a clear function.
 
 namespace CGAL {
 
@@ -59,6 +62,10 @@ namespace CGAL {
             using Region_range            = CGAL::Iterator_range<typename Regions::const_iterator>;
             ///< An `Iterator_range` of iterators in `CGAL::Shape_detection::Region_growing::Regions`.
 
+            ///< \cond SKIP_IN_MANUAL
+            using Visited_map             = std::map<Element, bool>;
+            ///< \endcond
+
             /*!
                 The constructor requires an input range and instances of the Connectivity class and Conditions class.
             */
@@ -66,6 +73,14 @@ namespace CGAL {
                 m_input_range(input_range),
                 m_connectivity(connectivity),
                 m_conditions(conditions) 
+                { }
+
+            Region_growing(const Input_range &input_range, Connectivity &connectivity, Conditions &conditions, 
+            const Element_map &element_map) :
+                m_input_range(input_range),
+                m_connectivity(connectivity),
+                m_conditions(conditions),
+                m_element_map(element_map)
                 { }
 
             /*!
@@ -77,14 +92,14 @@ namespace CGAL {
                 Region region;
 
                 for (auto it = m_input_range.begin(); it != m_input_range.end(); ++it) {
-                    if (!m_visited[get(m_elem_map, *it)]) { // element is available
+                    if (!m_visited[get(m_element_map, *it)]) { // element is available
 
                         // Grow a region from that element.
                         region.clear();
                         grow_region(*it, region);
 
                         // Check global conditions.
-                        if (!m_conditions.is_valid(region)) revert(region);
+                        if (!m_conditions.are_valid(region)) revert(region);
                         else m_regions.push_back(region);
                     }
                 }
@@ -120,11 +135,11 @@ namespace CGAL {
 
                 // Once an element is pushed to the queue, it is pushed to the region too.
                 ewp_queue[depth_index].push(seed);
-                m_visited[get(m_elem_map, seed)] = true;
+                m_visited[get(m_element_map, seed)] = true;
                 region.push_back(seed);
 
                 // Update internal properties of the growing shape if needed.
-                m_conditions.update_shape(region);
+                m_conditions.update(region);
 
                 while (!ewp_queue[depth_index].empty() || !ewp_queue[!depth_index].empty()) {
 
@@ -141,19 +156,19 @@ namespace CGAL {
                     for (auto it = neighbors.begin(); it != neighbors.end(); ++it) {
                         Element_with_properties neighbor = *it;
 
-                        if (!m_visited[get(m_elem_map, neighbor)] && m_conditions.is_in_same_region(ewp, neighbor, region)) {
+                        if (!m_visited[get(m_element_map, neighbor)] && m_conditions.are_in_same_region(ewp, neighbor, region)) {
 
                             // Add to the other queue the neighbor which doesn't belong to any regions
                             // so that we can visit them later.
                             ewp_queue[!depth_index].push(neighbor);
                             region.push_back(neighbor);
-                            m_visited[get(m_elem_map, neighbor)] = true;
+                            m_visited[get(m_element_map, neighbor)] = true;
                         }
                     }
 
                     if (ewp_queue[depth_index].empty()) {
 
-                        m_conditions.update_shape(region);
+                        m_conditions.update(region);
                         depth_index = !depth_index;
                     }
                 }
@@ -161,18 +176,18 @@ namespace CGAL {
 
             void revert(const Region &region) {
                 for (auto it = region.begin(); it != region.end(); ++it)
-                    m_visited[get(m_elem_map, *it)] = false;
+                    m_visited[get(m_element_map, *it)] = false;
             }
 
             // Fields.
-            const Input_range              &m_input_range;
-            Connectivity                   &m_connectivity;
-            Conditions                     &m_conditions;
+            const Input_range       &m_input_range;
+            Connectivity            &m_connectivity;
+            Conditions              &m_conditions;
             
-            Element_map                     m_elem_map;
-            Regions                         m_regions;
-            std::map<Element, bool>         m_visited;
-            Region_range                    m_output = Region_range(m_regions.begin(), m_regions.end());
+            Element_map              m_element_map;
+            Regions                  m_regions;
+            Visited_map              m_visited;
+            Region_range             m_output = Region_range(m_regions.begin(), m_regions.end());
         };
 
     } // namespace Shape_detection

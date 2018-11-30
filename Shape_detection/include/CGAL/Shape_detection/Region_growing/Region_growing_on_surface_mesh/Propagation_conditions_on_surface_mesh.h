@@ -96,17 +96,25 @@ namespace CGAL {
             m_normal_threshold(normal_threshold) 
             { }
                 
+            Propagation_conditions_on_surface_mesh(const Mesh &mesh, const FT epsilon, const FT normal_threshold,
+            const Element_map &element_map) :
+            m_mesh(mesh),
+            m_epsilon(epsilon),
+            m_normal_threshold(normal_threshold),
+            m_element_map(element_map)
+            { }
+
             /*!
                 Local conditions that check if a new face in `unassigned_element` is similar to the face `assigned_element` and its enclosing region `region`.
                 \tparam Region CGAL::Shape_detection::Region_growing::Region
             */
             template<class Region>
-            bool is_in_same_region(
+            bool are_in_same_region(
                                 const Element_with_properties &assigned_element,
                                 const Element_with_properties &unassigned_element,
                                 const Region &region) {
 
-                const Face &face = get(m_elem_map, unassigned_element);
+                const Face &face = get(m_element_map, unassigned_element);
 
                 Point_3 face_centroid;
                 get_centroid(face, face_centroid);
@@ -129,7 +137,7 @@ namespace CGAL {
                 \tparam Region CGAL::Shape_detection::Region_growing::Region
             */
             template<class Region>
-            inline bool is_valid(const Region &region) {
+            inline bool are_valid(const Region &region) {
                 
                 return region.size() > 0;
             }
@@ -139,12 +147,12 @@ namespace CGAL {
                 \tparam Region CGAL::Shape_detection::Region_growing::Region
             */
             template<class Region>
-            void update_shape(const Region &region) {
+            void update(const Region &region) {
 
                 CGAL_precondition(region.end() != region.begin());
                 if (region.size() == 1) {
                         
-                    const Face &face = get(m_elem_map, *region.begin());
+                    const Face &face = get(m_element_map, *region.begin());
 
                     Point_3 face_centroid;
                     get_centroid(face, face_centroid);
@@ -164,7 +172,7 @@ namespace CGAL {
 
                     // The region is formed by face indices.
                     for (auto rit = region.begin(); rit != region.end(); ++rit) {
-                        const Face &face = get(m_elem_map, *rit);
+                        const Face &face = get(m_element_map, *rit);
                             
                         // Get vertices of each face and push them to `points`.
                         Vertex_range vr = vertices_around_face(m_mesh.halfedge(face), m_mesh);
@@ -227,7 +235,7 @@ namespace CGAL {
             const FT                        m_normal_threshold;
 
             const Sqrt                      m_sqrt;
-            const Element_map               m_elem_map = Element_map();
+            const Element_map               m_element_map;
             const To_local_converter        m_to_local_converter;
             
             Local_plane_3                   m_plane_of_best_fit;

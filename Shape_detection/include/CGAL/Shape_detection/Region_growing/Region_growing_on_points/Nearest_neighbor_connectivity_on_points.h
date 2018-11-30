@@ -12,6 +12,9 @@
 #include <CGAL/Search_traits_adapter.h>
 #include <CGAL/Orthogonal_k_neighbor_search.h>
 
+// Todo:
+// Add clear function.
+
 namespace CGAL {
 
     namespace Shape_detection {
@@ -93,6 +96,15 @@ namespace CGAL {
                 m_tree.insert(m_input_range.begin(), m_input_range.end());
             }
 
+            Nearest_neighbor_connectivity_on_points(const Input_range &input_range, const size_t number_of_neighbors,
+            const Element_map &element_map) :
+            m_input_range(input_range),
+            m_number_of_neighbors(number_of_neighbors),
+            m_element_map(element_map) {
+            
+                m_tree.insert(m_input_range.begin(), m_input_range.end());
+            }
+
             /*!
                 The function takes a query point and return the K closest points around it. The result is stored in `neighbors`.
                 \tparam Neighbors CGAL::Shape_detection::Region_growing::Neighbors
@@ -101,7 +113,7 @@ namespace CGAL {
             void get_neighbors(const Element_with_properties &query, Neighbors &neighbors) {
 
                 neighbors.clear();
-                Neighbor_search search(m_tree, get(m_elem_map, query), m_number_of_neighbors);
+                Neighbor_search search(m_tree, get(m_element_map, query), m_number_of_neighbors);
                 for (auto it = search.begin(); it != search.end(); ++it)
                     neighbors.push_back(it->first);
             }
@@ -112,7 +124,7 @@ namespace CGAL {
             const Input_range       &m_input_range;
 
             const size_t             m_number_of_neighbors;
-            const Element_map        m_elem_map = Element_map();
+            const Element_map        m_element_map;
             Tree                     m_tree;
         };
 

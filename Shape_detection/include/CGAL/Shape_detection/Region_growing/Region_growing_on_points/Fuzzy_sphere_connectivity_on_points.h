@@ -13,6 +13,7 @@
 
 // Todo:
 // Add default values to the constructor.
+// Add clear function.
 
 namespace CGAL {
 
@@ -113,7 +114,6 @@ namespace CGAL {
             const Input_range       &m_input_range;
 
             const FT                m_radius;
-            const Element_map       m_elem_map = Element_map();
             Tree                    m_tree;
         };
 
