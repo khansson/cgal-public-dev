@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
     std::cout << std::endl << "region_growing_on_points_3 example started" << std::endl << std::endl;
     std::cout << "Note: if 0 points are loaded, please specify the path to the file data/points_3.xyz by hand!" << std::endl << std::endl;
 
-    // Load pwn data either from a local folder or a user-provided file.
+    // Load xyz data either from a local folder or a user-provided file.
     std::ifstream in(argc > 1 ? argv[1] : "../data/points_3.xyz");
     CGAL::set_ascii_mode(in);
 
@@ -114,10 +114,10 @@ int main(int argc, char *argv[]) {
     // Run the algorithm.
     region_growing.find_regions();
 
-    // Print the number of regions found.
+    // Print the number of found regions.
     std::cerr << "* " << region_growing.number_of_regions() << " regions have been found" << std::endl;
 
-    // Get the list of regions found.
+    // Get the list of found regions.
     const Regions &regions = region_growing.regions();
 
     Pwc_vector pwc;

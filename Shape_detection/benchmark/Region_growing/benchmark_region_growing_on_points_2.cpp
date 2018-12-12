@@ -1,81 +1,98 @@
-#include <iostream>
-#include <fstream>
-#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
-#include <CGAL/Region_growing.h>
-#include <CGAL/property_map.h>
-#include <CGAL/Iterator_range.h>
-#include <CGAL/IO/write_ply_points.h>
-#include <CGAL/Timer.h>
 
-using Kernel            = CGAL::Exact_predicates_inexact_constructions_kernel;
-using Point_2           = Kernel::Point_2;
-using Vector_2          = Kernel::Vector_2;
+// STL includes.
+#include <string>
+#include <vector>
+#include <utility>
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
+
+// CGAL includes.
+#include <CGAL/Timer.h>
+#include <CGAL/property_map.h>
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+
+#include <CGAL/Shape_detection/Region_growing/Region_growing.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_traits.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_points.h>
+
+using Kernel = CGAL::Exact_predicates_inexact_constructions_kernel;
+
+using FT       = typename Kernel::FT;
+using Point_2  = typename Kernel::Point_2;
+using Vector_2 = typename Kernel::Vector_2;
+
 using Point_with_normal = std::pair<Point_2, Vector_2>;
+using Input_range       = std::vector<Point_with_normal>;
 using Point_map         = CGAL::First_of_pair_property_map<Point_with_normal>;
 using Normal_map        = CGAL::Second_of_pair_property_map<Point_with_normal>;
-using Input_range       = CGAL::Iterator_range<std::vector<Point_with_normal>::iterator>;
 
-using Traits            = CGAL::Region_growing::Region_growing_traits<Input_range, Point_map, Kernel>;
-using Conditions        = CGAL::Region_growing::Region_growing_with_points::Points_conditions_2<Traits, Normal_map>;
-using Connectivity      = CGAL::Region_growing::Region_growing_with_points::Points_connectivity_circular_query<Traits>;
-using Region_growing    = CGAL::Region_growing::Generalized_region_growing<Traits, Connectivity, Conditions>;
+using Traits         = CGAL::Shape_detection::Region_growing_traits<Input_range, Point_map, Kernel>;
+using Connectivity   = CGAL::Shape_detection::Fuzzy_sphere_connectivity_on_points<Traits>;
+using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_points_2<Traits, Normal_map>;
+using Region_growing = CGAL::Shape_detection::Region_growing<Traits, Connectivity, Conditions>;
+using Regions        = typename Region_growing::Region_range;
 
-using Region_range      = Region_growing::Region_range;
+using Timer = CGAL::Timer;
 
-using Point_3           = Kernel::Point_3;
-using Color             = CGAL::cpp11::array<unsigned char, 3>;
-using Point_with_color  = std::pair<Point_3, Color>;
-using PLY_Point_map     = CGAL::First_of_pair_property_map<Point_with_color>;
-using PLY_Color_map     = CGAL::Second_of_pair_property_map<Point_with_color>;
+void benchmark_region_growing_on_points_2(const size_t test_count, const Input_range &input_range, 
+const FT search_radius, const FT max_distance_to_line, const FT normal_threshold, const size_t min_region_size) {
 
-using FT                = Kernel::FT;
-
-void benchmark_region_growing(const size_t test_count, const Input_range& input_range, const double radius, const size_t min_size, const double epsilon, const double normal_threshold) {
-
-    Connectivity connectivity(input_range, radius);
-    Conditions conditions(epsilon, normal_threshold, min_size);
+    // Create instances of the classes Connectivity and Conditions.
+    Connectivity connectivity(input_range, search_radius);
+    Conditions   conditions(max_distance_to_line, normal_threshold, min_region_size);
+    
+    // Create an instance of the region growing class.
     Region_growing region_growing(input_range, connectivity, conditions);
 
-    CGAL::Timer t;
-    t.start();
+    // Run the algorithm.
+    Timer timer;
+    timer.start();
     region_growing.find_regions();
-    t.stop();
+    timer.stop();
 
-    size_t number_of_points_assigned = 0;
-    Region_growing::Region_range regions = region_growing.regions();
+    // Compute the number of points assigned to all found regions.
+    size_t number_of_assigned_points = 0;
+    const Regions &regions = region_growing.regions();
 
-    for (Region_range::const_iterator it = regions.begin(); it != regions.end(); ++it) {
-        number_of_points_assigned += (*it).size();
-    }
+    for (auto region = regions.begin(); region != regions.end(); ++region)
+        number_of_assigned_points += region->size();
 
-    std::cout << "Test #" << test_count << ":\n";
-    std::cout << "  radius = " << radius << ";\n";
-    std::cout << "  min_size = " << min_size << ";\n";
-    std::cout << "  epsilon = " << epsilon << ";\n";
-    std::cout << "  normal_threshold = " << normal_threshold << ";\n";
-    std::cout << "  -----\n";
-    std::cout << "  Time elapsed: " << t.time() << '\n';
-    std::cout << "  Number of regions detected: " << region_growing.number_of_regions() << '\n';
-    std::cout << "  Number of points assigned: " << number_of_points_assigned << '\n';
-    std::cout << '\n';
+    // Print statistics.
+    std::cout << "Test #"                         << test_count                         << std::endl;
+    std::cout << "  search_radius = "             << search_radius                      << std::endl;
+    std::cout << "  min_region_size = "           << min_region_size                    << std::endl;
+    std::cout << "  max_distance_to_line = "      << max_distance_to_line               << std::endl;
+    std::cout << "  normal_threshold = "          << normal_threshold                   << std::endl;
+    std::cout << "  -----"                                                              << std::endl;
+    std::cout << "  Time elapsed: "               << timer.time()                       << std::endl;
+    std::cout << "  Number of detected regions: " << region_growing.number_of_regions() << std::endl;
+    std::cout << "  Number of assigned points: "  << number_of_assigned_points          << std::endl;
+    std::cout << std::endl << std::endl;
 }
 
 int main(int argc, char *argv[]) {
-    std::ifstream in(argc > 1 ? argv[1] : "../data/inputbig_2.xyz");
+    
+    // Load xyz data either from a local folder or a user-provided file.
+    std::ifstream in(argc > 1 ? argv[1] : "../data/points_2.xyz");
     CGAL::set_ascii_mode(in);
 
-    std::vector<Point_with_normal > pwn;
-    double a,b,c,d,e,f;
-    int i = 0;
-    while (in >> a >> b >> c >> d >> e >> f) {
-        pwn.push_back(std::make_pair(Point_2(a, b), Vector_2(d, e)));
-        ++i;
-    }
+    Input_range input_range;
+    FT a, b, c, d, e, f;
 
-    Input_range input_range(pwn.begin(), pwn.end());
+    while (in >> a >> b >> c >> d >> e >> f) 
+        input_range.push_back(std::make_pair(Point_2(a, b), Vector_2(d, e)));
 
-    benchmark_region_growing(1, input_range, 1, 5, 4.5, 0.7);
-    benchmark_region_growing(2, input_range, 3, 5, 4.5, 0.7);
-    benchmark_region_growing(3, input_range, 6, 5, 4.5, 0.7);
-    benchmark_region_growing(4, input_range, 9, 5, 4.5, 0.7);
+    in.close();
+
+    // Parameters.
+    const FT     max_distance_to_line = FT(45) / FT(10);
+    const FT     normal_threshold     = FT(7)  / FT(10);
+    const size_t min_region_size      = 5;
+
+    // Run benchmarks.
+    benchmark_region_growing_on_points_2(1, input_range, FT(1), max_distance_to_line, normal_threshold, min_region_size);
+    benchmark_region_growing_on_points_2(2, input_range, FT(3), max_distance_to_line, normal_threshold, min_region_size);
+    benchmark_region_growing_on_points_2(3, input_range, FT(6), max_distance_to_line, normal_threshold, min_region_size);
+    benchmark_region_growing_on_points_2(4, input_range, FT(9), max_distance_to_line, normal_threshold, min_region_size);
 }

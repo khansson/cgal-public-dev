@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
     // Run the algorithm.
     region_growing.find_regions();
 
-    // Print the number of regions found.
+    // Print the number of found regions.
     std::cerr << "* " << region_growing.number_of_regions() << " regions have been found" << std::endl;
 
     std::cout << std::endl << "region_growing_on_surface_mesh example finished" << std::endl << std::endl;

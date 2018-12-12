@@ -1,56 +1,62 @@
-# Generate the benchmark table in the user manual
+# This code generates the benchmark table in the user manual.
 
-First, compile the file `benchmark_region_growing_with_points_2.cpp` using the provided cmake file:
+First, compile the file `benchmark_region_growing_on_points_2.cpp` using the provided cmake file:
 
 ```bash
 $ cd /path/to/build/directory
-$ cmake -DCGAL_DIR=/path/to/cgal/release/build -DCMAKE_BUILD_TYPE=Release /path/to/benchmark/Generalized_region_growing
-$ make benchmark_region_growing_with_points_2 # Compile
+$ cmake -DCGAL_DIR=/path/to/cgal/release/build -DCMAKE_BUILD_TYPE=Release /path/to/benchmark/Region_growing
+$ make benchmark_region_growing_on_points_2
 ```
 
-The program uses data file `data/inputbig_2.xyz`, run the benchmark program as follows:
+The program uses the data file `data/points_2.xyz`, run the benchmark program as follows:
 
 ```bash
-$ ./benchmark_region_growing_with_points_2 /path/to/data/inputbig_2.xyz
+$ ./benchmark_region_growing_on_points_2 /path/to/data/points_2.xyz
 ```
 
-Result:
+Results:
 
 ```
-Test #1:
-  radius = 1;
-  min_size = 5;
-  epsilon = 4.5;
-  normal_threshold = 0.7;
+Test #1
+  search_radius = 1
+  min_region_size = 5
+  max_distance_to_line = 4.5
+  normal_threshold = 0.7
   -----
-  Time elapsed: 0.350881
-  Number of regions detected: 796
-  Number of points assigned: 4491
-Test #2:
-  radius = 3;
-  min_size = 5;
-  epsilon = 4.5;
-  normal_threshold = 0.7;
+  Time elapsed: 0.243534
+  Number of detected regions: 796
+  Number of assigned points: 4491
+
+
+Test #2
+  search_radius = 3
+  min_region_size = 5
+  max_distance_to_line = 4.5
+  normal_threshold = 0.7
   -----
-  Time elapsed: 0.306144
-  Number of regions detected: 3054
-  Number of points assigned: 63154
-Test #3:
-  radius = 6;
-  min_size = 5;
-  epsilon = 4.5;
-  normal_threshold = 0.7;
+  Time elapsed: 0.219941
+  Number of detected regions: 3054
+  Number of assigned points: 63154
+
+
+Test #3
+  search_radius = 6
+  min_region_size = 5
+  max_distance_to_line = 4.5
+  normal_threshold = 0.7
   -----
-  Time elapsed: 0.435842
-  Number of regions detected: 2483
-  Number of points assigned: 64977
-Test #4:
-  radius = 9;
-  min_size = 5;
-  epsilon = 4.5;
-  normal_threshold = 0.7;
+  Time elapsed: 0.321682
+  Number of detected regions: 2483
+  Number of assigned points: 64977
+
+
+Test #4
+  search_radius = 9
+  min_region_size = 5
+  max_distance_to_line = 4.5
+  normal_threshold = 0.7
   -----
-  Time elapsed: 0.650403
-  Number of regions detected: 2282
-  Number of points assigned: 65353
+  Time elapsed: 0.466346
+  Number of detected regions: 2282
+  Number of assigned points: 65353
 ```
