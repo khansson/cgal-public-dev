@@ -2,21 +2,11 @@
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_H
 
 // STL includes.
-#include <map>
-#include <list>
 #include <queue>
+#include <vector>
 
 // CGAL includes.
 #include <CGAL/Iterator_range.h>
-
-// Todo:
-// Reduce to one queue? - no, because we have to know when we need to update the shape.
-// Can we improve m_visited? If we can, we could possibly remove m_elem_map, too. Yes, we can use m_visited[i], where
-// i is the index coming from the loop (m_input_range.begin() ... m_input_range.end(), ++it, ++i). In that case, we can use unordered_map, too.
-// In that case, we also use get(m_input_range.point_map(), *(m_input_range.begin() + i)) to get an element.
-// Element_with_properties neighbor = *it; and Element_with_properties ewp = ewp_queue[depth_index].front(); - add const and reference.
-// Add access to all unclassified elements.
-// Add a clear function.
 
 namespace CGAL {
 
@@ -25,46 +15,46 @@ namespace CGAL {
         /*!
             \ingroup PkgShapeDetection
             \brief Region growing algorithm
-            \tparam RegionGrowingTraits `CGAL::Shape_detection::Region_growing_traits`
+            \tparam InputRange An arbitrary range with user-defined items.
             \tparam Connectivity Model of `RegionGrowingConnectivity`
             \tparam Conditions Model of `RegionGrowingPropagationConditions`
         */
-        template<class RegionGrowingTraits, class Connectivity, class Conditions>
+        template<class InputRange, class Connectivity, class Conditions>
         class Region_growing {
 
         public:
 
-            using Region_growing_traits   = RegionGrowingTraits;
-            ///< Type storing region growing traits.
-
-            using Input_range             = typename Region_growing_traits::Input_range;
-            ///< Type storing user-defined elements.
-
-            using Element                 = typename Region_growing_traits::Element;
-            ///< The primary geometric element on which the region growing algorithm will run
-            ///< The operator '<' must be defined for Element so that `std::map<Element>` can be used.
+            using Input_range             = InputRange;
+            ///< An arbitrary range with user-defined items. The range must implement the function size().
             
-            using Element_map             = typename Region_growing_traits::Element_map;
-            ///< An `LvaluePropertyMap` that maps to type `CGAL::Shape_detection::Region_growing::Element`.
-            
-            using Element_with_properties = typename Element_map::key_type;
-            ///< Value type of the iterator in the input range.
-
-            using Neighbors               = std::list<Element_with_properties>;
-            ///< Type storing items, used in `RegionGrowingConnectivity::get_neighbors()`.
-
-            using Region                  = std::list<Element_with_properties>;
-            ///< Type storing items that represent a region.
-
-            using Regions                 = std::list<Region>;
-            ///< Type storing regions.
-
-            using Region_range            = CGAL::Iterator_range<typename Regions::const_iterator>;
-            ///< An `Iterator_range` of iterators in `CGAL::Shape_detection::Region_growing::Regions`.
+            using Item_index              = std::size_t;
+            ///< Index of a given item.
 
             ///< \cond SKIP_IN_MANUAL
-            using Visited_map             = std::map<Element, bool>;
+            using Visited_items           = std::vector<bool>;
+
+            using Running_queue           = std::queue<Item_index>;
+
+            using Items                   = std::vector<Item_index>;
             ///< \endcond
+
+            using Neighbors               = Items;
+            ///< Indices of the neighbors of the given item that should be returned by the call to the function `RegionGrowingConnectivity::get_neighbors()`.
+
+            using Region                  = Items;
+            ///< A random access container with indices of all items that belong to a region.
+
+            using Regions                 = std::vector<Region>;
+            ///< All found regions.
+
+            using Region_range            = CGAL::Iterator_range<typename Regions::const_iterator>;
+            ///< An `Iterator_range` of the iterators in `CGAL::Shape_detection::Region_growing::Regions`.
+
+            using Unclassified_items      = Items;
+            ///< A random access container with indices of all unclassified items.
+
+            using Unclassified_range      = CGAL::Iterator_range<typename Unclassified_items::const_iterator>;
+            ///< An `Iterator_range` of the iterators in `CGAL::Shape_detection::Region_growing::Unclassified_items`. Here, we store indices of all unclassified items.
 
             /*!
                 The constructor requires an input range and instances of the Connectivity class and Conditions class.
@@ -72,101 +62,121 @@ namespace CGAL {
             Region_growing(const Input_range &input_range, Connectivity &connectivity, Conditions &conditions) :
                 m_input_range(input_range),
                 m_connectivity(connectivity),
-                m_conditions(conditions) 
-                { }
-
-            Region_growing(const Input_range &input_range, Connectivity &connectivity, Conditions &conditions, 
-            const Element_map &element_map) :
-                m_input_range(input_range),
-                m_connectivity(connectivity),
-                m_conditions(conditions),
-                m_element_map(element_map)
+                m_conditions(conditions)
                 { }
 
             /*!
-                Perform the region growing algorithm over the input range, using the Connectivity class to find neighbors and the PropagationConditions class to validate elements and regions.
+                Perform the region growing algorithm over the input range, using the Connectivity class to find neighbors and the Conditions class to validate regions.
             */
-            void find_regions() {
+            void detect() {
 
-                m_regions.clear();
+                clear();
                 Region region;
 
-                for (auto it = m_input_range.begin(); it != m_input_range.end(); ++it) {
-                    if (!m_visited[get(m_element_map, *it)]) { // element is available
-
-                        // Grow a region from that element.
-                        region.clear();
-                        grow_region(*it, region);
+                for (Item_index seed_index = 0; seed_index < m_input_range.size(); ++seed_index) {
+                    
+                    // Try to grow a new region from the seed item.
+                    if (!m_visited[seed_index]) {
+                        propagate(seed_index, region);
 
                         // Check global conditions.
-                        if (!m_conditions.are_valid(region)) revert(region);
-                        else m_regions.push_back(region);
+                        if (!m_conditions.are_valid(region)) 
+                            revert(region);
+                        else 
+                            m_regions.push_back(region);
                     }
                 }
-                m_output = Region_range(m_regions.begin(), m_regions.end());
+                m_output_regions = Region_range(m_regions.begin(), m_regions.end());
+
+                // Return unclassified items.
+                for (Item_index item_index = 0; item_index < m_input_range.size(); ++item_index)
+                    if (!m_visited[item_index]) m_unclassified.push_back(item_index);
+
+                m_output_unclassified = Unclassified_range(m_unclassified.begin(), m_unclassified.end());
             }
 
             /*!
-                Return a pair of begin iterator and pass-the-end iterator of the list of regions found. If `CGAL::Shape_detection::Region_growing::find_regions()` has not been called, 
-                the first and second of the pair will be the same, which implies an empty list.
+                Return a pair of begin iterator and pass-the-end iterator of the container with found regions. If the function `CGAL::Shape_detection::Region_growing::detect()` has not been called,
+                the first and second of the pair will be the same, which implies an empty container.
             */
             const Region_range &regions() {
-                return m_output;
+                return m_output_regions;
+            }
+
+            const Unclassified_range &unclassified_items() {
+                return m_output_unclassified;
             }
 
             /*!
-                Return the number of regions found.
+                Return the number of found regions.
             */
             size_t number_of_regions() {
                 return m_regions.size();
             }
 
+            /*!
+                Return the number of unclassified items.
+            */
+            size_t number_of_unclassified_items() {
+                return m_unclassified.size();
+            }
+
+            /*!
+                Clear all internal data structures.
+            */
+            void clear() {
+                
+                m_visited.clear();
+                m_regions.clear();
+
+                m_unclassified.clear();
+                m_visited.resize(m_input_range.size(), false);
+            }
+
         private:
 
-            // Functions.
-            void grow_region(const Element_with_properties &seed, Region &region) {
+            void propagate(const Item_index seed_index, Region &region) {
                 region.clear();
 
                 // Use two queues, while running on this queue, push to the other queue;
                 // When the queue is done, update the shape of the current region and swap to the other queue;
-                // depth_index is the index of the queue we're using.
-                std::queue<Element_with_properties> ewp_queue[2];
+                // depth_index is the index of the queue we are using.
+                Running_queue running_queue[2];
                 bool depth_index = 0;
 
-                // Once an element is pushed to the queue, it is pushed to the region too.
-                ewp_queue[depth_index].push(seed);
-                m_visited[get(m_element_map, seed)] = true;
-                region.push_back(seed);
+                // Once an item is pushed to the queue, it is pushed to the region too.
+                m_visited[seed_index] = true;
+                running_queue[depth_index].push(seed_index);
+                region.push_back(seed_index);
 
-                // Update internal properties of the growing shape if needed.
+                // Update internal properties of the propagating region.
                 m_conditions.update(region);
 
-                while (!ewp_queue[depth_index].empty() || !ewp_queue[!depth_index].empty()) {
+                while (!running_queue[depth_index].empty() || !running_queue[!depth_index].empty()) {
 
-                    // Call the next element of the queue and remove it from the queue
-                    // but the element is not removed from the region.
-                    Element_with_properties ewp = ewp_queue[depth_index].front();
-                    ewp_queue[depth_index].pop();
+                    // Call the next item of the queue and remove it from the queue.
+                    const Item_index item_index = running_queue[depth_index].front();
+                    running_queue[depth_index].pop();
 
-                    // Get neighbors.
+                    // Get neighbors of the current item.
                     Neighbors neighbors;
-                    m_connectivity.get_neighbors(ewp, neighbors);
+                    m_connectivity.get_neighbors(item_index, neighbors);
 
                     // Visit the neighbors.
-                    for (auto it = neighbors.begin(); it != neighbors.end(); ++it) {
-                        Element_with_properties neighbor = *it;
+                    for (Item_index i = 0; i < neighbors.size(); ++i) {
+                        const Item_index neighbor_index = neighbors[i];
+                        
+                        if (!m_visited[neighbor_index] && m_conditions.belongs_to_region(neighbor_index, region)) {
 
-                        if (!m_visited[get(m_element_map, neighbor)] && m_conditions.are_in_same_region(ewp, neighbor, region)) {
-
-                            // Add to the other queue the neighbor which doesn't belong to any regions
-                            // so that we can visit them later.
-                            ewp_queue[!depth_index].push(neighbor);
-                            region.push_back(neighbor);
-                            m_visited[get(m_element_map, neighbor)] = true;
+                            // Add this neighbor to the other queue so that we can visit it later.
+                            m_visited[neighbor_index] = true;
+                            running_queue[!depth_index].push(neighbor_index);
+                            region.push_back(neighbor_index);
                         }
                     }
 
-                    if (ewp_queue[depth_index].empty()) {
+                    // Update internal properties of the propagating region.
+                    if (running_queue[depth_index].empty()) {
 
                         m_conditions.update(region);
                         depth_index = !depth_index;
@@ -175,19 +185,22 @@ namespace CGAL {
             }
 
             void revert(const Region &region) {
-                for (auto it = region.begin(); it != region.end(); ++it)
-                    m_visited[get(m_element_map, *it)] = false;
+
+                for (Item_index i = 0; i < region.size(); ++i)
+                    m_visited[region[i]] = false;
             }
 
             // Fields.
             const Input_range       &m_input_range;
             Connectivity            &m_connectivity;
             Conditions              &m_conditions;
-            
-            Element_map              m_element_map;
-            Regions                  m_regions;
-            Visited_map              m_visited;
-            Region_range             m_output = Region_range(m_regions.begin(), m_regions.end());
+
+            Visited_items           m_visited;
+            Regions                 m_regions;
+            Unclassified_items      m_unclassified;
+
+            Region_range            m_output_regions      = Region_range(m_regions.begin(), m_regions.end());
+            Unclassified_range      m_output_unclassified = Unclassified_range(m_unclassified.begin(), m_unclassified.end());
         };
 
     } // namespace Shape_detection

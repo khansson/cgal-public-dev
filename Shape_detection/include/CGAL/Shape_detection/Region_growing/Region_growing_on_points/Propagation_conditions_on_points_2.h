@@ -100,14 +100,14 @@ namespace CGAL {
                 Local conditions that check if a new point in `unassigned_element` is similar to the point `assigned_element` and its enclosing region. Each item in `Region` has the same structure as in the input range, i.e. has the type `Element_with_properties`.
                 \tparam Region CGAL::Shape_detection::Region_growing::Region
             */
-            template<class Region>
+            template<class Input_element, class Region>
             bool are_in_same_region(
-                                const Element_with_properties &assigned_element,
-                                const Element_with_properties &unassigned_element,
+                                const Input_element &assigned_element,
+                                const Input_element &unassigned_element,
                                 const Region &region) {
 
-                const Point_2  &point_unassigned = get(m_element_map, unassigned_element);
-                const Vector_2 &normal           = get(m_normal_map , unassigned_element);
+                const Point_2  &point_unassigned = get(m_element_map, *unassigned_element);
+                const Vector_2 &normal           = get(m_normal_map , *unassigned_element);
 
                 const FT normal_length     = m_sqrt(normal.squared_length());
                 Vector_2 normal_unassigned = normal / normal_length;
@@ -144,8 +144,8 @@ namespace CGAL {
                 if (region.size() == 1) {
                     
                     // The best fit line will be a line through this point with its normal being the point's normal.
-                    const Point_2  &point  = get(m_element_map, *region.begin());
-                    const Vector_2 &normal = get(m_normal_map , *region.begin());
+                    const Point_2  &point  = get(m_element_map, **region.begin());
+                    const Vector_2 &normal = get(m_normal_map , **region.begin());
                     
                     const FT normal_length = m_sqrt(normal.squared_length());
 
@@ -159,7 +159,7 @@ namespace CGAL {
                     std::vector<Local_point_2> points(region.size());
 
                     for (auto it = region.begin(); it != region.end(); ++it, ++i)
-                        points[i] = m_to_local_converter(get(m_element_map, *it));
+                        points[i] = m_to_local_converter(get(m_element_map, **it));
 
                     // Fit the region to a line.
                     Local_point_2 centroid;
