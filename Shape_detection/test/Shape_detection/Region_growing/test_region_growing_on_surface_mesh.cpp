@@ -73,7 +73,7 @@ bool test_region_growing_on_surface_mesh() {
 
     // Run region growing.
     Region_growing region_growing(input_range, connectivity, conditions);
-    region_growing.find_regions();
+    region_growing.detect();
 
     const Regions &regions = region_growing.regions();
 

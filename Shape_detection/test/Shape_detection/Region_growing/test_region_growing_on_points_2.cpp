@@ -61,7 +61,7 @@ bool test_region_growing_on_points_2(int argc, char *argv[]) {
 
     // Run region growing.
     Region_growing region_growing(input_range, connectivity, conditions);
-    region_growing.find_regions();
+    region_growing.detect();
 
     const Regions &regions = region_growing.regions();
 

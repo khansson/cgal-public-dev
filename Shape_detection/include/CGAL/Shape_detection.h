@@ -31,17 +31,9 @@
 
 #include <CGAL/license/Shape_detection.h>
 
-#include <CGAL/Shape_detection/RANSAC_on_points_3/Efficient_RANSAC_traits.h>
-#include <CGAL/Shape_detection/RANSAC_on_points_3/Efficient_RANSAC.h>
-#include <CGAL/Shape_detection/RANSAC_on_points_3/Octree.h>
-#include <CGAL/Shape_detection/RANSAC_on_points_3/Primitives.h>
-#include <CGAL/Shape_detection/RANSAC_on_points_3/Property_maps.h>
+#include <CGAL/Shape_detection/Region_growing.h>
+#include <CGAL/Shape_detection/Efficient_RANSAC.h>
 
-#include <CGAL/Region_growing/Region_growing.h>
-#include <CGAL/Region_growing/Region_growing_traits.h>
-#include <CGAL/Region_growing/Region_growing_on_points.h>
-#include <CGAL/Region_growing/Region_growing_on_surface_mesh.h>
-
-#include <CGAL/Shape_detection/regularize_planes.h>
+#include <CGAL/regularize_planes.h>
 
 #endif // CGAL_SHAPE_DETECTION_H
