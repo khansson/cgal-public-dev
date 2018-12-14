@@ -5,18 +5,15 @@
 #include <vector>
 
 // CGAL includes.
+#include <CGAL/assertions.h>
 #include <CGAL/number_utils.h>
-#include <CGAL/squared_distance_2.h>
 #include <CGAL/Cartesian_converter.h>
 #include <CGAL/linear_least_squares_fitting_2.h>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 
-// Todo:
-// Add default values to the constructor. Also specify preconditions on these parameters.
-// Change global CGAL functions like squared_distance to their counterparts from the Kernel.
-// Change m_line_of_best_fit and m_normal_of_best_fit to the FT type? - Does it actually work with exact Kernel?
-// Add const to normal_unassigned.
-// Add const to normal.
+// Local includes.
+#include <CGAL/Shape_detection/Region_growing/Tools/Sqrt.h>
+#include <CGAL/Shape_detection/Region_growing/Tools/Default_item_index_to_item_property_map.h>
 
 namespace CGAL {
 
@@ -25,101 +22,117 @@ namespace CGAL {
         /*! 
             \ingroup PkgShapeDetection
             \brief Local and global conditions for the region growing algorithm on a 2D point cloud.
-            \tparam RegionGrowingTraits CGAL::Shape_detection::Region_growing_traits
-            \tparam NormalMap An `LvaluePropertyMap` that maps to a vector, representing the normal associated with the point.
+            \tparam PointMap An `LvaluePropertyMap` that maps to `Point_2`.
+            \tparam NormalMap An `LvaluePropertyMap` that maps to `Vector_2`.
+            \tparam Traits Model of `RegionGrowingOnPointsTraits`
             \cgalModels `RegionGrowingPropagationConditions`
         */
-        template<class RegionGrowingTraits, class NormalMap>
+        template<class InputRange, class PointMap, class NormalMap, class Traits, 
+        class ItemIndexToItemMap = CGAL::Shape_detection::Default_item_index_to_item_property_map<InputRange> >
         class Propagation_conditions_on_points_2 {
-
-            // Sqrt object.
-            template<class ...>
-            using void_t = void;
-
-            template<class Kernel, class = void>
-            class Get_sqrt {
-                using FT = typename Kernel::FT;
-            public:
-                FT operator()(const FT value) const {
-                    return static_cast<FT>(CGAL::sqrt(CGAL::to_double(value)));
-                }
-            };
-
-            template<class Kernel>
-            class Get_sqrt<Kernel, void_t<typename Kernel::Sqrt> > : 
-            Kernel::Sqrt 
-            { };
 
         public:
 
-            using Kernel = typename RegionGrowingTraits::Kernel;
-            
-            using Normal_map = NormalMap;
-            
-            using Element_map = typename RegionGrowingTraits::Element_map;
+            using Input_range            = InputRange;
+            ///< An arbitrary range with user-defined items.
 
-            using Element_with_properties = typename Element_map::key_type;
-            ///< Value type of the iterator in the input range.
+            using Point_map              = PointMap;
+            ///< An `LvaluePropertyMap` that maps to `Point_2`.
 
-            using FT       = typename Kernel::FT;       ///< Number type
-            using Point_2  = typename Kernel::Point_2;  ///< Point type
-            using Vector_2 = typename Kernel::Vector_2; ///< Vector type
-            using Line_2   = typename Kernel::Line_2;   ///< Line type
+            using Normal_map             = NormalMap;
+            ///< An `LvaluePropertyMap` that maps to `Vector_2`.
+
+            using Item_index_to_item_map = ItemIndexToItemMap;
+            ///< An `LvaluePropertyMap` that maps to an arbitrary item.
+
+            using FT                     = typename Traits::FT;       ///< Number type
+            using Point_2                = typename Traits::Point_2;  ///< Point type
+            using Vector_2               = typename Traits::Vector_2; ///< Vector type
+            using Line_2                 = typename Traits::Line_2;   ///< Line type
 
             ///< \cond SKIP_IN_MANUAL
-            using Sqrt               = Get_sqrt<Kernel>;
-            using Local_kernel       = Exact_predicates_inexact_constructions_kernel;
-            using Local_FT           = typename Local_kernel::FT;
-            using Local_point_2      = typename Local_kernel::Point_2;
-            using Local_vector_2     = typename Local_kernel::Vector_2;
-            using Local_line_2       = typename Local_kernel::Line_2;
-            using To_local_converter = Cartesian_converter<Kernel, Local_kernel>;
+            using Local_traits           = Exact_predicates_inexact_constructions_kernel;
+            using Local_FT               = typename Local_traits::FT;
+            using Local_point_2          = typename Local_traits::Point_2;
+            using Local_line_2           = typename Local_traits::Line_2;
+            using To_local_converter     = Cartesian_converter<Traits, Local_traits>;
+
+            using Squared_length_2       = typename Traits::Compute_squared_length_2;
+            using Squared_distance_2     = typename Traits::Compute_squared_distance_2;
+            using Scalar_product_2       = typename Traits::Compute_scalar_product_2;
+
+            using Get_sqrt               = CGAL::Shape_detection::Get_sqrt<Traits>;
+            using Sqrt                   = typename Get_sqrt::Sqrt;
+
+            using Item_index             = std::size_t;
             ///< \endcond
 
             /*!
-                Each region is represented by a line. The constructor requires three parameters, in order: the maximum distance from a point to the region, the minimum dot product between the normal associated with the point and the normal of the region, and the minimum number of points a region must have.
+                Each region is represented by a line. The constructor requires three parameters, in order: 
+                the maximum distance from a point to the region, 
+                the minimum dot product between the normal associated with the point and the normal of the region, 
+                and the minimum number of points a region must have.
+                In addition, you can provide instances of the Point_map, Normal_map, and Traits classes.
             */
-            Propagation_conditions_on_points_2(const FT epsilon, const FT normal_threshold, const size_t min_region_size) :
-            m_epsilon(epsilon),
+            Propagation_conditions_on_points_2(const Input_range &input_range, 
+            const FT distance_threshold = FT(1), const FT normal_threshold = FT(9) / FT(10), const size_t min_region_size = 2, 
+            const Point_map &point_map = PointMap(), const Normal_map &normal_map = Normal_map(), const Traits &traits = Traits()) : 
+            m_item_index_to_item_map(input_range),
+            m_distance_threshold(distance_threshold),
             m_normal_threshold(normal_threshold),
             m_min_region_size(min_region_size),
-            m_sqrt(Sqrt()) 
-            { }
+            m_point_map(point_map),
+            m_normal_map(normal_map),
+            m_squared_length_2(traits.compute_squared_length_2_object()),
+            m_squared_distance_2(traits.compute_squared_distance_2_object()),
+            m_scalar_product_2(traits.compute_scalar_product_2_object()),
+            m_sqrt(Get_sqrt::sqrt_object(traits)) {
 
-            Propagation_conditions_on_points_2(const FT epsilon, const FT normal_threshold, const size_t min_region_size,
-            const Element_map &element_map, const Normal_map &normal_map) :
-            m_epsilon(epsilon),
+                CGAL_precondition(distance_threshold >= FT(0));
+                CGAL_precondition(normal_threshold   >= FT(0) && normal_threshold <= FT(1));
+                CGAL_precondition(min_region_size    > 1);
+            }        
+
+            Propagation_conditions_on_points_2(const Input_range &, const Item_index_to_item_map &item_index_to_item_map, 
+            const FT distance_threshold = FT(1), const FT normal_threshold = FT(9) / FT(10), const size_t min_region_size = 2, 
+            const Point_map &point_map = PointMap(), const Normal_map &normal_map = Normal_map(), const Traits &traits = Traits()) :
+            m_item_index_to_item_map(item_index_to_item_map),
+            m_distance_threshold(distance_threshold),
             m_normal_threshold(normal_threshold),
             m_min_region_size(min_region_size),
-            m_sqrt(Sqrt()),
-            m_element_map(element_map),
-            m_normal_map(normal_map)
-            { }
+            m_point_map(point_map),
+            m_normal_map(normal_map),
+            m_squared_length_2(traits.compute_squared_length_2_object()),
+            m_squared_distance_2(traits.compute_squared_distance_2_object()),
+            m_scalar_product_2(traits.compute_scalar_product_2_object()),
+            m_sqrt(Get_sqrt::sqrt_object(traits)) { 
+
+                CGAL_precondition(distance_threshold >= FT(0));
+                CGAL_precondition(normal_threshold   >= FT(0) && normal_threshold <= FT(1));
+                CGAL_precondition(min_region_size    > 1);
+            }
 
             /*!
-                Local conditions that check if a new point in `unassigned_element` is similar to the point `assigned_element` and its enclosing region. Each item in `Region` has the same structure as in the input range, i.e. has the type `Element_with_properties`.
+                Local conditions that check if a query item belongs to the given region.
                 \tparam Region CGAL::Shape_detection::Region_growing::Region
             */
-            template<class Input_element, class Region>
-            bool are_in_same_region(
-                                const Input_element &assigned_element,
-                                const Input_element &unassigned_element,
-                                const Region &region) {
+            template<class Region>
+            bool belongs_to_region(const Item_index query_index, const Region &region) const {
 
-                const Point_2  &point_unassigned = get(m_element_map, *unassigned_element);
-                const Vector_2 &normal           = get(m_normal_map , *unassigned_element);
+                const auto &query_item = get(m_item_index_to_item_map, query_index);
 
-                const FT normal_length     = m_sqrt(normal.squared_length());
-                Vector_2 normal_unassigned = normal / normal_length;
+                const Point_2  &query_point = get(m_point_map , *query_item);
+                const Vector_2 &normal      = get(m_normal_map, *query_item);
 
-                // Must use Local_FT, because fit line is of local kernel.
-                const Local_FT distance_to_fit_line = CGAL::sqrt(CGAL::squared_distance(m_to_local_converter(point_unassigned), m_line_of_best_fit));
-                const Local_FT cos_angle            = CGAL::abs(m_to_local_converter(normal_unassigned) * m_normal_of_best_fit);
+                const FT normal_length = m_sqrt(m_squared_length_2(normal));
+                CGAL_precondition(normal_length > FT(0));
 
-                CGAL_precondition(m_epsilon >= FT(0));
-                CGAL_precondition(m_normal_threshold >= FT(0) && m_normal_threshold <= FT(1));
+                const Vector_2 query_normal = normal / normal_length;
 
-                return ( ( distance_to_fit_line <= m_to_local_converter(m_epsilon) ) && ( cos_angle >= m_to_local_converter(m_normal_threshold) ) );
+                const FT distance_to_fitted_line = m_sqrt(m_squared_distance_2( query_point , m_line_of_best_fit));
+                const FT cos_angle               = CGAL::abs(m_scalar_product_2(query_normal, m_normal_of_best_fit));
+
+                return ( ( distance_to_fitted_line <= m_distance_threshold ) && ( cos_angle >= m_normal_threshold ) );
             }
 
             /*!
@@ -128,8 +141,6 @@ namespace CGAL {
             */
             template<class Region>
             inline bool are_valid(const Region &region) const {
-
-                CGAL_precondition(m_min_region_size >= 2);
                 return ( region.size() >= m_min_region_size );
             }
 
@@ -140,40 +151,57 @@ namespace CGAL {
             template<class Region>
             void update(const Region &region) {
 
-                CGAL_precondition(region.end() != region.begin());
-                if (region.size() == 1) {
+                CGAL_precondition(region.size() > 0);
+                if (region.size() == 1) { // create new reference line and normal
                     
                     // The best fit line will be a line through this point with its normal being the point's normal.
-                    const Point_2  &point  = get(m_element_map, **region.begin());
-                    const Vector_2 &normal = get(m_normal_map , **region.begin());
+                    const auto &item = get(m_item_index_to_item_map, region[0]);
+
+                    const Point_2  &point  = get(m_point_map , *item);
+                    const Vector_2 &normal = get(m_normal_map, *item);
                     
-                    const FT normal_length = m_sqrt(normal.squared_length());
+                    const FT normal_length = m_sqrt(m_squared_length_2(normal));
+                    CGAL_precondition(normal_length > FT(0));
 
-                    m_line_of_best_fit   = m_to_local_converter(Line_2(point, normal).perpendicular(point));
-                    m_normal_of_best_fit = m_to_local_converter(normal / normal_length);
+                    m_line_of_best_fit   = Line_2(point, normal).perpendicular(point);
+                    m_normal_of_best_fit = normal / normal_length;
 
-                } else {
+                } else { // update reference line and normal
 
-                    // Extract the geometric Element (Point_2).
-                    size_t i = 0;
+                    Local_FT x = Local_FT(0);
+                    Local_FT y = Local_FT(0);
+
                     std::vector<Local_point_2> points(region.size());
+                    for (Item_index i = 0; i < region.size(); ++i) {
 
-                    for (auto it = region.begin(); it != region.end(); ++it, ++i)
-                        points[i] = m_to_local_converter(get(m_element_map, **it));
+                        const auto &item = get(m_item_index_to_item_map, region[i]);
+                        points[i] = m_to_local_converter(get(m_point_map, *item));
 
-                    // Fit the region to a line.
-                    Local_point_2 centroid;
+                        x += points[i].x();
+                        y += points[i].y();
+                    }
 
+                    CGAL_precondition(points.size()> 0);
+
+                    x /= static_cast<Local_FT>(points.size());
+                    y /= static_cast<Local_FT>(points.size());
+
+                    Local_line_2  fitted_line;
+                    Local_point_2 fitted_centroid = Local_point_2(x, y);
+
+                    // The best fit line will be a line fitted to all region points with its normal being perpendicular to the line.
                     #ifndef CGAL_EIGEN2_ENABLED
-                        linear_least_squares_fitting_2(points.begin(), points.end(), m_line_of_best_fit, centroid, CGAL::Dimension_tag<0>(), Local_kernel(), CGAL::Default_diagonalize_traits<Local_FT, 2>());
+                        linear_least_squares_fitting_2(points.begin(), points.end(), fitted_line, fitted_centroid, CGAL::Dimension_tag<0>(), Local_traits(), CGAL::Default_diagonalize_traits<Local_FT, 2>());
                     #else 
-                        linear_least_squares_fitting_2(points.begin(), points.end(), m_line_of_best_fit, centroid, CGAL::Dimension_tag<0>(), Local_kernel(), CGAL::Eigen_diagonalize_traits<Local_FT, 2>());
+                        linear_least_squares_fitting_2(points.begin(), points.end(), fitted_line, fitted_centroid, CGAL::Dimension_tag<0>(), Local_traits(), CGAL::Eigen_diagonalize_traits<Local_FT, 2>());
                     #endif
-
-                    Local_vector_2 normal = m_line_of_best_fit.perpendicular(m_line_of_best_fit.point(0)).to_vector();
                     
-                    const Local_FT normal_length = CGAL::sqrt(normal.squared_length());
+                    m_line_of_best_fit = Line_2(static_cast<FT>(fitted_line.a()), static_cast<FT>(fitted_line.b()), static_cast<FT>(fitted_line.c()));
+                    
+                    const Vector_2 normal  = m_line_of_best_fit.perpendicular(m_line_of_best_fit.point(0)).to_vector();
+                    const FT normal_length = m_sqrt(m_squared_length_2(normal));
 
+                    CGAL_precondition(normal_length > FT(0));
                     m_normal_of_best_fit = normal / normal_length;
                 }
             }
@@ -181,19 +209,24 @@ namespace CGAL {
         private:
         
             // Fields.
-            const FT                        m_epsilon;
-            const FT                        m_normal_threshold;
-            const size_t                    m_min_region_size;
+            const FT                            m_distance_threshold;
+            const FT                            m_normal_threshold;
+            const size_t                        m_min_region_size;
 
-            const Sqrt                      m_sqrt;
+            const Point_map                    &m_point_map;
+            const Normal_map                   &m_normal_map;
+            
+            const Item_index_to_item_map        m_item_index_to_item_map;
+            
+            const Squared_length_2              m_squared_length_2;
+            const Squared_distance_2            m_squared_distance_2;
+            const Scalar_product_2              m_scalar_product_2;
+            const Sqrt                          m_sqrt;
 
-            const Element_map               m_element_map;
-            const Normal_map                m_normal_map;
+            const To_local_converter            m_to_local_converter;
 
-            const To_local_converter        m_to_local_converter;
-
-            Local_line_2                    m_line_of_best_fit;
-            Local_vector_2                  m_normal_of_best_fit;
+            Line_2                              m_line_of_best_fit;
+            Vector_2                            m_normal_of_best_fit;
         };
 
     } // namespace Shape_detection

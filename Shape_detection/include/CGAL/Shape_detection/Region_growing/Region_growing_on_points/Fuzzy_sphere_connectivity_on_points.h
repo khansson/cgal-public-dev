@@ -2,6 +2,7 @@
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_FUZZY_SPHERE_CONNECTIVITY_ON_POINTS_H
 
 // STL includes.
+#include <vector>
 #include <typeinfo>
 #include <type_traits>
 
@@ -10,9 +11,14 @@
 
 // CGAL includes.
 #include <CGAL/Kd_tree.h>
+#include <CGAL/assertions.h>
 #include <CGAL/Fuzzy_sphere.h>
 #include <CGAL/Search_traits_2.h>
 #include <CGAL/Search_traits_3.h>
+
+// Local includes.
+#include <CGAL/Shape_detection/Region_growing/Tools/Item_to_point_property_map.h>
+#include <CGAL/Shape_detection/Region_growing/Tools/Default_item_index_to_item_property_map.h>
 
 namespace CGAL {
 
@@ -26,7 +32,8 @@ namespace CGAL {
             \tparam Traits Model of `RegionGrowingOnPointsTraits`
             \cgalModels `RegionGrowingConnectivity`
         */
-        template<class InputRange, class PointMap, class Traits>
+        template<class InputRange, class PointMap, class Traits,
+        class ItemIndexToItemMap = CGAL::Shape_detection::Default_item_index_to_item_property_map<InputRange> >
         class Fuzzy_sphere_connectivity_on_points {
 
         public:
@@ -40,10 +47,13 @@ namespace CGAL {
             using Point                   = typename PointMap::value_type;
             ///< Point type, can only be `Point_2` or `Point_3`.
 
+            using Item_index_to_item_map  = ItemIndexToItemMap;
+            ///< An `LvaluePropertyMap` that maps to an arbitrary item.
+
             ///< \cond SKIP_IN_MANUAL
             using Item_index              = std::size_t;
 
-            using Neighbors               = std::vector<Item_index>;
+            using Item_index_to_point_map = CGAL::Shape_detection::Item_to_point_property_map<Item_index_to_item_map, Point_map>;
             ///< \endcond
 
             #ifdef DOXYGEN_RUNNING
@@ -57,37 +67,10 @@ namespace CGAL {
             #else
                 
                 using Search_base         = typename std::conditional<std::is_same<typename Traits::Point_2, Point>::value, CGAL::Search_traits_2<Traits>, CGAL::Search_traits_3<Traits> >::type;
-                
-                class Index_to_point_map {
-                        
-                public:
-                    
-                    using value_type      = Point;
-                    using reference       = const value_type&;
-                    using key_type        = Item_index;
-                    using category        = boost::lvalue_property_map_tag;
-
-                    Index_to_point_map(const Input_range &input_range, const Point_map &point_map) : 
-                    m_input_range(input_range), 
-                    m_point_map(point_map) 
-                    { }
-
-                    reference operator[](key_type k) const { 
-                        return get(m_point_map, *(m_input_range.begin() + Item_index(k)));
-                    }
-
-                    friend inline reference get(const Index_to_point_map &index_to_point_map, key_type k) { 
-                        return index_to_point_map[k];
-                    }
-                
-                private:
-                    const Input_range &m_input_range;
-                    const Point_map   &m_point_map;
-                };
 
                 struct Search_structures {
                     
-					using Search_traits   = CGAL::Search_traits_adapter<Item_index, Index_to_point_map, Search_base>;
+					using Search_traits   = CGAL::Search_traits_adapter<Item_index, Item_index_to_point_map, Search_base>;
                     using Splitter        = CGAL::Sliding_midpoint<Search_traits>;
                     using Fuzzy_sphere    = CGAL::Fuzzy_sphere<Search_traits>;
                     using Tree            = CGAL::Kd_tree<Search_traits, Splitter, CGAL::Tag_true>;
@@ -106,27 +89,46 @@ namespace CGAL {
 
             /*!
                 The constructor takes the point set given in `input_range` and the searching radius, then initializes a Kd tree upon the point set.
+                In addition, you can provide an instance of the point map class.
             */
             Fuzzy_sphere_connectivity_on_points(const Input_range &input_range, const FT search_radius = FT(1), const Point_map &point_map = PointMap()) :
             m_search_radius(search_radius),
-            m_index_to_point_map(input_range, point_map),
+            m_item_index_to_item_map(input_range),
+            m_item_index_to_point_map(m_item_index_to_item_map, point_map),
             m_tree(
                 boost::counting_iterator<Item_index>(0),
                 boost::counting_iterator<Item_index>(input_range.size()),
                 typename Search_structures::Splitter(),
-                typename Search_structures::Search_traits(m_index_to_point_map)) { 
+                typename Search_structures::Search_traits(m_item_index_to_point_map)) { 
 
                     m_tree.build();
+                    CGAL_precondition(search_radius >= FT(0));
+                }
+
+            Fuzzy_sphere_connectivity_on_points(const Input_range &input_range, const Item_index_to_item_map &item_index_to_item_map, const FT search_radius = FT(1), const Point_map &point_map = PointMap()) :
+            m_search_radius(search_radius),
+            m_item_index_to_item_map(item_index_to_item_map),
+            m_item_index_to_point_map(m_item_index_to_item_map, point_map),
+            m_tree(
+                boost::counting_iterator<Item_index>(0),
+                boost::counting_iterator<Item_index>(input_range.size()),
+                typename Search_structures::Splitter(),
+                typename Search_structures::Search_traits(m_item_index_to_point_map)) { 
+
+                    m_tree.build();
+                    CGAL_precondition(search_radius >= FT(0));
                 }
 
             /*!
                 From a query item with the index `query_index`, this function creates a search sphere centered at this item.
                 It then uses CGAL::Kd_tree::search() to look for the neighbors of the given query and push their indices to `neighbors`.
+                \tparam Neighbors CGAL::Shape_detection::Region_growing::Neighbors
             */
+            template<class Neighbors>
             void get_neighbors(const Item_index query_index, Neighbors &neighbors) const {
                 
                 neighbors.clear();
-                const Fuzzy_sphere sphere(query_index, m_search_radius, 0, m_tree.traits());
+                const Fuzzy_sphere sphere(query_index, m_search_radius, FT(0), m_tree.traits());
                 m_tree.search(std::back_inserter(neighbors), sphere);
             }
 
@@ -137,9 +139,10 @@ namespace CGAL {
         private:
 
             // Fields.
-            const FT                m_search_radius;
-            Index_to_point_map      m_index_to_point_map;
-            Tree                    m_tree;
+            const FT                            m_search_radius;
+            const Item_index_to_item_map        m_item_index_to_item_map;
+            const Item_index_to_point_map       m_item_index_to_point_map;
+            Tree                                m_tree;
         };
 
     } // namespace Shape_detection
