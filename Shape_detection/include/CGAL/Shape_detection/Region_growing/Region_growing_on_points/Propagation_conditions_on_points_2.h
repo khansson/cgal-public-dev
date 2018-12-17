@@ -13,7 +13,7 @@
 
 // Local includes.
 #include <CGAL/Shape_detection/Region_growing/Tools/Sqrt.h>
-#include <CGAL/Shape_detection/Region_growing/Tools/Default_item_index_to_item_property_map.h>
+#include <CGAL/Shape_detection/Region_growing/Tools/Random_access_index_to_item_property_map.h>
 
 namespace CGAL {
 
@@ -28,7 +28,7 @@ namespace CGAL {
             \cgalModels `RegionGrowingPropagationConditions`
         */
         template<class InputRange, class PointMap, class NormalMap, class Traits, 
-        class ItemIndexToItemMap = CGAL::Shape_detection::Default_item_index_to_item_property_map<InputRange> >
+        class IndexToItemMap = CGAL::Shape_detection::Random_access_index_to_item_property_map<InputRange> >
         class Propagation_conditions_on_points_2 {
 
         public:
@@ -42,7 +42,7 @@ namespace CGAL {
             using Normal_map             = NormalMap;
             ///< An `LvaluePropertyMap` that maps to `Vector_2`.
 
-            using Item_index_to_item_map = ItemIndexToItemMap;
+            using Index_to_item_map      = IndexToItemMap;
             ///< An `LvaluePropertyMap` that maps to an arbitrary item.
 
             using FT                     = typename Traits::FT;       ///< Number type
@@ -64,7 +64,7 @@ namespace CGAL {
             using Get_sqrt               = CGAL::Shape_detection::Get_sqrt<Traits>;
             using Sqrt                   = typename Get_sqrt::Sqrt;
 
-            using Item_index             = std::size_t;
+            using Index                  = std::size_t;
             ///< \endcond
 
             /*!
@@ -75,9 +75,9 @@ namespace CGAL {
                 In addition, you can provide instances of the Point_map, Normal_map, and Traits classes.
             */
             Propagation_conditions_on_points_2(const Input_range &input_range, 
-            const FT distance_threshold = FT(1), const FT normal_threshold = FT(9) / FT(10), const size_t min_region_size = 2, 
-            const Point_map &point_map = PointMap(), const Normal_map &normal_map = Normal_map(), const Traits &traits = Traits()) : 
-            m_item_index_to_item_map(input_range),
+            const FT distance_threshold = FT(1), const FT normal_threshold = FT(9) / FT(10), const std::size_t min_region_size = 2, 
+            const Point_map &point_map = Point_map(), const Normal_map &normal_map = Normal_map(), const Traits &traits = Traits()) : 
+            m_index_to_item_map(input_range),
             m_distance_threshold(distance_threshold),
             m_normal_threshold(normal_threshold),
             m_min_region_size(min_region_size),
@@ -93,10 +93,10 @@ namespace CGAL {
                 CGAL_precondition(min_region_size    > 1);
             }        
 
-            Propagation_conditions_on_points_2(const Input_range &, const Item_index_to_item_map &item_index_to_item_map, 
-            const FT distance_threshold = FT(1), const FT normal_threshold = FT(9) / FT(10), const size_t min_region_size = 2, 
-            const Point_map &point_map = PointMap(), const Normal_map &normal_map = Normal_map(), const Traits &traits = Traits()) :
-            m_item_index_to_item_map(item_index_to_item_map),
+            Propagation_conditions_on_points_2(const Input_range &, const Index_to_item_map &index_to_item_map,
+            const FT distance_threshold = FT(1), const FT normal_threshold = FT(9) / FT(10), const std::size_t min_region_size = 2, 
+            const Point_map &point_map = Point_map(), const Normal_map &normal_map = Normal_map(), const Traits &traits = Traits()) :
+            m_index_to_item_map(index_to_item_map),
             m_distance_threshold(distance_threshold),
             m_normal_threshold(normal_threshold),
             m_min_region_size(min_region_size),
@@ -117,12 +117,13 @@ namespace CGAL {
                 \tparam Region CGAL::Shape_detection::Region_growing::Region
             */
             template<class Region>
-            bool belongs_to_region(const Item_index query_index, const Region &region) const {
+            bool belongs_to_region(const Index query_index, const Region &region) const {
 
-                const auto &query_item = get(m_item_index_to_item_map, query_index);
+                const auto &query_item = get(m_index_to_item_map, query_index);
+                const auto &key        = *query_item;
 
-                const Point_2  &query_point = get(m_point_map , *query_item);
-                const Vector_2 &normal      = get(m_normal_map, *query_item);
+                const Point_2  &query_point = get(m_point_map , key);
+                const Vector_2 &normal      = get(m_normal_map, key);
 
                 const FT normal_length = m_sqrt(m_squared_length_2(normal));
                 CGAL_precondition(normal_length > FT(0));
@@ -155,10 +156,11 @@ namespace CGAL {
                 if (region.size() == 1) { // create new reference line and normal
                     
                     // The best fit line will be a line through this point with its normal being the point's normal.
-                    const auto &item = get(m_item_index_to_item_map, region[0]);
+                    const auto &item = get(m_index_to_item_map, region[0]);
+                    const auto &key  = *item;
 
-                    const Point_2  &point  = get(m_point_map , *item);
-                    const Vector_2 &normal = get(m_normal_map, *item);
+                    const Point_2  &point  = get(m_point_map , key);
+                    const Vector_2 &normal = get(m_normal_map, key);
                     
                     const FT normal_length = m_sqrt(m_squared_length_2(normal));
                     CGAL_precondition(normal_length > FT(0));
@@ -172,16 +174,18 @@ namespace CGAL {
                     Local_FT y = Local_FT(0);
 
                     std::vector<Local_point_2> points(region.size());
-                    for (Item_index i = 0; i < region.size(); ++i) {
+                    for (Index i = 0; i < region.size(); ++i) {
 
-                        const auto &item = get(m_item_index_to_item_map, region[i]);
-                        points[i] = m_to_local_converter(get(m_point_map, *item));
+                        const auto &item = get(m_index_to_item_map, region[i]);
+                        const auto &key  = *item;
+
+                        points[i] = m_to_local_converter(get(m_point_map, key));
 
                         x += points[i].x();
                         y += points[i].y();
                     }
 
-                    CGAL_precondition(points.size()> 0);
+                    CGAL_precondition(points.size() > 0);
 
                     x /= static_cast<Local_FT>(points.size());
                     y /= static_cast<Local_FT>(points.size());
@@ -211,12 +215,12 @@ namespace CGAL {
             // Fields.
             const FT                            m_distance_threshold;
             const FT                            m_normal_threshold;
-            const size_t                        m_min_region_size;
+            const std::size_t                   m_min_region_size;
 
             const Point_map                    &m_point_map;
             const Normal_map                   &m_normal_map;
             
-            const Item_index_to_item_map        m_item_index_to_item_map;
+            const Index_to_item_map             m_index_to_item_map;
             
             const Squared_length_2              m_squared_length_2;
             const Squared_distance_2            m_squared_distance_2;

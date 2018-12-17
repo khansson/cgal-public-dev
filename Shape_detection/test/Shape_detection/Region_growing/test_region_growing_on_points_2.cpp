@@ -1,6 +1,7 @@
 
 // STL includes.
 #include <string>
+#include <vector>
 #include <utility>
 #include <fstream>
 #include <iostream>
@@ -32,10 +33,10 @@ bool test_region_growing_on_points_2(int argc, char *argv[]) {
     using Region_growing = CGAL::Shape_detection::Region_growing<Input_range, Connectivity, Conditions>;
 
     // Default parameter values for the data file points_2.xyz.
-    const FT     search_radius        = FT(5);
-    const FT     max_distance_to_line = FT(45) / FT(10);
-    const FT     normal_threshold     = FT(7)  / FT(10);
-    const size_t min_region_size      = 5;
+    const FT          search_radius        = FT(5);
+    const FT          max_distance_to_line = FT(45) / FT(10);
+    const FT          normal_threshold     = FT(7)  / FT(10);
+    const std::size_t min_region_size      = 5;
     
     // Load data.
     std::ifstream in(argc > 1 ? argv[1] : "../data/points_2.xyz");

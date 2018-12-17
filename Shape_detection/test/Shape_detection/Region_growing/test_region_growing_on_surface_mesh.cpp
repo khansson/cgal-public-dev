@@ -12,11 +12,10 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
-#include <CGAL/Shape_detection/Region_growing/Region_growing_traits.h>
-#include <CGAL/Shape_detection/Region_growing/Region_growing_on_surface_mesh.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_face_graph.h>
 
 template<class Kernel>
-bool test_region_growing_on_surface_mesh() {
+bool test_region_growing_on_surface_mesh(int argc, char *argv[]) {
 
     using FT      = typename Kernel::FT;
     using Point_3 = typename Kernel::Point_3;
@@ -27,41 +26,23 @@ bool test_region_growing_on_surface_mesh() {
     using Face_index     = typename Mesh::Face_index;
     using Face_index_map = CGAL::Identity_property_map<Face_index>;
 
-    using Traits         = CGAL::Shape_detection::Region_growing_traits<Input_range, Face_index_map, Kernel>;
-    using Connectivity   = CGAL::Shape_detection::Connectivity_on_surface_mesh<Traits, Mesh>;
-    using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_surface_mesh<Traits, Mesh>;
-    using Region_growing = CGAL::Shape_detection::Region_growing<Traits, Connectivity, Conditions>;
-    using Regions        = typename Region_growing::Region_range;
+    using Connectivity   = CGAL::Shape_detection::Connectivity_on_face_graph<Mesh, Face_index_map>;
+    using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_face_graph<Mesh, Face_index_map, Kernel>;
+    using Region_growing = CGAL::Shape_detection::Region_growing<Input_range, Connectivity, Conditions>;
 
     // Default parameter values for the cube mesh below.
-    const FT max_distance_to_plane = FT(1) / FT(10);
-    const FT normal_threshold      = FT(9) / FT(10);
-    
-    // Create a cube mesh.
+    const FT          max_distance_to_plane = FT(1) / FT(10);
+    const FT          normal_threshold      = FT(9) / FT(10);
+    const std::size_t min_region_size       = 1;
+
+    // Load data.
+    std::ifstream in(argc > 1 ? argv[1] : "../data/cube.off");
+    CGAL::set_ascii_mode(in);
+
     Mesh mesh;
-
-    const Vertex_index v0 = mesh.add_vertex(Point_3(0, 0, 0));
-    const Vertex_index v1 = mesh.add_vertex(Point_3(0, 1, 0));
-    const Vertex_index v2 = mesh.add_vertex(Point_3(1, 0, 0));
-    const Vertex_index v3 = mesh.add_vertex(Point_3(1, 1, 0));
-    const Vertex_index v4 = mesh.add_vertex(Point_3(0, 0, 1));
-    const Vertex_index v5 = mesh.add_vertex(Point_3(0, 1, 1));
-    const Vertex_index v6 = mesh.add_vertex(Point_3(1, 0, 1));
-    const Vertex_index v7 = mesh.add_vertex(Point_3(1, 1, 1));
-
-    mesh.add_face(v0, v3, v2);
-    mesh.add_face(v0, v3, v1);
-    mesh.add_face(v0, v6, v2);
-    mesh.add_face(v0, v6, v4);
-    mesh.add_face(v0, v5, v1);
-    mesh.add_face(v0, v5, v4);
-    mesh.add_face(v7, v2, v3);
-    mesh.add_face(v7, v2, v6);
-    mesh.add_face(v7, v1, v3);
-    mesh.add_face(v7, v1, v5);
-    mesh.add_face(v7, v4, v5);
-    mesh.add_face(v7, v4, v6);
-
+    in >> mesh;
+    
+    in.close();
     const Input_range &input_range = mesh.faces();
 
     CGAL_assertion(input_range.size() == 6);
@@ -69,13 +50,13 @@ bool test_region_growing_on_surface_mesh() {
 
     // Create connectivity and conditions.
     Connectivity connectivity(mesh);
-    Conditions   conditions(mesh, max_distance_to_plane, normal_threshold);
+    Conditions   conditions(mesh, max_distance_to_plane, normal_threshold, min_region_size);
 
     // Run region growing.
     Region_growing region_growing(input_range, connectivity, conditions);
     region_growing.detect();
 
-    const Regions &regions = region_growing.regions();
+    const auto &regions = region_growing.regions();
 
     CGAL_assertion(regions.size() == 6);
     if (regions.size() != 6) return false;
@@ -90,7 +71,7 @@ int main(int argc, char *argv[]) {
     // ------>
 
     bool cartesian_double_test_success = true;
-    if (!test_region_growing_on_surface_mesh< CGAL::Simple_cartesian<double> >()) cartesian_double_test_success = false;
+    if (!test_region_growing_on_surface_mesh< CGAL::Simple_cartesian<double> >(argc, argv)) cartesian_double_test_success = false;
     
     std::cout << "cartesian_double_test_success: " << cartesian_double_test_success << std::endl;
     CGAL_assertion(cartesian_double_test_success);
@@ -98,7 +79,7 @@ int main(int argc, char *argv[]) {
     // ------>
 
     bool exact_inexact_test_success = true;
-    if (!test_region_growing_on_surface_mesh<CGAL::Exact_predicates_inexact_constructions_kernel>()) exact_inexact_test_success = false;
+    if (!test_region_growing_on_surface_mesh<CGAL::Exact_predicates_inexact_constructions_kernel>(argc, argv)) exact_inexact_test_success = false;
     
     std::cout << "exact_inexact_test_success: " << exact_inexact_test_success << std::endl;
     CGAL_assertion(exact_inexact_test_success);
@@ -106,7 +87,7 @@ int main(int argc, char *argv[]) {
     // ------>
 
     bool exact_exact_test_success = true;
-    if (!test_region_growing_on_surface_mesh<CGAL::Exact_predicates_exact_constructions_kernel>()) exact_exact_test_success = false;
+    if (!test_region_growing_on_surface_mesh<CGAL::Exact_predicates_exact_constructions_kernel>(argc, argv)) exact_exact_test_success = false;
     
     std::cout << "exact_exact_test_success: " << exact_exact_test_success << std::endl;
     CGAL_assertion(exact_exact_test_success);

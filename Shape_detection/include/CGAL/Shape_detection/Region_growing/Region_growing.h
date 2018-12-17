@@ -110,14 +110,14 @@ namespace CGAL {
             /*!
                 Return the number of found regions.
             */
-            size_t number_of_regions() {
+            std::size_t number_of_regions() {
                 return m_regions.size();
             }
 
             /*!
                 Return the number of unclassified items.
             */
-            size_t number_of_unclassified_items() {
+            std::size_t number_of_unclassified_items() {
                 return m_unclassified.size();
             }
 
