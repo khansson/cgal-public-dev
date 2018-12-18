@@ -55,19 +55,26 @@ bool test_region_growing_on_points_2(int argc, char *argv[]) {
 
     // Create connectivity and conditions.
     Connectivity connectivity(input_range, search_radius);
-    Conditions   conditions(input_range, max_distance_to_line, normal_threshold, min_region_size);
+    Conditions     conditions(input_range, max_distance_to_line, normal_threshold, min_region_size);
 
     // Run region growing.
     Region_growing region_growing(input_range, connectivity, conditions);
     region_growing.detect();
 
+    // Test data.
     const auto &regions = region_growing.regions();
 
-    CGAL_assertion(regions.size() == 65);
+    CGAL_assertion(regions.size() == 65 && regions.size() == region_growing.number_of_regions());
     if (regions.size() != 65) return false;
 
     for (auto region = regions.begin(); region != regions.end(); ++region)
         if (!conditions.are_valid(*region)) return false;
+
+    const auto &unclassified_points = region_growing.unclassified_items();
+
+    CGAL_assertion(unclassified_points.size() == 82 && unclassified_points.size() == region_growing.number_of_unclassified_items());
+    if (unclassified_points.size() != 82) return false;
+
     return true;
 }
 

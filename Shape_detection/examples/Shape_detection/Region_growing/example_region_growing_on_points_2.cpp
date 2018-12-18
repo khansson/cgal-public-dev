@@ -15,8 +15,8 @@
 #include <CGAL/Simple_cartesian.h>
 
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
-#include <CGAL/Shape_detection/Region_growing/Region_growing_traits.h>
 #include <CGAL/Shape_detection/Region_growing/Region_growing_on_points.h>
+#include <CGAL/Shape_detection/Region_growing/Tools/Random_access_index_to_item_property_map.h>
 
 // Type declarations.
 using Kernel = CGAL::Simple_cartesian<double>;
@@ -31,17 +31,17 @@ using Input_range       = std::vector<Point_with_normal>;
 using Point_map         = CGAL::First_of_pair_property_map<Point_with_normal>;
 using Normal_map        = CGAL::Second_of_pair_property_map<Point_with_normal>;
 
-using Traits         = CGAL::Shape_detection::Region_growing_traits<Input_range, Point_map, Kernel>;
-using Connectivity   = CGAL::Shape_detection::Fuzzy_sphere_connectivity_on_points<Traits>;
-using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_points_2<Traits, Normal_map>;
-using Region_growing = CGAL::Shape_detection::Region_growing<Traits, Connectivity, Conditions>;
-using Regions        = typename Region_growing::Region_range;
+using Connectivity   = CGAL::Shape_detection::Fuzzy_sphere_connectivity_on_points<Input_range, Point_map, Kernel>;
+using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_points_2<Input_range, Point_map, Normal_map, Kernel>;
+using Region_growing = CGAL::Shape_detection::Region_growing<Input_range, Connectivity, Conditions>;
 
 using Color            = CGAL::cpp11::array<unsigned char, 3>;
 using Point_with_color = std::pair<Point_3, Color>;
 using Pwc_vector       = std::vector<Point_with_color>;
 using PLY_Point_map    = CGAL::First_of_pair_property_map<Point_with_color>;
 using PLY_Color_map    = CGAL::Second_of_pair_property_map<Point_with_color>;
+
+using Index_to_item_map = CGAL::Shape_detection::Random_access_index_to_item_property_map<Input_range>;
 
 // Define how a color should be stored.
 namespace CGAL {
@@ -83,31 +83,33 @@ int main(int argc, char *argv[]) {
     in.close();
     std::cout << "* loaded " << input_range.size() << " points with normals" << std::endl;
 
-    // Create instances of the classes Connectivity and Conditions.
+    // Default parameter values for the data file points_2.xyz.
     const FT     search_radius        = FT(5);
     const FT     max_distance_to_line = FT(45) / FT(10);
     const FT     normal_threshold     = FT(7)  / FT(10);
     const size_t min_region_size      = 5;
 
+    // Create instances of the classes Connectivity and Conditions.
     Connectivity connectivity(input_range, search_radius);
-    Conditions   conditions(max_distance_to_line, normal_threshold, min_region_size);
+    Conditions     conditions(input_range, max_distance_to_line, normal_threshold, min_region_size);
     
     // Create an instance of the region growing class.
     Region_growing region_growing(input_range, connectivity, conditions);
 
     // Run the algorithm.
-    region_growing.find_regions();
+    region_growing.detect();
 
     // Print the number of found regions.
     std::cerr << "* " << region_growing.number_of_regions() << " regions have been found" << std::endl;
 
-    // Get the list of found regions.
-    const Regions &regions = region_growing.regions();
+    // Get all found regions.
+    const auto &regions = region_growing.regions();
 
     Pwc_vector pwc;
     srand(time(NULL));
 
     // Iterate through all regions.
+    const Index_to_item_map index_to_item_map(input_range);
     for (auto region = regions.begin(); region != regions.end(); ++region) {
         
         // Generate a random color.
@@ -117,9 +119,9 @@ int main(int argc, char *argv[]) {
                                 static_cast<unsigned char>(rand() % 256));
 
         // Iterate through all region elements.
-        for (auto element : *region) {
+        for (auto index : *region) {
             
-            const Point_2 &point = get(Point_map(), element);
+            const Point_2 &point = get(Point_map(), *get(index_to_item_map, index));
             pwc.push_back(std::make_pair(Point_3(point.x(), point.y(), 0), color));
         }
     }

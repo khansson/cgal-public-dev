@@ -1,8 +1,14 @@
 #ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_CONNECTIVITY_ON_FACE_GRAPH_H
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_CONNECTIVITY_ON_FACE_GRAPH_H
 
-// STL includes.
-// #include <type_traits>
+// Boost includes.
+#include <boost/graph/properties.hpp>
+#include <boost/graph/graph_traits.hpp>
+
+// Face graph includes.
+#include <CGAL/boost/graph/iterator.h>
+#include <CGAL/boost/graph/graph_traits_Surface_mesh.h>
+#include <CGAL/boost/graph/graph_traits_Polyhedron_3.h>
 
 // CGAL includes.
 #include <CGAL/Iterator_range.h>
@@ -22,7 +28,8 @@ namespace CGAL {
             \cgalModels `RegionGrowingConnectivity`
         */
         template<class FaceGraph, class FaceDescriptorMap,
-        class IndexToItemMap = CGAL::Shape_detection::Random_access_index_to_item_property_map<typename FaceGraph::Face_range> >
+        class FaceRange = typename FaceGraph::Face_range,
+        class IndexToItemMap = CGAL::Shape_detection::Random_access_index_to_item_property_map<FaceRange> >
         class Connectivity_on_face_graph {
 
         public:
@@ -37,6 +44,8 @@ namespace CGAL {
             ///< An `LvaluePropertyMap` that maps to an arbitrary item.
 
             ///< \cond SKIP_IN_MANUAL
+            using Input_range                  = FaceRange;
+
             using Index                        = std::size_t;
 
             using Index_to_face_descriptor_map = CGAL::Shape_detection::Item_property_map<Index_to_item_map, Face_descriptor_map>;
@@ -46,16 +55,20 @@ namespace CGAL {
                 The constructor takes an arbitrary face graph.
                 In addition, you can provide an instance of the face descriptor map class.
             */
-            Connectivity_on_face_graph(const Face_graph &face_graph, const Face_descriptor_map &face_descriptor_map = Face_descriptor_map()) :
+            Connectivity_on_face_graph(const Face_graph &face_graph, const Face_descriptor_map face_descriptor_map = Face_descriptor_map()) :
             m_face_graph(face_graph),
-            m_index_to_item_map(m_face_graph.faces()),
-            m_index_to_face_descriptor_map(m_index_to_item_map, face_descriptor_map) 
+            m_input_range(CGAL::faces(m_face_graph)),
+            m_index_to_item_map(m_input_range),
+            m_face_descriptor_map(face_descriptor_map),
+            m_index_to_face_descriptor_map(m_index_to_item_map, m_face_descriptor_map) 
             { }
 
-            Connectivity_on_face_graph(const Face_graph &face_graph, const Index_to_item_map &index_to_item_map, const Face_descriptor_map &face_descriptor_map = Face_descriptor_map()) :
+            Connectivity_on_face_graph(const Face_graph &face_graph, const Index_to_item_map index_to_item_map, const Face_descriptor_map face_descriptor_map = Face_descriptor_map()) :
             m_face_graph(face_graph),
+            m_input_range(CGAL::faces(m_face_graph)),
             m_index_to_item_map(index_to_item_map),
-            m_index_to_face_descriptor_map(m_index_to_item_map, face_descriptor_map) 
+            m_face_descriptor_map(face_descriptor_map),
+            m_index_to_face_descriptor_map(m_index_to_item_map, m_face_descriptor_map) 
             { }
 
             /*!
@@ -85,8 +98,11 @@ namespace CGAL {
 
             // Fields.
             const Face_graph                       &m_face_graph;
+            
+            const Input_range                       m_input_range;
 
             const Index_to_item_map                 m_index_to_item_map;
+            const Face_descriptor_map               m_face_descriptor_map;
             const Index_to_face_descriptor_map      m_index_to_face_descriptor_map;
         };
 

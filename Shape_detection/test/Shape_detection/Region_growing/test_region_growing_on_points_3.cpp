@@ -1,7 +1,6 @@
 
 // STL includes.
 #include <string>
-#include <utility>
 #include <fstream>
 #include <iostream>
 
@@ -53,12 +52,13 @@ bool test_region_growing_on_points_3(int argc, char *argv[]) {
 
     // Create connectivity and conditions.
     Connectivity connectivity(input_range, num_neighbors, input_range.point_map());
-    Conditions   conditions(input_range, max_distance_to_plane, normal_threshold, min_region_size, input_range.point_map(), input_range.normal_map());
+    Conditions     conditions(input_range, max_distance_to_plane, normal_threshold, min_region_size, input_range.point_map(), input_range.normal_map());
 
     // Run region growing.
     Region_growing region_growing(input_range, connectivity, conditions);
     region_growing.detect();
 
+    // Test data.
     const auto &regions = region_growing.regions();
 
     CGAL_assertion(regions.size() == 1108);
@@ -66,6 +66,12 @@ bool test_region_growing_on_points_3(int argc, char *argv[]) {
 
     for (auto region = regions.begin(); region != regions.end(); ++region)
         if (!conditions.are_valid(*region)) return false;
+
+    const auto &unclassified_points = region_growing.unclassified_items();
+ 
+    CGAL_assertion(unclassified_points.size() == 1063 && unclassified_points.size() == region_growing.number_of_unclassified_items());
+    if (unclassified_points.size() != 1063) return false;
+
     return true;
 }
 
@@ -89,10 +95,9 @@ int main(int argc, char *argv[]) {
 
     // ------>
 
-    /* // super slow test!
     bool exact_exact_test_success = true;
     if (!test_region_growing_on_points_3<CGAL::Exact_predicates_exact_constructions_kernel>(argc, argv)) exact_exact_test_success = false;
     
     std::cout << "exact_exact_test_success: " << exact_exact_test_success << std::endl;
-    CGAL_assertion(exact_exact_test_success); */
+    CGAL_assertion(exact_exact_test_success);
 }

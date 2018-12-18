@@ -1,8 +1,6 @@
 
 // STL includes.
 #include <string>
-#include <vector>
-#include <utility>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -14,13 +12,12 @@
 #include <CGAL/IO/write_ply_points.h>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 
-/*
 #include <CGAL/Point_set_3.h>
-#include <CGAL/Point_set_3/IO.h> */
+#include <CGAL/Point_set_3/IO.h>
 
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
-#include <CGAL/Shape_detection/Region_growing/Region_growing_traits.h>
 #include <CGAL/Shape_detection/Region_growing/Region_growing_on_points.h>
+#include <CGAL/Shape_detection/Region_growing/Tools/Random_access_index_to_item_property_map.h>
 
 // Type declarations.
 using Kernel = CGAL::Exact_predicates_inexact_constructions_kernel;
@@ -29,28 +26,21 @@ using FT       = typename Kernel::FT;
 using Point_3  = typename Kernel::Point_3;
 using Vector_3 = typename Kernel::Vector_3;
 
-// Todo:
-/* // should be fixed!
 using Input_range = CGAL::Point_set_3<Point_3>;
 using Point_map   = typename Input_range::Point_map;
-using Normal_map  = typename Input_range::Vector_map; */
+using Normal_map  = typename Input_range::Vector_map;
 
-using Point_with_normal = std::pair<Point_3, Vector_3>;
-using Input_range       = std::vector<Point_with_normal>;
-using Point_map         = CGAL::First_of_pair_property_map<Point_with_normal>;
-using Normal_map        = CGAL::Second_of_pair_property_map<Point_with_normal>;
-
-using Traits         = CGAL::Shape_detection::Region_growing_traits<Input_range, Point_map, Kernel>;
-using Connectivity   = CGAL::Shape_detection::Nearest_neighbor_connectivity_on_points<Traits>;
-using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_points_3<Traits, Normal_map>;
-using Region_growing = CGAL::Shape_detection::Region_growing<Traits, Connectivity, Conditions>;
-using Regions        = typename Region_growing::Region_range;
+using Connectivity   = CGAL::Shape_detection::Nearest_neighbor_connectivity_on_points<Input_range, Point_map, Kernel>;
+using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_points_3<Input_range, Point_map, Normal_map, Kernel>;
+using Region_growing = CGAL::Shape_detection::Region_growing<Input_range, Connectivity, Conditions>;
 
 using Color            = CGAL::cpp11::array<unsigned char, 3>;
 using Point_with_color = std::pair<Point_3, Color>;
 using Pwc_vector       = std::vector<Point_with_color>;
 using PLY_Point_map    = CGAL::First_of_pair_property_map<Point_with_color>;
 using PLY_Color_map    = CGAL::Second_of_pair_property_map<Point_with_color>;
+
+using Index_to_item_map = CGAL::Shape_detection::Random_access_index_to_item_property_map<Input_range>;
 
 // Define how a color should be stored.
 namespace CGAL {
@@ -83,47 +73,41 @@ int main(int argc, char *argv[]) {
     std::ifstream in(argc > 1 ? argv[1] : "../data/points_3.xyz");
     CGAL::set_ascii_mode(in);
 
-    /*
     const bool with_normal_map = true;
     Input_range input_range(with_normal_map);
 
     in >> input_range;    
-    in.close(); */
-
-    Input_range input_range;
-    Point_3 point; Vector_3 normal;
-
-    while (in >> point >> normal)
-        input_range.push_back(std::make_pair(point, normal));
-    
     in.close();
+
     std::cout << "* loaded " << input_range.size() << " points with normals" << std::endl;
 
-    // Create instances of the classes Connectivity and Conditions.
+    // Default parameter values for the data file points_3.xyz.
     const size_t num_neighbors         = 100;
     const FT     max_distance_to_plane = FT(5) / FT(10);
     const FT     normal_threshold      = FT(9) / FT(10);
     const size_t min_region_size       = 3;
 
-    Connectivity connectivity(input_range, num_neighbors);
-    Conditions   conditions(max_distance_to_plane, normal_threshold, min_region_size);
+    // Create instances of the classes Connectivity and Conditions.
+    Connectivity connectivity(input_range, num_neighbors, input_range.point_map());
+    Conditions     conditions(input_range, max_distance_to_plane, normal_threshold, min_region_size, input_range.point_map(), input_range.normal_map());
 
     // Create an instance of the region growing class.
     Region_growing region_growing(input_range, connectivity, conditions);
 
     // Run the algorithm.
-    region_growing.find_regions();
+    region_growing.detect();
 
     // Print the number of found regions.
     std::cerr << "* " << region_growing.number_of_regions() << " regions have been found" << std::endl;
 
-    // Get the list of found regions.
-    const Regions &regions = region_growing.regions();
+    // Get all found regions.
+    const auto &regions = region_growing.regions();
 
     Pwc_vector pwc;
     srand(time(NULL));
 
     // Iterate through all regions.
+    const Index_to_item_map index_to_item_map(input_range);
     for (auto region = regions.begin(); region != regions.end(); ++region) {
         
         // Generate a random color.
@@ -133,9 +117,9 @@ int main(int argc, char *argv[]) {
                                 static_cast<unsigned char>(rand() % 256));
 
         // Iterate through all region elements.
-        for (auto element : *region) {
+        for (auto index : *region) {
             
-            const Point_3 &point = get(Point_map(), element);
+            const Point_3 &point = get(input_range.point_map(), *get(index_to_item_map, index));
             pwc.push_back(std::make_pair(point, color));
         }
     }
@@ -159,6 +143,22 @@ int main(int argc, char *argv[]) {
         std::cerr << "* found regions are saved in " << fullpath << std::endl;
     }
 
+    // Print the number of unclassified points.
+    std::cerr << "* " << region_growing.number_of_unclassified_items() << " points do not belong to any region" << std::endl;
+
+    // Get all unclassified items.
+    const auto &unclassified_items = region_growing.unclassified_items();
+
+    // Store all unclassified points.
+    std::vector<Point_3> unclassified_points;
+    for (auto index : unclassified_items) {
+            
+        const Point_3 &point = get(input_range.point_map(), *get(index_to_item_map, index));
+        unclassified_points.push_back(point);
+    }
+
+    std::cerr << "* " << unclassified_points.size() << " unclassified points are stored" << std::endl;
     std::cout << std::endl << "region_growing_on_points_3 example finished" << std::endl << std::endl;
+
     return EXIT_SUCCESS;
 }

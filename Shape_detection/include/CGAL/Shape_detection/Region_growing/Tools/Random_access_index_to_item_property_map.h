@@ -21,6 +21,8 @@ namespace CGAL {
             { }
 
             value_type operator[](key_type k) const { 
+
+                CGAL_precondition(k < m_input_range.size());
                 return static_cast<value_type>(m_input_range.begin() + k);
             }
 

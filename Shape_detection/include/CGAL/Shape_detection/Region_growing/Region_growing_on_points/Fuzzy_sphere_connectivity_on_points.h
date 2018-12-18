@@ -93,10 +93,11 @@ namespace CGAL {
                 The constructor takes the point set given in `input_range` and the searching radius, then initializes a Kd tree upon the point set.
                 In addition, you can provide an instance of the point map class.
             */
-            Fuzzy_sphere_connectivity_on_points(const Input_range &input_range, const FT search_radius = FT(1), const Point_map &point_map = Point_map()) :
+            Fuzzy_sphere_connectivity_on_points(const Input_range &input_range, const FT search_radius = FT(1), const Point_map point_map = Point_map()) :
             m_search_radius(search_radius),
             m_index_to_item_map(input_range),
-            m_index_to_point_map(m_index_to_item_map, point_map),
+            m_point_map(point_map),
+            m_index_to_point_map(m_index_to_item_map, m_point_map),
             m_tree(
                 boost::counting_iterator<Index>(0),
                 boost::counting_iterator<Index>(input_range.size()),
@@ -107,10 +108,11 @@ namespace CGAL {
                     CGAL_precondition(search_radius >= FT(0));
                 }
 
-            Fuzzy_sphere_connectivity_on_points(const Input_range &input_range, const Index_to_item_map &index_to_item_map, const FT search_radius = FT(1), const Point_map &point_map = Point_map()) :
+            Fuzzy_sphere_connectivity_on_points(const Input_range &input_range, const Index_to_item_map index_to_item_map, const FT search_radius = FT(1), const Point_map point_map = Point_map()) :
             m_search_radius(search_radius),
             m_index_to_item_map(index_to_item_map),
-            m_index_to_point_map(m_index_to_item_map, point_map),
+            m_point_map(point_map),
+            m_index_to_point_map(m_index_to_item_map, m_point_map),
             m_tree(
                 boost::counting_iterator<Index>(0),
                 boost::counting_iterator<Index>(input_range.size()),
@@ -143,6 +145,7 @@ namespace CGAL {
             // Fields.
             const FT                        m_search_radius;
             const Index_to_item_map         m_index_to_item_map;
+            const Point_map                 m_point_map;
             const Index_to_point_map        m_index_to_point_map;
             Tree                            m_tree;
         };

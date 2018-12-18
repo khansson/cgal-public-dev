@@ -4,6 +4,16 @@
 // STL includes.
 #include <vector>
 
+// Boost includes.
+#include <boost/graph/properties.hpp>
+#include <boost/graph/graph_traits.hpp>
+#include <boost/iterator/transform_iterator.hpp>
+
+// Face graph includes.
+#include <CGAL/boost/graph/iterator.h>
+#include <CGAL/boost/graph/graph_traits_Surface_mesh.h>
+#include <CGAL/boost/graph/graph_traits_Polyhedron_3.h>
+
 // CGAL includes.
 #include <CGAL/assertions.h>
 #include <CGAL/number_utils.h>
@@ -27,8 +37,9 @@ namespace CGAL {
             \tparam Mesh Has model `CGAL::Surface_mesh`.
             \cgalModels `RegionGrowingPropagationConditions`
         */
-        template<class FaceGraph, class FaceDescriptorMap, class Traits, 
-        class IndexToItemMap = CGAL::Shape_detection::Random_access_index_to_item_property_map<typename FaceGraph::Face_range> >
+        template<class FaceGraph, class FaceDescriptorMap, class Traits,
+        class FaceRange = typename FaceGraph::Face_range,
+        class IndexToItemMap = CGAL::Shape_detection::Random_access_index_to_item_property_map<FaceRange> >
         class Propagation_conditions_on_face_graph {
 
         public:
@@ -42,7 +53,9 @@ namespace CGAL {
             using Index_to_item_map      = IndexToItemMap;
             ///< An `LvaluePropertyMap` that maps to an arbitrary item.
 
-            using Input_range            = typename Face_graph::Face_range;
+            using Face_descriptor        = typename Face_descriptor_map::value_type;
+
+            using Input_range            = FaceRange;
 
             using FT                     = typename Traits::FT;       ///< Number type
             using Point_3                = typename Traits::Point_3;  ///< Point type
@@ -75,9 +88,9 @@ namespace CGAL {
             */
             Propagation_conditions_on_face_graph(const Face_graph &face_graph,
             const FT distance_threshold = FT(1), const FT normal_threshold = FT(9) / FT(10), const std::size_t min_region_size = 1, 
-            const Face_descriptor_map &face_descriptor_map = Face_descriptor_map(), const Traits &traits = Traits()) : 
+            const Face_descriptor_map face_descriptor_map = Face_descriptor_map(), const Traits &traits = Traits()) : 
             m_face_graph(face_graph),
-            m_input_range(m_face_graph.faces()),
+            m_input_range(CGAL::faces(m_face_graph)),
             m_index_to_item_map(m_input_range),
             m_distance_threshold(distance_threshold),
             m_normal_threshold(normal_threshold),
@@ -93,10 +106,11 @@ namespace CGAL {
                 CGAL_precondition(min_region_size    > 0);
             }        
             
-            Propagation_conditions_on_face_graph(const Face_graph &face_graph, const Index_to_item_map &index_to_item_map,
+            Propagation_conditions_on_face_graph(const Face_graph &face_graph, const Index_to_item_map index_to_item_map,
             const FT distance_threshold = FT(1), const FT normal_threshold = FT(9) / FT(10), const std::size_t min_region_size = 1, 
-            const Face_descriptor_map &face_descriptor_map = Face_descriptor_map(), const Traits &traits = Traits()) : 
+            const Face_descriptor_map face_descriptor_map = Face_descriptor_map(), const Traits &traits = Traits()) : 
             m_face_graph(face_graph),
+            m_input_range(CGAL::faces(m_face_graph)),
             m_index_to_item_map(index_to_item_map),
             m_distance_threshold(distance_threshold),
             m_normal_threshold(normal_threshold),
@@ -122,7 +136,7 @@ namespace CGAL {
                 const auto &query_item = get(m_index_to_item_map, query_index);
                 const auto &key        = *query_item;
 
-                const auto &face_descriptor = get(m_face_descriptor_map, key);
+                const Face_descriptor &face_descriptor = get(m_face_descriptor_map, key);
 
                 Point_3 face_centroid;
                 get_centroid(face_descriptor, face_centroid);
@@ -221,7 +235,6 @@ namespace CGAL {
 
         private:
         
-            template<class Face_descriptor>
             void get_centroid(const Face_descriptor &face_descriptor, Point_3 &centroid) const {
                 
                 const auto &halfedge_descriptor = CGAL::halfedge(face_descriptor, m_face_graph);
@@ -251,7 +264,6 @@ namespace CGAL {
                 centroid = Point_3(x, y, z);
             }
 
-            template<class Face_descriptor>
             void get_normal(const Face_descriptor &face_descriptor, Vector_3 &normal) const {
 
                 const auto &halfedge_descriptor = CGAL::halfedge(face_descriptor, m_face_graph);
@@ -272,13 +284,14 @@ namespace CGAL {
             // Fields.
             const Face_graph                   &m_face_graph;
 
+            const Input_range                   m_input_range;
+            const Index_to_item_map             m_index_to_item_map;
+
             const FT                            m_distance_threshold;
             const FT                            m_normal_threshold;
             const std::size_t                   m_min_region_size;
             
-            const Face_descriptor_map          &m_face_descriptor_map;
-
-            const Index_to_item_map             m_index_to_item_map;
+            const Face_descriptor_map           m_face_descriptor_map;
             
             const Squared_length_3              m_squared_length_3;
             const Squared_distance_3            m_squared_distance_3;
@@ -289,8 +302,6 @@ namespace CGAL {
 
             Plane_3                             m_plane_of_best_fit;
             Vector_3                            m_normal_of_best_fit;
-
-            const Input_range                   m_input_range;
         };
 
     } // namespace Shape_detection

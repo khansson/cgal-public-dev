@@ -23,6 +23,8 @@ namespace CGAL {
             value_type operator[](key_type k) const { 
                 
                 key_type count = 0;
+                CGAL_precondition(k < m_input_range.size());
+                
                 for (value_type item = m_input_range.begin(); item != m_input_range.end(); ++item, ++count)
                     if (count == k) return item;
             }

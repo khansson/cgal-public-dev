@@ -5,11 +5,11 @@ project(Region_growing_Tests)
 
 cmake_minimum_required(VERSION 2.8.10)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 
 find_package(CGAL QUIET COMPONENTS Core)
 
-if (CGAL_FOUND)
+if(CGAL_FOUND)
 
     include(${CGAL_USE_FILE})
 
@@ -21,8 +21,8 @@ if (CGAL_FOUND)
 
     create_single_source_cgal_program("test_region_growing_on_points_2.cpp")
     create_single_source_cgal_program("test_region_growing_on_points_3.cpp")
-    create_single_source_cgal_program("test_region_growing_on_surface_mesh.cpp")
+    create_single_source_cgal_program("test_region_growing_on_face_graph.cpp")
 
-else ()
+else()
     message(WARNING "This program requires the CGAL library, and will not be compiled.")
-endif ()
+endif()

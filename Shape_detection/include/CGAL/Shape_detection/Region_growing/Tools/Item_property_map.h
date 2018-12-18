@@ -34,8 +34,8 @@ namespace CGAL {
             }
                 
         private:
-            const Index_to_item_map &m_index_to_item_map;
-            const Property_map      &m_property_map;
+            const Index_to_item_map  &m_index_to_item_map;
+            const Property_map       &m_property_map;
         };
 
     } // namespace Shape_detection

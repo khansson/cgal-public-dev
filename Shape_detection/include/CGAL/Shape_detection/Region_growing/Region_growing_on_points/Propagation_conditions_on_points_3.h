@@ -76,8 +76,9 @@ namespace CGAL {
             */
             Propagation_conditions_on_points_3(const Input_range &input_range, 
             const FT distance_threshold = FT(1), const FT normal_threshold = FT(9) / FT(10), const std::size_t min_region_size = 3, 
-            const Point_map &point_map = Point_map(), const Normal_map &normal_map = Normal_map(), const Traits &traits = Traits()) : 
-            m_index_to_item_map(input_range),
+            const Point_map point_map = Point_map(), const Normal_map normal_map = Normal_map(), const Traits traits = Traits()) : 
+            m_input_range(input_range),
+            m_index_to_item_map(m_input_range),
             m_distance_threshold(distance_threshold),
             m_normal_threshold(normal_threshold),
             m_min_region_size(min_region_size),
@@ -93,9 +94,10 @@ namespace CGAL {
                 CGAL_precondition(min_region_size    > 2);
             }        
 
-            Propagation_conditions_on_points_3(const Input_range &, const Index_to_item_map &index_to_item_map,
+            Propagation_conditions_on_points_3(const Input_range &input_range, const Index_to_item_map index_to_item_map,
             const FT distance_threshold = FT(1), const FT normal_threshold = FT(9) / FT(10), const std::size_t min_region_size = 3, 
-            const Point_map &point_map = Point_map(), const Normal_map &normal_map = Normal_map(), const Traits &traits = Traits()) :
+            const Point_map point_map = Point_map(), const Normal_map normal_map = Normal_map(), const Traits traits = Traits()) :
+            m_input_range(input_range),
             m_index_to_item_map(index_to_item_map),
             m_distance_threshold(distance_threshold),
             m_normal_threshold(normal_threshold),
@@ -216,14 +218,16 @@ namespace CGAL {
         private:
         
             // Fields.
+            const Input_range                  &m_input_range;
+
+            const Index_to_item_map             m_index_to_item_map;
+
             const FT                            m_distance_threshold;
             const FT                            m_normal_threshold;
             const std::size_t                   m_min_region_size;
 
-            const Point_map                    &m_point_map;
-            const Normal_map                   &m_normal_map;
-            
-            const Index_to_item_map             m_index_to_item_map;
+            const Point_map                     m_point_map;
+            const Normal_map                    m_normal_map;
             
             const Squared_length_3              m_squared_length_3;
             const Squared_distance_3            m_squared_distance_3;
