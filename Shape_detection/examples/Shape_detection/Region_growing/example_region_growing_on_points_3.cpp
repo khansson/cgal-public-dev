@@ -7,7 +7,6 @@
 
 // CGAL includes.
 #include <CGAL/array.h>
-#include <CGAL/IO/Color.h>
 #include <CGAL/property_map.h>
 #include <CGAL/IO/write_ply_points.h>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
@@ -30,8 +29,8 @@ using Input_range = CGAL::Point_set_3<Point_3>;
 using Point_map   = typename Input_range::Point_map;
 using Normal_map  = typename Input_range::Vector_map;
 
-using Connectivity   = CGAL::Shape_detection::Nearest_neighbor_connectivity_on_points<Input_range, Point_map, Kernel>;
-using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_points_3<Input_range, Point_map, Normal_map, Kernel>;
+using Connectivity   = CGAL::Shape_detection::Nearest_neighbor_connectivity_on_points<Kernel, Input_range, Point_map>;
+using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_points_3<Kernel, Input_range, Point_map, Normal_map>;
 using Region_growing = CGAL::Shape_detection::Region_growing<Input_range, Connectivity, Conditions>;
 
 using Color            = CGAL::cpp11::array<unsigned char, 3>;
@@ -116,7 +115,7 @@ int main(int argc, char *argv[]) {
                                 static_cast<unsigned char>(rand() % 256),
                                 static_cast<unsigned char>(rand() % 256));
 
-        // Iterate through all region elements.
+        // Iterate through all region items.
         for (auto index : *region) {
             
             const Point_3 &point = get(input_range.point_map(), *get(index_to_item_map, index));
@@ -141,23 +140,24 @@ int main(int argc, char *argv[]) {
                                         CGAL::PLY_property<unsigned char>("blue")));
 
         std::cerr << "* found regions are saved in " << fullpath << std::endl;
+        out.close();
     }
 
-    // Print the number of unclassified points.
-    std::cerr << "* " << region_growing.number_of_unclassified_items() << " points do not belong to any region" << std::endl;
+    // Print the number of unassigned points.
+    std::cerr << "* " << region_growing.number_of_unassigned_items() << " points do not belong to any region" << std::endl;
 
-    // Get all unclassified items.
-    const auto &unclassified_items = region_growing.unclassified_items();
+    // Get all unassigned items.
+    const auto &unassigned_items = region_growing.unassigned_items();
 
-    // Store all unclassified points.
-    std::vector<Point_3> unclassified_points;
-    for (auto index : unclassified_items) {
+    // Store all unassigned points.
+    std::vector<Point_3> unassigned_points;
+    for (auto index : unassigned_items) {
             
         const Point_3 &point = get(input_range.point_map(), *get(index_to_item_map, index));
-        unclassified_points.push_back(point);
+        unassigned_points.push_back(point);
     }
 
-    std::cerr << "* " << unclassified_points.size() << " unclassified points are stored" << std::endl;
+    std::cerr << "* " << unassigned_points.size() << " unassigned points are stored" << std::endl;
     std::cout << std::endl << "region_growing_on_points_3 example finished" << std::endl << std::endl;
 
     return EXIT_SUCCESS;

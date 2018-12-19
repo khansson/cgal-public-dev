@@ -13,7 +13,6 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
-#include <CGAL/Shape_detection/Region_growing/Region_growing_traits.h>
 #include <CGAL/Shape_detection/Region_growing/Region_growing_on_points.h>
 
 using Kernel = CGAL::Exact_predicates_inexact_constructions_kernel;
@@ -27,11 +26,9 @@ using Input_range       = std::vector<Point_with_normal>;
 using Point_map         = CGAL::First_of_pair_property_map<Point_with_normal>;
 using Normal_map        = CGAL::Second_of_pair_property_map<Point_with_normal>;
 
-using Traits         = CGAL::Shape_detection::Region_growing_traits<Input_range, Point_map, Kernel>;
-using Connectivity   = CGAL::Shape_detection::Fuzzy_sphere_connectivity_on_points<Traits>;
-using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_points_2<Traits, Normal_map>;
-using Region_growing = CGAL::Shape_detection::Region_growing<Traits, Connectivity, Conditions>;
-using Regions        = typename Region_growing::Region_range;
+using Connectivity   = CGAL::Shape_detection::Fuzzy_sphere_connectivity_on_points<Kernel, Input_range, Point_map>;
+using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_points_2<Kernel, Input_range, Point_map, Normal_map>;
+using Region_growing = CGAL::Shape_detection::Region_growing<Input_range, Connectivity, Conditions>;
 
 using Timer = CGAL::Timer;
 
@@ -40,7 +37,7 @@ const FT search_radius, const FT max_distance_to_line, const FT normal_threshold
 
     // Create instances of the classes Connectivity and Conditions.
     Connectivity connectivity(input_range, search_radius);
-    Conditions   conditions(max_distance_to_line, normal_threshold, min_region_size);
+    Conditions   conditions(input_range, max_distance_to_line, normal_threshold, min_region_size);
     
     // Create an instance of the region growing class.
     Region_growing region_growing(input_range, connectivity, conditions);
@@ -48,26 +45,27 @@ const FT search_radius, const FT max_distance_to_line, const FT normal_threshold
     // Run the algorithm.
     Timer timer;
     timer.start();
-    region_growing.find_regions();
+    region_growing.detect();
     timer.stop();
 
     // Compute the number of points assigned to all found regions.
     size_t number_of_assigned_points = 0;
-    const Regions &regions = region_growing.regions();
+    const auto &regions = region_growing.regions();
 
     for (auto region = regions.begin(); region != regions.end(); ++region)
         number_of_assigned_points += region->size();
 
     // Print statistics.
-    std::cout << "Test #"                         << test_count                         << std::endl;
-    std::cout << "  search_radius = "             << search_radius                      << std::endl;
-    std::cout << "  min_region_size = "           << min_region_size                    << std::endl;
-    std::cout << "  max_distance_to_line = "      << max_distance_to_line               << std::endl;
-    std::cout << "  normal_threshold = "          << normal_threshold                   << std::endl;
-    std::cout << "  -----"                                                              << std::endl;
-    std::cout << "  Time elapsed: "               << timer.time()                       << std::endl;
-    std::cout << "  Number of detected regions: " << region_growing.number_of_regions() << std::endl;
-    std::cout << "  Number of assigned points: "  << number_of_assigned_points          << std::endl;
+    std::cout << "Test #"                          << test_count                                  << std::endl;
+    std::cout << "  search_radius = "              << search_radius                               << std::endl;
+    std::cout << "  min_region_size = "            << min_region_size                             << std::endl;
+    std::cout << "  max_distance_to_line = "       << max_distance_to_line                        << std::endl;
+    std::cout << "  normal_threshold = "           << normal_threshold                            << std::endl;
+    std::cout << "  -----"                                                                        << std::endl;
+    std::cout << "  Time elapsed: "                << timer.time()                                << std::endl;
+    std::cout << "  Number of detected regions: "  << region_growing.number_of_regions()          << std::endl;
+    std::cout << "  Number of assigned points: "   << number_of_assigned_points                   << std::endl;
+    std::cout << "  Number of unassigned points: " << region_growing.number_of_unassigned_items() << std::endl;
     std::cout << std::endl << std::endl;
 }
 
@@ -85,7 +83,7 @@ int main(int argc, char *argv[]) {
 
     in.close();
 
-    // Parameters.
+    // Default parameter values for the data file points_2.xyz.
     const FT     max_distance_to_line = FT(45) / FT(10);
     const FT     normal_threshold     = FT(7)  / FT(10);
     const size_t min_region_size      = 5;

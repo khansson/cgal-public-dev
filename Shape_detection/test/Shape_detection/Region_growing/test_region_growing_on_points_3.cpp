@@ -27,8 +27,8 @@ bool test_region_growing_on_points_3(int argc, char *argv[]) {
     using Point_map   = typename Input_range::Point_map;
     using Normal_map  = typename Input_range::Vector_map;
 
-    using Connectivity   = CGAL::Shape_detection::Nearest_neighbor_connectivity_on_points<Input_range, Point_map, Kernel>;
-    using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_points_3<Input_range, Point_map, Normal_map, Kernel>;
+    using Connectivity   = CGAL::Shape_detection::Nearest_neighbor_connectivity_on_points<Kernel, Input_range, Point_map>;
+    using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_points_3<Kernel, Input_range, Point_map, Normal_map>;
     using Region_growing = CGAL::Shape_detection::Region_growing<Input_range, Connectivity, Conditions>;
 
     // Default parameter values for the data file points_3.xyz.
@@ -67,10 +67,10 @@ bool test_region_growing_on_points_3(int argc, char *argv[]) {
     for (auto region = regions.begin(); region != regions.end(); ++region)
         if (!conditions.are_valid(*region)) return false;
 
-    const auto &unclassified_points = region_growing.unclassified_items();
+    const auto &unassigned_points = region_growing.unassigned_items();
  
-    CGAL_assertion(unclassified_points.size() == 1063 && unclassified_points.size() == region_growing.number_of_unclassified_items());
-    if (unclassified_points.size() != 1063) return false;
+    CGAL_assertion(unassigned_points.size() == 1063 && unassigned_points.size() == region_growing.number_of_unassigned_items());
+    if (unassigned_points.size() != 1063) return false;
 
     return true;
 }
@@ -92,12 +92,4 @@ int main(int argc, char *argv[]) {
     
     std::cout << "exact_inexact_test_success: " << exact_inexact_test_success << std::endl;
     CGAL_assertion(exact_inexact_test_success);
-
-    // ------>
-
-    bool exact_exact_test_success = true;
-    if (!test_region_growing_on_points_3<CGAL::Exact_predicates_exact_constructions_kernel>(argc, argv)) exact_exact_test_success = false;
-    
-    std::cout << "exact_exact_test_success: " << exact_exact_test_success << std::endl;
-    CGAL_assertion(exact_exact_test_success);
 }

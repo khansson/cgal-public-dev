@@ -12,7 +12,7 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 
 // Local includes.
-#include <CGAL/Shape_detection/Region_growing/Tools/Sqrt.h>
+#include <CGAL/Shape_detection/Region_growing/Internal/Sqrt.h>
 #include <CGAL/Shape_detection/Region_growing/Tools/Random_access_index_to_item_property_map.h>
 
 namespace CGAL {
@@ -27,7 +27,7 @@ namespace CGAL {
             \tparam Traits Model of `RegionGrowingOnPointsTraits`
             \cgalModels `RegionGrowingPropagationConditions`
         */
-        template<class InputRange, class PointMap, class NormalMap, class Traits, 
+        template<class Traits, class InputRange, class PointMap, class NormalMap,
         class IndexToItemMap = CGAL::Shape_detection::Random_access_index_to_item_property_map<InputRange> >
         class Propagation_conditions_on_points_3 {
 
@@ -64,7 +64,7 @@ namespace CGAL {
             using Get_sqrt               = CGAL::Shape_detection::Get_sqrt<Traits>;
             using Sqrt                   = typename Get_sqrt::Sqrt;
 
-            using Index                  = std::size_t;
+            using Index                  = int;
             ///< \endcond
 
             /*!

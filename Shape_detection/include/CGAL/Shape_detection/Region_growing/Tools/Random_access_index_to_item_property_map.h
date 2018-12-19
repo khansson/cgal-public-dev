@@ -1,6 +1,9 @@
 #ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_RANDOM_ACCESS_INDEX_TO_ITEM_PROPERTY_MAP_H
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_RANDOM_ACCESS_INDEX_TO_ITEM_PROPERTY_MAP_H
 
+// CGAL includes.
+#include <CGAL/assertions.h>
+
 namespace CGAL {
 
     namespace Shape_detection {
@@ -13,7 +16,7 @@ namespace CGAL {
             using Input_range = InputRange;
 
             using value_type  = typename InputRange::const_iterator;
-            using key_type    = std::size_t;
+            using key_type    = int;
             using category    = boost::lvalue_property_map_tag;
 
             Random_access_index_to_item_property_map(const Input_range &input_range) : 
@@ -23,7 +26,7 @@ namespace CGAL {
             value_type operator[](key_type k) const { 
 
                 CGAL_precondition(k < m_input_range.size());
-                return static_cast<value_type>(m_input_range.begin() + k);
+                return m_input_range.begin() + k;
             }
 
             friend inline value_type get(const Random_access_index_to_item_property_map &index_to_item_map, key_type k) { 

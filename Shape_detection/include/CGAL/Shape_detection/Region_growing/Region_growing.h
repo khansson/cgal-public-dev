@@ -27,7 +27,7 @@ namespace CGAL {
             using Input_range             = InputRange;
             ///< An arbitrary range with user-defined items. The range must implement the function size().
             
-            using Item_index              = std::size_t;
+            using Item_index              = int;
             ///< Index of a given item.
 
             ///< \cond SKIP_IN_MANUAL
@@ -50,11 +50,11 @@ namespace CGAL {
             using Region_range            = CGAL::Iterator_range<typename Regions::const_iterator>;
             ///< An `Iterator_range` of the iterators in `CGAL::Shape_detection::Region_growing::Regions`.
 
-            using Unclassified_items      = Items;
-            ///< A random access container with indices of all unclassified items.
+            using Unassigned_items        = Items;
+            ///< A random access container with indices of all unassigned items.
 
-            using Unclassified_range      = CGAL::Iterator_range<typename Unclassified_items::const_iterator>;
-            ///< An `Iterator_range` of the iterators in `CGAL::Shape_detection::Region_growing::Unclassified_items`. Here, we store indices of all unclassified items.
+            using Unassigned_range        = CGAL::Iterator_range<typename Unassigned_items::const_iterator>;
+            ///< An `Iterator_range` of the iterators in `CGAL::Shape_detection::Region_growing::Unassigned_items`. Here, we store indices of all unassigned items.
 
             /*!
                 The constructor requires an input range and instances of the Connectivity class and Conditions class.
@@ -88,11 +88,11 @@ namespace CGAL {
                 }
                 m_output_regions = Region_range(m_regions.begin(), m_regions.end());
 
-                // Return unclassified items.
+                // Return unassigned items.
                 for (Item_index item_index = 0; item_index < m_input_range.size(); ++item_index)
-                    if (!m_visited[item_index]) m_unclassified.push_back(item_index);
+                    if (!m_visited[item_index]) m_unassigned.push_back(item_index);
 
-                m_output_unclassified = Unclassified_range(m_unclassified.begin(), m_unclassified.end());
+                m_output_unassigned = Unassigned_range(m_unassigned.begin(), m_unassigned.end());
             }
 
             /*!
@@ -103,8 +103,8 @@ namespace CGAL {
                 return m_output_regions;
             }
 
-            const Unclassified_range &unclassified_items() {
-                return m_output_unclassified;
+            const Unassigned_range &unassigned_items() {
+                return m_output_unassigned;
             }
 
             /*!
@@ -115,10 +115,10 @@ namespace CGAL {
             }
 
             /*!
-                Return the number of unclassified items.
+                Return the number of unassigned items.
             */
-            std::size_t number_of_unclassified_items() {
-                return m_unclassified.size();
+            std::size_t number_of_unassigned_items() {
+                return m_unassigned.size();
             }
 
             /*!
@@ -129,7 +129,7 @@ namespace CGAL {
                 m_visited.clear();
                 m_regions.clear();
 
-                m_unclassified.clear();
+                m_unassigned.clear();
                 m_visited.resize(m_input_range.size(), false);
             }
 
@@ -197,10 +197,10 @@ namespace CGAL {
 
             Visited_items           m_visited;
             Regions                 m_regions;
-            Unclassified_items      m_unclassified;
+            Unassigned_items        m_unassigned;
 
-            Region_range            m_output_regions      = Region_range(m_regions.begin(), m_regions.end());
-            Unclassified_range      m_output_unclassified = Unclassified_range(m_unclassified.begin(), m_unclassified.end());
+            Region_range            m_output_regions    = Region_range(m_regions.begin(), m_regions.end());
+            Unassigned_range        m_output_unassigned = Unassigned_range(m_unassigned.begin(), m_unassigned.end());
         };
 
     } // namespace Shape_detection

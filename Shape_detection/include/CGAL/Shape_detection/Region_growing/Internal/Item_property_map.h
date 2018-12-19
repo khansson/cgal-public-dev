@@ -15,7 +15,7 @@ namespace CGAL {
 
             using value_type = typename Property_map::value_type;
             using reference  = const value_type&;
-            using key_type   = std::size_t;
+            using key_type   = int;
             using category   = boost::lvalue_property_map_tag;
 
             Item_property_map(const Index_to_item_map &index_to_item_map, const Property_map &property_map) : 

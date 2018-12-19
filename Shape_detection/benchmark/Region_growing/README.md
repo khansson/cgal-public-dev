@@ -23,9 +23,10 @@ Test #1
   max_distance_to_line = 4.5
   normal_threshold = 0.7
   -----
-  Time elapsed: 0.243534
+  Time elapsed: 0.164965
   Number of detected regions: 796
   Number of assigned points: 4491
+  Number of unassigned points: 63277
 
 
 Test #2
@@ -34,9 +35,10 @@ Test #2
   max_distance_to_line = 4.5
   normal_threshold = 0.7
   -----
-  Time elapsed: 0.219941
+  Time elapsed: 0.115316
   Number of detected regions: 3054
   Number of assigned points: 63154
+  Number of unassigned points: 4614
 
 
 Test #3
@@ -45,9 +47,10 @@ Test #3
   max_distance_to_line = 4.5
   normal_threshold = 0.7
   -----
-  Time elapsed: 0.321682
+  Time elapsed: 0.132817
   Number of detected regions: 2483
   Number of assigned points: 64977
+  Number of unassigned points: 2791
 
 
 Test #4
@@ -56,7 +59,8 @@ Test #4
   max_distance_to_line = 4.5
   normal_threshold = 0.7
   -----
-  Time elapsed: 0.466346
+  Time elapsed: 0.168458
   Number of detected regions: 2282
   Number of assigned points: 65353
+  Number of unassigned points: 2415
 ```

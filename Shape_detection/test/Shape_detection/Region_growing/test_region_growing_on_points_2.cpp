@@ -28,8 +28,8 @@ bool test_region_growing_on_points_2(int argc, char *argv[]) {
     using Point_map         = CGAL::First_of_pair_property_map<Point_with_normal>;
     using Normal_map        = CGAL::Second_of_pair_property_map<Point_with_normal>;
 
-    using Connectivity   = CGAL::Shape_detection::Fuzzy_sphere_connectivity_on_points<Input_range, Point_map, Kernel>;
-    using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_points_2<Input_range, Point_map, Normal_map, Kernel>;
+    using Connectivity   = CGAL::Shape_detection::Fuzzy_sphere_connectivity_on_points<Kernel, Input_range, Point_map>;
+    using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_points_2<Kernel, Input_range, Point_map, Normal_map>;
     using Region_growing = CGAL::Shape_detection::Region_growing<Input_range, Connectivity, Conditions>;
 
     // Default parameter values for the data file points_2.xyz.
@@ -70,10 +70,10 @@ bool test_region_growing_on_points_2(int argc, char *argv[]) {
     for (auto region = regions.begin(); region != regions.end(); ++region)
         if (!conditions.are_valid(*region)) return false;
 
-    const auto &unclassified_points = region_growing.unclassified_items();
+    const auto &unassigned_points = region_growing.unassigned_items();
 
-    CGAL_assertion(unclassified_points.size() == 82 && unclassified_points.size() == region_growing.number_of_unclassified_items());
-    if (unclassified_points.size() != 82) return false;
+    CGAL_assertion(unassigned_points.size() == 82 && unassigned_points.size() == region_growing.number_of_unassigned_items());
+    if (unassigned_points.size() != 82) return false;
 
     return true;
 }

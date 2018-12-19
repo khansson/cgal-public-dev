@@ -24,8 +24,8 @@ using Input_range       = std::vector<Point_with_normal>;
 using Point_map         = CGAL::First_of_pair_property_map<Point_with_normal>;
 using Normal_map        = CGAL::Second_of_pair_property_map<Point_with_normal>;
 
-using Connectivity   = CGAL::Shape_detection::Fuzzy_sphere_connectivity_on_points<Input_range, Point_map, Kernel>;
-using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_points_2<Input_range, Point_map, Normal_map, Kernel>;
+using Connectivity   = CGAL::Shape_detection::Fuzzy_sphere_connectivity_on_points<Kernel, Input_range, Point_map>;
+using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_points_2<Kernel, Input_range, Point_map, Normal_map>;
 using Region_growing = CGAL::Shape_detection::Region_growing<Input_range, Connectivity, Conditions>;
 
 int main(int argc, char *argv[]) {

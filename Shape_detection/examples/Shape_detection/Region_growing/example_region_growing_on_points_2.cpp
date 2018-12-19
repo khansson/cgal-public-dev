@@ -9,7 +9,6 @@
 
 // CGAL includes.
 #include <CGAL/array.h>
-#include <CGAL/IO/Color.h>
 #include <CGAL/property_map.h>
 #include <CGAL/IO/write_ply_points.h>
 #include <CGAL/Simple_cartesian.h>
@@ -31,8 +30,8 @@ using Input_range       = std::vector<Point_with_normal>;
 using Point_map         = CGAL::First_of_pair_property_map<Point_with_normal>;
 using Normal_map        = CGAL::Second_of_pair_property_map<Point_with_normal>;
 
-using Connectivity   = CGAL::Shape_detection::Fuzzy_sphere_connectivity_on_points<Input_range, Point_map, Kernel>;
-using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_points_2<Input_range, Point_map, Normal_map, Kernel>;
+using Connectivity   = CGAL::Shape_detection::Fuzzy_sphere_connectivity_on_points<Kernel, Input_range, Point_map>;
+using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_points_2<Kernel, Input_range, Point_map, Normal_map>;
 using Region_growing = CGAL::Shape_detection::Region_growing<Input_range, Connectivity, Conditions>;
 
 using Color            = CGAL::cpp11::array<unsigned char, 3>;
@@ -118,7 +117,7 @@ int main(int argc, char *argv[]) {
                                 static_cast<unsigned char>(rand() % 256),
                                 static_cast<unsigned char>(rand() % 256));
 
-        // Iterate through all region elements.
+        // Iterate through all region items.
         for (auto index : *region) {
             
             const Point_2 &point = get(Point_map(), *get(index_to_item_map, index));
@@ -143,6 +142,7 @@ int main(int argc, char *argv[]) {
                                         CGAL::PLY_property<unsigned char>("blue")));
 
         std::cerr << "* found regions are saved in " << fullpath << std::endl;
+        out.close();
     }
 
     std::cout << std::endl << "region_growing_on_points_2 example finished" << std::endl << std::endl;
