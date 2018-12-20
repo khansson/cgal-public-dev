@@ -20,20 +20,20 @@
 // Author(s)     : Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez
 //
 
-#ifndef CGAL_SHAPE_DETECTION_3_PLANE_H
-#define CGAL_SHAPE_DETECTION_3_PLANE_H
+#ifndef CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_PLANE_H
+#define CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_PLANE_H
 
-#include <CGAL/license/Point_set_shape_detection_3.h>
+// #include <CGAL/license/Shape_detection.h>
 
 
-#include <CGAL/Shape_detection_3/Shape_base.h>
+#include <CGAL/Shape_detection/Efficient_RANSAC/Shape_base.h>
 #include <CGAL/number_utils.h>
 
 /*!
  \file Plane.h
  */
 namespace CGAL {
-  namespace Shape_detection_3 {
+  namespace Shape_detection {
     /*!
      \ingroup PkgPointSetShapeDetection3Shapes
      \brief Plane implements Shape_base. The plane is represented by the normal vector and the distance to the origin.

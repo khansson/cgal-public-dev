@@ -1,46 +1,43 @@
-#include <CGAL/internal/disable_deprecation_warnings_and_errors.h>
-
-#include "generators.h"
+#include "test_efficient_RANSAC_generators.h"
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/IO/read_xyz_points.h>
 #include <CGAL/Simple_cartesian.h>
 
-#include <CGAL/Shape_detection_3.h>
-#include <CGAL/Shape_detection_3/Efficient_RANSAC_traits.h> // Deprecated
-#include <CGAL/regularize_planes.h>
+#include <CGAL/Shape_detection/Efficient_RANSAC.h>
+#include <CGAL/Regularization/regularize_planes.h>
 #include <CGAL/Point_with_normal_3.h>
 #include <CGAL/property_map.h>
 
 
 template <class K>
-bool test_scene() {
+bool test_scene(int argc, char** argv) {
   typedef typename K::FT                                      FT;
   typedef CGAL::Point_with_normal_3<K>                        Pwn;
   typedef std::vector<Pwn>                                    Pwn_vector;
   typedef CGAL::Identity_property_map<Pwn>                    Point_map;
   typedef CGAL::Normal_of_point_with_normal_map<K>            Normal_map;
 
-  typedef CGAL::Shape_detection_3::Efficient_RANSAC_traits<   // Deprecated
+  typedef CGAL::Shape_detection::Efficient_RANSAC_traits<
     K, Pwn_vector, Point_map, Normal_map>                     Traits;
 
-  typedef CGAL::Shape_detection_3::Efficient_RANSAC<Traits>
+  typedef CGAL::Shape_detection::Efficient_RANSAC<Traits>
                                                               Efficient_ransac;
 
   typedef typename Efficient_ransac::Point_index_range        Point_index_range;
 
-  typedef CGAL::Shape_detection_3::Plane<Traits>              Plane;
-  typedef CGAL::Shape_detection_3::Cone<Traits>               Cone;
-  typedef CGAL::Shape_detection_3::Cylinder<Traits>           Cylinder;
-  typedef CGAL::Shape_detection_3::Sphere<Traits>             Sphere;
-  typedef CGAL::Shape_detection_3::Torus<Traits>              Torus;
+  typedef CGAL::Shape_detection::Plane<Traits>              Plane;
+  typedef CGAL::Shape_detection::Cone<Traits>               Cone;
+  typedef CGAL::Shape_detection::Cylinder<Traits>           Cylinder;
+  typedef CGAL::Shape_detection::Sphere<Traits>             Sphere;
+  typedef CGAL::Shape_detection::Torus<Traits>              Torus;
 
   Pwn_vector points;
 
   // Loads point set from a file. 
   // read_xyz_points_and_normals takes an OutputIterator for storing the points
   // and a property map to store the normal vector with each point.
-  std::ifstream stream("data/cube.pwn");
+  std::ifstream stream((argc > 1) ? argv[1] : "../data/cube.pwn");
 
   if (!stream ||
     !CGAL::read_xyz_points(stream,
@@ -135,8 +132,8 @@ bool test_scene() {
   CGAL::regularize_planes (points,
                            Point_map(),
                            planes,
-                           CGAL::Shape_detection_3::Plane_map<Traits>(),
-                           CGAL::Shape_detection_3::Point_to_shape_index_map<Traits>(points, planes),
+                           CGAL::Shape_detection::Plane_map<Traits>(),
+                           CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
                            true, true, true, true,
                            (FT)50., (FT)0.01);
   
@@ -148,19 +145,19 @@ bool test_scene() {
 }
 
 
-int main() {
+int main(int argc, char** argv) {
   bool success = true;
 
   std::cout << "test_scene<CGAL::Simple_cartesian<float>> ";
-  if (!test_scene<CGAL::Simple_cartesian<float> >()) 
+  if (!test_scene<CGAL::Simple_cartesian<float> >(argc, argv)) 
     success = false;
 
   std::cout << "test_scene<CGAL::Simple_cartesian<double>> ";
-  if (!test_scene<CGAL::Simple_cartesian<double> >())
+  if (!test_scene<CGAL::Simple_cartesian<double> >(argc, argv))
     success = false;
 
   std::cout << "test_scene<CGAL::Exact_predicates_inexact_constructions_kernel> ";
-  if (!test_scene<CGAL::Exact_predicates_inexact_constructions_kernel>()) 
+  if (!test_scene<CGAL::Exact_predicates_inexact_constructions_kernel>(argc, argv)) 
     success = false;
 
   return (success) ? EXIT_SUCCESS : EXIT_FAILURE;

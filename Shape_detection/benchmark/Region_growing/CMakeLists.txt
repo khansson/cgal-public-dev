@@ -15,8 +15,6 @@ if(CGAL_FOUND)
 
     include(CGAL_CreateSingleSourceCGALProgram)
 
-    include_directories(BEFORE "../../include")
-
     create_single_source_cgal_program("benchmark_region_growing_on_points_2.cpp")
 
 else()

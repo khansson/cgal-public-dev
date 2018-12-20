@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
     if (argc > 2) {
         
         const std::string path     = argv[2];
-        const std::string fullpath = path + "regions_3.ply";
+        const std::string fullpath = path + "regions_points_3.ply";
 
         std::ofstream out(fullpath);
 

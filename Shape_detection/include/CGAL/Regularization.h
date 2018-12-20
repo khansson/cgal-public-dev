@@ -1,4 +1,4 @@
-// Copyright (c) 2015 INRIA Sophia-Antipolis (France).
+// Copyright (c) 2018 INRIA Sophia-Antipolis (France).
 // All rights reserved.
 //
 // This file is part of CGAL (www.cgal.org).
@@ -17,21 +17,20 @@
 // SPDX-License-Identifier: GPL-3.0+
 //
 //
-// Author(s) : Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez
+// Author(s) : Dmitry Anisimov
 //
 
 /**
 * \ingroup PkgShapeDetection
-* \file CGAL/Shape_detection.h
+* \file CGAL/Regularization.h
 * A header file that includes all headers of this package.
 */
 
-#ifndef CGAL_SHAPE_DETECTION_H
-#define CGAL_SHAPE_DETECTION_H
+#ifndef CGAL_REGULARIZATION_H
+#define CGAL_REGULARIZATION_H
 
-// #include <CGAL/license/Shape_detection.h>
+// #include <CGAL/license/Regularization.h>
 
-#include <CGAL/Shape_detection/Region_growing.h>
-#include <CGAL/Shape_detection/Efficient_RANSAC.h>
+#include <CGAL/Regularization/regularize_planes.h>
 
-#endif // CGAL_SHAPE_DETECTION_H
+#endif // CGAL_REGULARIZATION_H

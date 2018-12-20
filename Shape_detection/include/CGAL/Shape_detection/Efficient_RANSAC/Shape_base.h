@@ -20,10 +20,10 @@
 // Author(s)     : Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez
 //
 
-#ifndef CGAL_SHAPE_DETECTION_3_SHAPE_BASE_H
-#define CGAL_SHAPE_DETECTION_3_SHAPE_BASE_H
+#ifndef CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_SHAPE_BASE_H
+#define CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_SHAPE_BASE_H
 
-#include <CGAL/license/Point_set_shape_detection_3.h>
+// #include <CGAL/license/Shape_detection.h>
 
 
 #include <vector>
@@ -49,7 +49,7 @@
 #endif
 
 namespace CGAL {
-  namespace Shape_detection_3 {
+  namespace Shape_detection {
   namespace internal {
     template<class PointAccessor>
     class Octree;

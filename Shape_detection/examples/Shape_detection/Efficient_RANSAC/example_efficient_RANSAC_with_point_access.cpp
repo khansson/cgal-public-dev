@@ -5,7 +5,7 @@
 #include <CGAL/Timer.h>
 #include <CGAL/number_utils.h>
 
-#include <CGAL/Shape_detection_3.h>
+#include <CGAL/Shape_detection/Efficient_RANSAC.h>
 
 #include <iostream>
 #include <fstream>
@@ -20,13 +20,13 @@ typedef CGAL::Second_of_pair_property_map<Point_with_normal> Normal_map;
 
 // In Shape_detection_traits the basic types, i.e., Point and Vector types
 // as well as iterator type and property maps, are defined.
-typedef CGAL::Shape_detection_3::Shape_detection_traits<Kernel,
+typedef CGAL::Shape_detection::Efficient_RANSAC_traits<Kernel,
   Pwn_vector, Point_map, Normal_map>            Traits;
-typedef CGAL::Shape_detection_3::Efficient_RANSAC<Traits>   Efficient_ransac;
-typedef CGAL::Shape_detection_3::Plane<Traits>              Plane;
+typedef CGAL::Shape_detection::Efficient_RANSAC<Traits>   Efficient_ransac;
+typedef CGAL::Shape_detection::Plane<Traits>              Plane;
 
 
-int main()
+int main(int argc, char** argv)
 {
   // Points with normals.
   Pwn_vector points;
@@ -34,7 +34,7 @@ int main()
   // Loads point set from a file. 
   // read_xyz_points_and_normals takes an OutputIterator for storing the points
   // and a property map to store the normal vector with each point.
-  std::ifstream stream("data/cube.pwn");
+  std::ifstream stream((argc > 1) ? argv[1] : "../data/cube.pwn");
 
   if (!stream ||
     !CGAL::read_xyz_points(stream,

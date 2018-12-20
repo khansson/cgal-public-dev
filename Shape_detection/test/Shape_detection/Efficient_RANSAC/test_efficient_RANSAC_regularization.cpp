@@ -2,8 +2,8 @@
 #include <CGAL/Point_with_normal_3.h>
 #include <CGAL/property_map.h>
 
-#include <CGAL/Shape_detection_3.h>
-#include <CGAL/regularize_planes.h>
+#include <CGAL/Shape_detection/Efficient_RANSAC.h>
+#include <CGAL/Regularization/regularize_planes.h>
 #include <CGAL/Random.h>
 #include <CGAL/Aff_transformation_3.h>
 
@@ -19,9 +19,9 @@ typedef std::vector<Point_with_normal>                       Pwn_vector;
 typedef CGAL::First_of_pair_property_map<Point_with_normal>  Point_map;
 typedef CGAL::Second_of_pair_property_map<Point_with_normal> Normal_map;
 
-typedef CGAL::Shape_detection_3::Shape_detection_traits
+typedef CGAL::Shape_detection::Efficient_RANSAC_traits
   <Kernel, Pwn_vector, Point_map, Normal_map>                Traits;
-typedef CGAL::Shape_detection_3::Efficient_RANSAC<Traits>    Efficient_ransac;
+typedef CGAL::Shape_detection::Efficient_RANSAC<Traits>    Efficient_ransac;
 
 typedef CGAL::Aff_transformation_3<Kernel>                   Transform;
 
@@ -83,7 +83,7 @@ std::vector<Plane> get_ransac_planes (const Efficient_ransac& ransac)
   std::vector<Plane> out;
   BOOST_FOREACH(boost::shared_ptr<Efficient_ransac::Shape> shape, ransac.shapes())
     {
-      out.push_back ((Plane)(*(dynamic_cast<CGAL::Shape_detection_3::Plane<Traits>*>(shape.get ()))));
+      out.push_back ((Plane)(*(dynamic_cast<CGAL::Shape_detection::Plane<Traits>*>(shape.get ()))));
     }
   return out;
 }
@@ -155,7 +155,7 @@ int main()
                             5000, std::back_inserter (points));
 
     ransac.set_input(points);
-    ransac.add_shape_factory<CGAL::Shape_detection_3::Plane<Traits> >();
+    ransac.add_shape_factory<CGAL::Shape_detection::Plane<Traits> >();
     ransac.detect(op);
     check_ransac_size (ransac, 2);
 
@@ -166,8 +166,8 @@ int main()
     CGAL::regularize_planes (points,
                              Point_map(),
                              planes,
-                             CGAL::Shape_detection_3::Plane_map<Traits>(),
-                             CGAL::Shape_detection_3::Point_to_shape_index_map<Traits>(points, planes),
+                             CGAL::Shape_detection::Plane_map<Traits>(),
+                             CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
                              true, false, false, false, 5.);
     
     std::vector<Plane> after = get_ransac_planes(ransac);
@@ -178,8 +178,8 @@ int main()
     CGAL::regularize_planes (points,
                              Point_map(),
                              planes,
-                             CGAL::Shape_detection_3::Plane_map<Traits>(),
-                             CGAL::Shape_detection_3::Point_to_shape_index_map<Traits>(points, planes),
+                             CGAL::Shape_detection::Plane_map<Traits>(),
+                             CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
                              true, false, false, false, 15.);
     
     after = get_ransac_planes(ransac);
@@ -202,7 +202,7 @@ int main()
 
     
     ransac.set_input(points);
-    ransac.add_shape_factory<CGAL::Shape_detection_3::Plane<Traits> >();
+    ransac.add_shape_factory<CGAL::Shape_detection::Plane<Traits> >();
     ransac.detect(op);
     check_ransac_size (ransac, 2);
 
@@ -212,8 +212,8 @@ int main()
     CGAL::regularize_planes (points,
                              Point_map(),
                              planes,
-                             CGAL::Shape_detection_3::Plane_map<Traits>(),
-                             CGAL::Shape_detection_3::Point_to_shape_index_map<Traits>(points, planes),
+                             CGAL::Shape_detection::Plane_map<Traits>(),
+                             CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
                              false, true, false, true, 5.);
 
     std::vector<Plane> after = get_ransac_planes(ransac);
@@ -224,8 +224,8 @@ int main()
     CGAL::regularize_planes (points,
                              Point_map(),
                              planes,
-                             CGAL::Shape_detection_3::Plane_map<Traits>(),
-                             CGAL::Shape_detection_3::Point_to_shape_index_map<Traits>(points, planes),
+                             CGAL::Shape_detection::Plane_map<Traits>(),
+                             CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
                              false, true, false, true, 15.);
 
     after = get_ransac_planes(ransac);
@@ -247,7 +247,7 @@ int main()
                             5000, std::back_inserter (points));
 
     ransac.set_input(points);
-    ransac.add_shape_factory<CGAL::Shape_detection_3::Plane<Traits> >();
+    ransac.add_shape_factory<CGAL::Shape_detection::Plane<Traits> >();
     ransac.detect(op);
     check_ransac_size (ransac, 2);
 
@@ -257,8 +257,8 @@ int main()
     CGAL::regularize_planes (points,
                              Point_map(),
                              planes,
-                             CGAL::Shape_detection_3::Plane_map<Traits>(),
-                             CGAL::Shape_detection_3::Point_to_shape_index_map<Traits>(points, planes),
+                             CGAL::Shape_detection::Plane_map<Traits>(),
+                             CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
                              true, false, true, false, 5., 0.1);
 
     std::vector<Plane> after = get_ransac_planes(ransac);
@@ -269,8 +269,8 @@ int main()
     CGAL::regularize_planes (points,
                              Point_map(),
                              planes,
-                             CGAL::Shape_detection_3::Plane_map<Traits>(),
-                             CGAL::Shape_detection_3::Point_to_shape_index_map<Traits>(points, planes),
+                             CGAL::Shape_detection::Plane_map<Traits>(),
+                             CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
                              true, false, true, false, 5., 0.3);
 
     after = get_ransac_planes(ransac);
@@ -297,7 +297,7 @@ int main()
                             5000, std::back_inserter (points));
 
     ransac.set_input(points);
-    ransac.add_shape_factory<CGAL::Shape_detection_3::Plane<Traits> >();
+    ransac.add_shape_factory<CGAL::Shape_detection::Plane<Traits> >();
     ransac.detect(op);
     check_ransac_size (ransac, 2);
 
@@ -306,8 +306,8 @@ int main()
     CGAL::regularize_planes (points,
                              Point_map(),
                              planes,
-                             CGAL::Shape_detection_3::Plane_map<Traits>(),
-                             CGAL::Shape_detection_3::Point_to_shape_index_map<Traits>(points, planes),
+                             CGAL::Shape_detection::Plane_map<Traits>(),
+                             CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
                              false, false, false, true, 5., 0.01, Vector(1., 0., 0.));
 
     std::vector<Plane> after = get_ransac_planes(ransac);
@@ -318,8 +318,8 @@ int main()
     CGAL::regularize_planes (points,
                              Point_map(),
                              planes,
-                             CGAL::Shape_detection_3::Plane_map<Traits>(),
-                             CGAL::Shape_detection_3::Point_to_shape_index_map<Traits>(points, planes),
+                             CGAL::Shape_detection::Plane_map<Traits>(),
+                             CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
                              false, false, false, true, 15., 0.01, Vector(1., 0., 0.));
 
     after = get_ransac_planes(ransac);

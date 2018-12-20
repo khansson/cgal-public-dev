@@ -2,7 +2,7 @@
 # This is the CMake script for compiling a CGAL application.
 
 
-project( Point_set_shape_detection_3_Tests )
+project( Efficient_RANSAC_Tests )
 
 cmake_minimum_required(VERSION 3.1)
 if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
@@ -17,19 +17,27 @@ find_package(CGAL QUIET)
 
 if ( CGAL_FOUND )
 
-  create_single_source_cgal_program( "test_cone_connected_component.cpp" )
-  create_single_source_cgal_program( "test_cone_parameters.cpp" )
-  create_single_source_cgal_program( "test_cylinder_connected_component.cpp" )
-  create_single_source_cgal_program( "test_cylinder_parameters.cpp" )
-  create_single_source_cgal_program( "test_plane_connected_component.cpp" )
-  create_single_source_cgal_program( "test_plane_parameters.cpp" )
-  create_single_source_cgal_program( "test_regularization.cpp" )
-  create_single_source_cgal_program( "test_sphere_connected_component.cpp" )
-  create_single_source_cgal_program( "test_sphere_parameters.cpp" )
-  create_single_source_cgal_program( "test_torus_connected_component.cpp" )
-  create_single_source_cgal_program( "test_torus_parameters.cpp" )
-  create_single_source_cgal_program( "test_scene.cpp" )
-  create_single_source_cgal_program( "deprecated_test_scene.cpp" )
+  include(${CGAL_USE_FILE})
+
+  include(CGAL_CreateSingleSourceCGALProgram)
+
+  create_single_source_cgal_program( "test_efficient_RANSAC_cone_connected_component.cpp" )
+  create_single_source_cgal_program( "test_efficient_RANSAC_cone_parameters.cpp" )
+  
+  create_single_source_cgal_program( "test_efficient_RANSAC_cylinder_connected_component.cpp" )
+  create_single_source_cgal_program( "test_efficient_RANSAC_cylinder_parameters.cpp" )
+  
+  create_single_source_cgal_program( "test_efficient_RANSAC_plane_connected_component.cpp" )
+  create_single_source_cgal_program( "test_efficient_RANSAC_plane_parameters.cpp" )
+
+  create_single_source_cgal_program( "test_efficient_RANSAC_sphere_connected_component.cpp" )
+  create_single_source_cgal_program( "test_efficient_RANSAC_sphere_parameters.cpp" )
+
+  create_single_source_cgal_program( "test_efficient_RANSAC_torus_connected_component.cpp" )
+  create_single_source_cgal_program( "test_efficient_RANSAC_torus_parameters.cpp" )
+
+  create_single_source_cgal_program( "test_efficient_RANSAC_scene.cpp" )
+  create_single_source_cgal_program( "test_efficient_RANSAC_regularization.cpp" )
 
 else()
   

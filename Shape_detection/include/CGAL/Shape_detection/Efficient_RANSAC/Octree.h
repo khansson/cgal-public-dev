@@ -20,10 +20,10 @@
 // Author(s)     : Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez
 //
 
-#ifndef CGAL_SHAPE_DETECTION_3_OCTREE_H
-#define CGAL_SHAPE_DETECTION_3_OCTREE_H
+#ifndef CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_OCTREE_H
+#define CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_OCTREE_H
 
-#include <CGAL/license/Point_set_shape_detection_3.h>
+// #include <CGAL/license/Shape_detection.h>
 
 
 #include <limits>
@@ -31,13 +31,13 @@
 
 #include <CGAL/Random.h>
 #include <CGAL/Bbox_3.h>
-#include <CGAL/Shape_detection_3/Shape_base.h>
+#include <CGAL/Shape_detection/Efficient_RANSAC/Shape_base.h>
 
 
 extern int scoreTime;
 
 namespace CGAL {
-  namespace Shape_detection_3 {
+  namespace Shape_detection {
   
     template<class Traits> 
     class Efficient_RANSAC;
@@ -176,7 +176,7 @@ namespace CGAL {
       typedef typename Sd_traits::Normal_map Normal_map;
 
       template<class Sd_traits>
-        friend class ::CGAL::Shape_detection_3::Efficient_RANSAC;
+        friend class ::CGAL::Shape_detection::Efficient_RANSAC;
 
       struct Cell {
         std::size_t first, last;

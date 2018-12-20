@@ -8,7 +8,9 @@
 #include <CGAL/Point_with_normal_3.h>
 #include <CGAL/property_map.h>
 
-#include <CGAL/Shape_detection_3.h>
+#include <CGAL/Shape_detection/Efficient_RANSAC.h>
+
+#include <CGAL/Timer.h>
 
 #include <iostream>
 #include <fstream>
@@ -22,22 +24,48 @@ typedef CGAL::Second_of_pair_property_map<Point_with_normal> Normal_map;
 
 // In Shape_detection_traits the basic types, i.e., Point and Vector types
 // as well as iterator type and property maps, are defined.
-typedef CGAL::Shape_detection_3::Shape_detection_traits
+typedef CGAL::Shape_detection::Efficient_RANSAC_traits
   <Kernel, Pwn_vector, Point_map, Normal_map>                Traits;
-typedef CGAL::Shape_detection_3::Efficient_RANSAC<Traits>    Efficient_ransac;
-typedef CGAL::Shape_detection_3::Region_growing<Traits>      Region_growing;
-typedef CGAL::Shape_detection_3::Plane<Traits>               Plane;
+typedef CGAL::Shape_detection::Efficient_RANSAC<Traits>    Efficient_ransac;
+typedef CGAL::Shape_detection::Plane<Traits>               Plane;
 
-// This program both works for RANSAC and Region Growing
+struct Timeout_callback
+{
+  mutable int nb;
+  mutable CGAL::Timer timer;
+  const double limit;
+  
+  Timeout_callback(double limit) : nb(0), limit(limit)
+  {
+    timer.start();
+  }
+  
+  bool operator()(double advancement) const
+  {
+    // Avoid calling time() at every single iteration, which could
+    // impact performances very badly
+    ++ nb;
+    if (nb % 1000 != 0)
+      return true;
+
+    // If the limit is reach, interrupt the algorithm
+    if (timer.time() > limit)
+    {
+      std::cerr << "Algorithm takes too long, exiting ("
+                << 100. * advancement << "% done)" << std::endl;
+      return false;
+    }
+
+    return true;
+  }
+};
+
+
+// This program works for RANSAC
 template <typename ShapeDetection>
 int run(const char* filename)
 {
-  // Points with normals.
   Pwn_vector points;
-
-  // Loads point set from a file. 
-  // read_xyz_points_and_normals takes an OutputIterator for storing the points
-  // and a property map to store the normal vector with each point.
   std::ifstream stream(filename);
 
   if (!stream || 
@@ -50,20 +78,16 @@ int run(const char* filename)
       return EXIT_FAILURE;
   }
 
-  // Instantiates shape detection engine.
   ShapeDetection shape_detection;
-
-  // Provides the input data.
   shape_detection.set_input(points);
-
-  // Registers planar shapes via template method.
   shape_detection.template add_shape_factory<Plane>();
 
+  // Create callback that interrupts the algorithm if it takes more than half a second
+  Timeout_callback timeout_callback(0.5);
+  
   // Detects registered shapes with default parameters.
-  shape_detection.detect();
-
-  // Prints number of detected shapes.
-  std::cout << shape_detection.shapes().end() - shape_detection.shapes().begin() << " shapes detected." << std::endl;
+  shape_detection.detect(typename ShapeDetection::Parameters(),
+                         timeout_callback);
 
   return EXIT_SUCCESS;
 }
@@ -71,12 +95,6 @@ int run(const char* filename)
 
 int main (int argc, char** argv)
 {
-  if (argc > 1 && std::string(argv[1]) == "-r")
-  {
     std::cout << "Efficient RANSAC" << std::endl;
-    return run<Efficient_ransac> ((argc > 2) ? argv[2] : "data/cube.pwn");
-  }
-
-  std::cout << "Region Growing" << std::endl;
-  return run<Region_growing> ((argc > 1) ? argv[1] : "data/cube.pwn");
+    return run<Efficient_ransac> ((argc > 1) ? argv[1] : "../data/cube.pwn");
 }

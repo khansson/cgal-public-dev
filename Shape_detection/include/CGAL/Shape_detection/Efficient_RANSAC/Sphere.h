@@ -20,13 +20,13 @@
 // Author(s)     : Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez
 //
 
-#ifndef CGAL_SHAPE_DETECTION_3_SPHERE_H
-#define CGAL_SHAPE_DETECTION_3_SPHERE_H
+#ifndef CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_SPHERE_H
+#define CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_SPHERE_H
 
-#include <CGAL/license/Point_set_shape_detection_3.h>
+// #include <CGAL/license/Shape_detection.h>
 
 
-#include <CGAL/Shape_detection_3/Shape_base.h>
+#include <CGAL/Shape_detection/Efficient_RANSAC/Shape_base.h>
 #include <CGAL/number_utils.h>
 #include <cmath>
 
@@ -36,7 +36,7 @@
  */
 
 namespace CGAL {
-  namespace Shape_detection_3 {
+  namespace Shape_detection {
     /*!
      \ingroup PkgPointSetShapeDetection3Shapes
      \brief Sphere implements Shape_base. The sphere is represented by its center and the radius.

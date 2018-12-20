@@ -22,7 +22,7 @@
 
 /**
  * \ingroup PkgPointSetShapeDetection3Ref
- * \file CGAL/regularize_planes.h
+ * \file CGAL/Regularization/regularize_planes.h
  *
  */
 
@@ -30,10 +30,10 @@
 #ifndef CGAL_REGULARIZE_PLANES_H
 #define CGAL_REGULARIZE_PLANES_H
 
-#include <CGAL/license/Point_set_shape_detection_3.h>
+// #include <CGAL/license/Shape_detection.h>
 
 
-#include <CGAL/Shape_detection_3.h>
+#include <CGAL/Shape_detection/Efficient_RANSAC.h>
 #include <CGAL/centroid.h>
 #include <CGAL/squared_distance_3.h>
 

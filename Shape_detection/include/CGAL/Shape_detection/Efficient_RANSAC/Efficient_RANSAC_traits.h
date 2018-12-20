@@ -20,21 +20,21 @@
 // Author(s)     : Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez
 //
 
-#ifndef CGAL_SHAPE_DETECTION_3_EFFICIENT_RANSAC_TRAITS_H
-#define CGAL_SHAPE_DETECTION_3_EFFICIENT_RANSAC_TRAITS_H
+#ifndef CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_TRAITS_H
+#define CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_TRAITS_H
 
-#include <CGAL/license/Point_set_shape_detection_3.h>
+// #include <CGAL/license/Shape_detection.h>
 
 #include <CGAL/Search_traits_3.h>
 
 /// \cond SKIP_IN_MANUAL
 
 namespace CGAL {
-  namespace Shape_detection_3 {
+  namespace Shape_detection {
     /*!
       \ingroup PkgPointSetShapeDetection3Ref
       \brief %Default traits class to use the shape detection class `Efficient_RANSAC`.
-      \cgalModels `Shape_detection_3::Traits`
+      \cgalModels `Shape_detection::Traits`
 
       \tparam Gt a model of the concept `#Kernel` with `Gt::FT` being `float` or `double`.
 
@@ -193,8 +193,8 @@ namespace CGAL {
     Gt m_gt;
   };
 
-} } // end of namespace CGAL::Shape_detection_3
+} } // end of namespace CGAL::Shape_detection
 
 /// \endcond
 
-#endif // CGAL_SHAPE_DETECTION_3_EFFICIENT_RANSAC_TRAITS_H
+#endif // CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_TRAITS_H

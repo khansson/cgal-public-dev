@@ -2,16 +2,16 @@
 \ingroup PkgPointSetShapeDetection3Concepts
 \cgalConcept
 
-Concept describing the set of types required by the class `CGAL::Shape_detection_3::Efficient_RANSAC` and all shape classes.
+Concept describing the set of types required by the class `CGAL::Shape_detection::Efficient_RANSAC` and all shape classes.
 
 To avoid copying potentially large input data, the shape detection class
-`CGAL::Shape_detection_3::Efficient_RANSAC` will work on the input
+`CGAL::Shape_detection::Efficient_RANSAC` will work on the input
 data directly and no internal copy will be made. For this reason, the
 input data has to be provided in form of a random access iterator.
 Point and normal property maps have to
 be provided to extract the points and the normals from the input.
 
-\cgalHasModel `CGAL::Shape_detection_3::Shape_detection_traits`
+\cgalHasModel `CGAL::Shape_detection::Shape_detection_traits`
 
 */
 class ShapeDetectionTraits{

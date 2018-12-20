@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
         }
 
         const std::string path     = argv[2];
-        const std::string fullpath = path + "regions.off";
+        const std::string fullpath = path + "regions_surface_mesh.off";
 
         std::ofstream out(fullpath);
 

@@ -20,15 +20,15 @@
 // Author(s)     : Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez
 //
 
-#ifndef CGAL_SHAPE_DETECTION_3_EFFICIENT_RANSAC_H
-#define CGAL_SHAPE_DETECTION_3_EFFICIENT_RANSAC_H
+#ifndef CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_H
+#define CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_H
 
-#include <CGAL/license/Point_set_shape_detection_3.h>
+// #include <CGAL/license/Shape_detection.h>
 
 
-#include <CGAL/Shape_detection_3/Octree.h>
-#include <CGAL/Shape_detection_3/Shape_base.h>
-#include <CGAL/Shape_detection_3/Plane.h>
+#include <CGAL/Shape_detection/Efficient_RANSAC/Octree.h>
+#include <CGAL/Shape_detection/Efficient_RANSAC/Shape_base.h>
+#include <CGAL/Shape_detection/Efficient_RANSAC/Plane.h>
 #include <CGAL/Random.h>
 #include <CGAL/function.h>
 
@@ -56,7 +56,7 @@
 */
 
 namespace CGAL {
-  namespace Shape_detection_3 {
+  namespace Shape_detection {
 
 /*!
 \ingroup PkgPointSetShapeDetection3Ref
@@ -166,7 +166,7 @@ shape. The implementation follows \cgalCite{schnabel2007efficient}.
     /// @{
       /*!
        %Parameters for the shape detection algorithm. They are explained in detail 
-       in Section \ref Point_set_shape_detection_3Parameters  of the User Manual.
+       in Section \ref Point_set_shape_detectionParameters  of the User Manual.
        */
     struct Parameters {
       Parameters()
@@ -286,10 +286,10 @@ shape. The implementation follows \cgalCite{schnabel2007efficient}.
     /*!
       Registers in the detection engine the shape type `ShapeType` that must inherit from `Shape_base`.
       For example, for registering a plane as detectable shape you should call
-      `ransac.add_shape_factory< Shape_detection_3::Plane<Traits> >();`. Note
+      `ransac.add_shape_factory< Shape_detection::Plane<Traits> >();`. Note
       that if your call is within a template, you should add the `template`
       keyword just before `add_shape_factory`: 
-      `ransac.template add_shape_factory< Shape_detection_3::Plane<Traits> >();`.
+      `ransac.template add_shape_factory< Shape_detection::Plane<Traits> >();`.
     */ 
     template <class Shape_type>
     void add_shape_factory() {
@@ -1033,4 +1033,4 @@ shape. The implementation follows \cgalCite{schnabel2007efficient}.
 }
 }
 
-#endif // CGAL_SHAPE_DETECTION_3_EFFICIENT_RANSAC_H
+#endif // CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_H

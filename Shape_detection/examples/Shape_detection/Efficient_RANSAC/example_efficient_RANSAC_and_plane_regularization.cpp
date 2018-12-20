@@ -8,8 +8,8 @@
 #include <CGAL/Point_with_normal_3.h>
 #include <CGAL/property_map.h>
 
-#include <CGAL/Shape_detection_3.h>
-#include <CGAL/regularize_planes.h>
+#include <CGAL/Shape_detection/Efficient_RANSAC.h>
+#include <CGAL/Regularization/regularize_planes.h>
 
 #include <iostream>
 #include <fstream>
@@ -20,15 +20,15 @@ typedef std::vector<Point_with_normal>                       Pwn_vector;
 typedef CGAL::First_of_pair_property_map<Point_with_normal>  Point_map;
 typedef CGAL::Second_of_pair_property_map<Point_with_normal> Normal_map;
 
-typedef CGAL::Shape_detection_3::Shape_detection_traits
+typedef CGAL::Shape_detection::Efficient_RANSAC_traits
   <Kernel, Pwn_vector, Point_map, Normal_map>                Traits;
-typedef CGAL::Shape_detection_3::Region_growing<Traits>      Region_growing;
-typedef CGAL::Shape_detection_3::Plane<Traits>               Plane;
+  typedef CGAL::Shape_detection::Efficient_RANSAC<Traits>    Efficient_ransac;
+typedef CGAL::Shape_detection::Plane<Traits>               Plane;
 
 int main(int argc, char** argv) 
 {
   Pwn_vector points;
-  std::ifstream stream(argc > 1 ? argv[1] : "data/cube.pwn");
+  std::ifstream stream(argc > 1 ? argv[1] : "../data/cube.pwn");
 
   if (!stream || 
     !CGAL::read_xyz_points(stream,
@@ -41,18 +41,18 @@ int main(int argc, char** argv)
   }
 
   // Call RANSAC shape detection with planes
-  Region_growing region_growing;
-  region_growing.set_input(points);
-  region_growing.add_shape_factory<Plane>();
-  region_growing.detect();
+  Efficient_ransac efficient_ransac;
+  efficient_ransac.set_input(points);
+  efficient_ransac.add_shape_factory<Plane>();
+  efficient_ransac.detect();
 
-  Region_growing::Plane_range planes = region_growing.planes();
+  Efficient_ransac::Plane_range planes = efficient_ransac.planes();
   // Regularize detected planes
   CGAL::regularize_planes (points,
                            Point_map(),
                            planes,
-                           CGAL::Shape_detection_3::Plane_map<Traits>(),
-                           CGAL::Shape_detection_3::Point_to_shape_index_map<Traits>(points, planes),
+                           CGAL::Shape_detection::Plane_map<Traits>(),
+                           CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
                            true, // Regularize parallelism
                            true, // Regularize orthogonality
                            false, // Do not regularize coplanarity

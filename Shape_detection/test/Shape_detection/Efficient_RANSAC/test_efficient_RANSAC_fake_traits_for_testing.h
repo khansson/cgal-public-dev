@@ -20,8 +20,8 @@
 // Author(s)     : Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez
 //
 
-#ifndef CGAL_SHAPE_DETECTION_3_EFFICIENT_RANSAC_TRAITS_COMPILATIO_TEST_H
-#define CGAL_SHAPE_DETECTION_3_EFFICIENT_RANSAC_TRAITS_COMPILATIO_TEST_H
+#ifndef CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_TRAITS_COMPILATION_TEST_H
+#define CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_TRAITS_COMPILATION_TEST_H
 
 #include <CGAL/Origin.h>
 #include <CGAL/Search_traits_3.h>
@@ -41,14 +41,14 @@ namespace CGAL {
   };
 
 
-  namespace Shape_detection_3 {
+  namespace Shape_detection {
   template <class Gt,
             class InputRange,
             class InputPointMap,
             class InputNormalMap>
-  struct Shape_detection_traits {
+  struct Efficient_RANSAC_traits {
 
-    typedef Shape_detection_traits<
+    typedef Efficient_RANSAC_traits<
       Gt, InputRange, InputPointMap, InputNormalMap> Self;
     ///
     typedef double FT;
@@ -306,13 +306,13 @@ namespace CGAL {
     Compute_squared_distance_3 compute_squared_distance_3_object() const
     { return Compute_squared_distance_3(); }*/
     ///
-    Shape_detection_traits(const Gt& gt =  Gt())
+    Efficient_RANSAC_traits(const Gt& gt =  Gt())
       : m_gt(gt) {}
 
   private:
     Gt m_gt;
   };
 
-} } // end of namespace CGAL::Shape_detection_3
+} } // end of namespace CGAL::Shape_detection
 
-#endif // CGAL_SHAPE_DETECTION_3_EFFICIENT_RANSAC_TRAITS_COMPILATIO_TEST_H
+#endif // CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_TRAITS_COMPILATION_TEST_H

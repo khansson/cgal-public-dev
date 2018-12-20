@@ -1,19 +1,19 @@
-#include "generators.h"
+#include "test_efficient_RANSAC_generators.h"
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Simple_cartesian.h>
 
-#include <CGAL/Shape_detection_3.h>
+#include <CGAL/Shape_detection/Efficient_RANSAC.h>
 #include <CGAL/Point_with_normal_3.h>
 #include <CGAL/property_map.h>
 #include <CGAL/number_utils.h>
 
 
 template <class K>
-bool test_torus_parameters() {
+bool test_cone_parameters() {
   const int NB_ROUNDS = 10;
   const int NB_POINTS = 1000;
-  
+
   typedef typename K::FT                                      FT;
   typedef CGAL::Point_with_normal_3<K>                        Pwn;
   typedef CGAL::Point_3<K>                                    Point;
@@ -22,38 +22,37 @@ bool test_torus_parameters() {
   typedef CGAL::Identity_property_map<Pwn>                    Point_map;
   typedef CGAL::Normal_of_point_with_normal_map<K>            Normal_map;
 
-  typedef CGAL::Shape_detection_3::Shape_detection_traits<
+  typedef CGAL::Shape_detection::Efficient_RANSAC_traits<
     K, Pwn_vector, Point_map, Normal_map>                     Traits;
 
-  typedef CGAL::Shape_detection_3::Efficient_RANSAC<Traits>   Efficient_ransac;
-  typedef CGAL::Shape_detection_3::Torus<Traits>              Torus;
+  typedef CGAL::Shape_detection::Efficient_RANSAC<Traits>   Efficient_ransac;
+  typedef CGAL::Shape_detection::Cone<Traits>               Cone;
 
   std::size_t success = 0;
 
-  for (int i = 0;i<NB_ROUNDS;i++) {
+  for (int i = 0 ; i < NB_ROUNDS ; i++) {
     Pwn_vector points;
 
-    // generate random points on random cylinder
-    FT minor_radius = (FT) 0;
-    FT major_radius = (FT) 0;
+	// generate random points on random cone
     Vector axis;
-    Point center;
+    Point apex;
+    FT angle = 0;
+    FT mid = 0;
     CGAL::Bbox_3 bbox(-10, -10, -10, 10, 10, 10);
+    
+    sample_random_cone(NB_POINTS, apex, axis, angle, mid,
+      std::back_inserter(points));
 
-    sample_random_torus(NB_POINTS, center, axis,
-      major_radius, minor_radius, std::back_inserter(points));
-
-    // add outliers in second half of rounds
+	// add outliers in second half of rounds
     if (i >= NB_ROUNDS / 2)
       for (std::size_t j = 0; j < NB_POINTS / 2; j++) 
         points.push_back(random_pwn_in<K>(bbox));
-
-
+        
     Efficient_ransac ransac;
     Traits traits = ransac.traits();
 
-    ransac.template add_shape_factory<Torus>();
-
+    ransac.template add_shape_factory<Cone>();
+    
     ransac.set_input(points);
 
     // Set cluster epsilon to a high value as just the parameters of
@@ -69,35 +68,32 @@ bool test_torus_parameters() {
       std::cout << " aborted" << std::endl;
       return false;
     }
-
+    
     typename Efficient_ransac::Shape_range shapes = ransac.shapes();
 
-    // check: unique shape detected
+	  // check: unique shape detected
     if (shapes.size() != 1)
       continue;
 
-    boost::shared_ptr<Torus> torus =
-      boost::dynamic_pointer_cast<Torus>((*shapes.first));
+    boost::shared_ptr<Cone> cone = boost::dynamic_pointer_cast<Cone>((*shapes.first));
 
-    // check: shape detected is a torus
-    if (!torus)
+    // check: shape detected is a cone
+    if (!cone)
+      continue;
+    
+    // Check radius and alignment with axis.
+    if (CGAL::abs(angle - cone->angle()) > (FT) 0.02 
+      || CGAL::abs(CGAL::abs(axis * cone->axis()) - (FT) 1.0) > (FT) 0.02)
       continue;
 
-    Point pos = torus->center();
-
-    // Check radii and alignment with axis.
-    if (CGAL::abs(major_radius - torus->major_radius()) > (FT) 0.02 
-      || CGAL::abs(minor_radius - torus->minor_radius()) > (FT) 0.02
-      || CGAL::abs(CGAL::abs(axis * torus->axis()) - 1.0) > (FT) 0.02)
+    // Check apex.
+    Point pos = cone->apex();
+    FT apex_pos_sqlen = traits.compute_squared_length_3_object()(
+      traits.construct_vector_3_object()(apex, pos));
+    if (apex_pos_sqlen > FT(0.0004))
       continue;
 
-    // Check center.
-    FT center_pos_sqlen = traits.compute_squared_length_3_object()(
-      traits.construct_vector_3_object()(center, pos));
-    if (center_pos_sqlen > FT(0.0004))
-      continue;
-
-    std::string info = torus->info();
+    std::string info = cone->info();
 
     success++;
   }
@@ -116,16 +112,16 @@ bool test_torus_parameters() {
 int main() {
   bool success = true;
 
-  std::cout << "test_torus_parameters<CGAL::Simple_cartesian<float>> ";
-  if (!test_torus_parameters<CGAL::Simple_cartesian<float> >()) 
+  std::cout << "test_cone_parameters<CGAL::Simple_cartesian<float>> ";
+  if (!test_cone_parameters<CGAL::Simple_cartesian<float> >()) 
     success = false;
 
-  std::cout << "test_torus_parameters<CGAL::Simple_cartesian<double>> ";
-  if (!test_torus_parameters<CGAL::Simple_cartesian<double> >())
+  std::cout << "test_cone_parameters<CGAL::Simple_cartesian<double>> ";
+  if (!test_cone_parameters<CGAL::Simple_cartesian<double> >())
     success = false;
 
-  std::cout << "test_torus_parameters<CGAL::Exact_predicates_inexact_constructions_kernel> ";
-  if (!test_torus_parameters<CGAL::Exact_predicates_inexact_constructions_kernel>()) 
+  std::cout << "test_cone_parameters<CGAL::Exact_predicates_inexact_constructions_kernel> ";
+  if (!test_cone_parameters<CGAL::Exact_predicates_inexact_constructions_kernel>()) 
     success = false;
 
   return (success) ? EXIT_SUCCESS : EXIT_FAILURE;

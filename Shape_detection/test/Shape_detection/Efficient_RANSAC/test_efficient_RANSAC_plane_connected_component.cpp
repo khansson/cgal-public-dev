@@ -1,9 +1,9 @@
-#include "generators.h"
+#include "test_efficient_RANSAC_generators.h"
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Simple_cartesian.h>
 
-#include <CGAL/Shape_detection_3.h>
+#include <CGAL/Shape_detection/Efficient_RANSAC.h>
 #include <CGAL/Point_with_normal_3.h>
 #include <CGAL/property_map.h>
 
@@ -20,13 +20,13 @@ bool test_plane_connected_component() {
   typedef CGAL::Identity_property_map<Pwn>                    Point_map;
   typedef CGAL::Normal_of_point_with_normal_map<K>            Normal_map;
 
-  typedef typename CGAL::Shape_detection_3::Shape_detection_traits<K,
+  typedef typename CGAL::Shape_detection::Efficient_RANSAC_traits<K,
     Pwn_vector, Point_map, Normal_map>                        Traits;
 
-  typedef typename CGAL::Shape_detection_3::Efficient_RANSAC<Traits>
+  typedef typename CGAL::Shape_detection::Efficient_RANSAC<Traits>
     Efficient_ransac;
 
-  typedef typename CGAL::Shape_detection_3::Plane<Traits>     Plane;
+  typedef typename CGAL::Shape_detection::Plane<Traits>     Plane;
 
   std::size_t success = 0;
 
