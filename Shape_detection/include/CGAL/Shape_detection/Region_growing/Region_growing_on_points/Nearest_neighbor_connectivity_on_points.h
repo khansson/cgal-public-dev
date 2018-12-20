@@ -53,7 +53,7 @@ namespace CGAL {
             ///< An `LvaluePropertyMap` that maps to an arbitrary item.
 
             ///< \cond SKIP_IN_MANUAL
-            using Index                   = int;
+            using Index                   = long;
 
             using Index_to_point_map      = CGAL::Shape_detection::Item_property_map<Index_to_item_map, Point_map>;
             ///< \endcond

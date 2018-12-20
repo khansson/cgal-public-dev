@@ -16,7 +16,7 @@ namespace CGAL {
             using Input_range = InputRange;
 
             using value_type  = typename InputRange::const_iterator;
-            using key_type    = int;
+            using key_type    = long;
             using category    = boost::lvalue_property_map_tag;
 
             Random_access_index_to_item_property_map(const Input_range &input_range) : 

@@ -37,7 +37,7 @@ using Point_3 = typename Kernel::Point_3;
 #else
 
     using Face_graph        = CGAL::Polyhedron_3<Kernel>;
-    using Face_range        = typename CGAL::Iterator_range< boost::graph_traits<Face_graph>::face_iterator>;
+    using Face_range        = typename CGAL::Iterator_range<typename boost::graph_traits<Face_graph>::face_iterator>;
     using Index_to_face_map = CGAL::Shape_detection::Generic_index_to_item_property_map<Face_range>;
     using Face_to_index_map = CGAL::Shape_detection::Hashable_item_to_index_property_map<Face_range>;
 
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
     std::cout << std::endl << "region_growing_on_face_graph example started" << std::endl << std::endl;
 
     // Load data.
-    std::ifstream in(argc > 1 ? argv[1] : "../data/cube.off");
+    std::ifstream in(argc > 1 ? argv[1] : "../data/face_graph.off");
     CGAL::set_ascii_mode(in);
 
     Face_graph face_graph;

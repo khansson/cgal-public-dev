@@ -27,7 +27,7 @@ namespace CGAL {
             using Input_range             = InputRange;
             ///< An arbitrary range with user-defined items. The range must implement the function size().
             
-            using Item_index              = int;
+            using Item_index              = long;
             ///< Index of a given item.
 
             ///< \cond SKIP_IN_MANUAL

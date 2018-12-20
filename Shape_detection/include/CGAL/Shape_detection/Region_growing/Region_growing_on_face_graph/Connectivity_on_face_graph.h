@@ -47,7 +47,7 @@ namespace CGAL {
             ///< An `LvaluePropertyMap` that maps to an arbitrary item.
 
             ///< \cond SKIP_IN_MANUAL
-            using Index                        = int;
+            using Index                        = long;
             ///< \endcond
 
             /*!

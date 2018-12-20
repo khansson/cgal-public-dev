@@ -21,7 +21,7 @@ namespace CGAL {
             using Iterator = typename Input_range::const_iterator;
             using Item     = typename Iterator::value_type;
 
-            using value_type = int;
+            using value_type = long;
             using key_type   = Item;
             using category   = boost::lvalue_property_map_tag;
 

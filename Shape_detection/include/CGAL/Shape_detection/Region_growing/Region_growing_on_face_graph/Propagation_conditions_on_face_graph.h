@@ -74,7 +74,7 @@ namespace CGAL {
             using Get_sqrt               = CGAL::Shape_detection::Get_sqrt<Traits>;
             using Sqrt                   = typename Get_sqrt::Sqrt;
 
-            using Index                  = int;
+            using Index                  = long;
             ///< \endcond
 
             /*!
