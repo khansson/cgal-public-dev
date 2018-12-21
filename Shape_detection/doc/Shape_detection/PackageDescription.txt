@@ -1,60 +1,75 @@
 /*!
-\defgroup PkgPointSetShapeDetection3Ref Point Set Shape Detection Reference
+\defgroup PkgShapeDetectionRef Shape Detection Reference
 
-\defgroup PkgPointSetShapeDetection3Concepts Concepts
-\ingroup PkgPointSetShapeDetection3Ref
+\defgroup PkgShapeDetectionConcepts Concepts
+\ingroup PkgShapeDetectionRef
 
-\defgroup PkgPointSetShapeDetection3Shapes Shapes
-\ingroup PkgPointSetShapeDetection3Ref
+\defgroup PkgShapeDetectionShapes Shapes
+\ingroup PkgShapeDetectionRef
 
+\addtogroup PkgShapeDetectionRef
 
-
-\addtogroup PkgPointSetShapeDetection3Ref
-
-\cgalPkgDescriptionBegin{Point Set Shape Detection, PkgPointSetShapeDetection3}
+\cgalPkgDescriptionBegin{Shape Detection, PkgShapeDetection}
 \cgalPkgPicture{shapes_detail.png}
 
 \cgalPkgSummaryBegin
-\cgalPkgAuthors{Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez, Florent Lafarge, Simon Giraudot}
-\cgalPkgDesc{This component implements two primitive shape detection algorithms: efficient RANSAC and region growing. Planes are detected from point sets with unoriented normals. RANSAC also handles the following shapes: sphere, cylinder, cone and torus. Other types of shapes can be detected through implementing a class deriving from the base shape class.}
-\cgalPkgManuals{Chapter_Point_Set_Shape_Detection, PkgPointSetShapeDetection3Ref}
+\cgalPkgAuthors{Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez, Florent Lafarge, Simon Giraudot, Thien Hoang, and Dmitry Anisimov}
+\cgalPkgDesc{This CGAL package implements an efficient RANSAC approach for detecting arbitrary shapes in an unorganized point set with unoriented normals and a region growing approach for detecting arbitrary shapes
+over a set of arbitrary items. With the efficient RANSAC, five canonical shapes can be detected: planes, spheres, cylinders, cones, and tori. Additional shapes can be detected, given a custom shape class by the user.
+For the region growing approach, CGAL provides three particular instances of the algorithm: detecting lines over 2D points, detecting planes over 3D points, and detecting planes over an arbitrary face graph.}
+\cgalPkgManuals{Chapter_Shape_Detection, PkgShapeDetectionRef}
 \cgalPkgSummaryEnd
 
 \cgalPkgShortInfoBegin
 \cgalPkgSince{4.7}
 \cgalPkgBib{cgal:ovja-pssd}
 \cgalPkgLicense{\ref licensesGPL "GPL"}
-\cgalPkgDemo{Polyhedron demo,polyhedron_3.zip}
+\cgalPkgDemo{Polyhedron demo, polyhedron_3.zip}
 \cgalPkgShortInfoEnd
 
 \cgalPkgDescriptionEnd
 
 \cgalClassifedRefPages
 
-## Concept ##
-- `ShapeDetectionTraits`
+## Concepts ##
+- `EfficientRANSACTraits`
+- `RegionGrowingConditions`
+- `RegionGrowingConnectivity`
 
 ## Main Classes ##
-- `CGAL::Shape_detection::Shape_detection_traits`
+- `CGAL::Shape_detection::Efficient_RANSAC_traits<Kernel, InputRange, InputPointMap, InputNormalMap>`
 - `CGAL::Shape_detection::Efficient_RANSAC<Traits>`
-- `CGAL::Shape_detection::Region_growing<Traits>`
+- `CGAL::Shape_detection::Region_growing<InputRange, Connectivity, Conditions>`
 
-## Shape Interface ##
+## Efficient RANSAC Shape Interface ##
 - `CGAL::Shape_detection::Shape_base<Traits>`
 
-## Shape Classes ##
+## Efficient RANSAC Shape Classes ##
 - `CGAL::Shape_detection::Plane<Traits>`
 - `CGAL::Shape_detection::Sphere<Traits>`
 - `CGAL::Shape_detection::Cylinder<Traits>`
 - `CGAL::Shape_detection::Cone<Traits>`
 - `CGAL::Shape_detection::Torus<Traits>`
 
-## Functions ##
-- `CGAL::regularize_planes()`
-
-## Property Maps ##
+## Efficient RANSAC Property Maps ##
 - `CGAL::Shape_detection::Plane_map<Traits>`
 - `CGAL::Shape_detection::Point_to_shape_index_map<Traits>`
 
-*/
+## Region Growing On Points ##
+- `CGAL::Shape_detection::Fuzzy_sphere_connectivity_on_points<Kernel, InputRange, InputPointMap>`
+- `CGAL::Shape_detection::Nearest_neighbor_connectivity_on_points<Kernel, InputRange, InputPointMap>`
+- `CGAL::Shape_detection::Propagation_conditions_on_points_2<Kernel, InputRange, InputPointMap, InputNormalMap>`
+- `CGAL::Shape_detection::Propagation_conditions_on_points_3<Kernel, InputRange, InputPointMap, InputNormalMap>`
 
+## Region Growing On Face Graph ##
+- `CGAL::Shape_detection::Connectivity_on_face_graph<FaceGraph>`
+- `CGAL::Shape_detection::Propagation_conditions_on_face_graph<Kernel, FaceGraph>`
+
+## Region Growing Property Maps ##
+- `CGAL::Shape_detection::Generic_index_to_item_property_map<InputRange>`
+- `CGAL::Shape_detection::Hashable_item_to_index_property_map<InputRange>`
+- `CGAL::Shape_detection::Random_access_index_to_item_property_map<InputRange>`
+
+## Functions ##
+- `CGAL::regularize_planes()`
+*/

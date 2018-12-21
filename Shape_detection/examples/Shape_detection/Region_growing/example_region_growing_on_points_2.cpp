@@ -15,7 +15,7 @@
 
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
 #include <CGAL/Shape_detection/Region_growing/Region_growing_on_points.h>
-#include <CGAL/Shape_detection/Region_growing/Tools/Random_access_index_to_item_property_map.h>
+#include <CGAL/Shape_detection/Region_growing/Property_maps/Random_access_index_to_item_property_map.h>
 
 // Type declarations.
 using Kernel = CGAL::Simple_cartesian<double>;

@@ -14,8 +14,8 @@
 #include <CGAL/assertions.h>
 
 // Local includes.
-#include <CGAL/Shape_detection/Region_growing/Tools/Hashable_item_to_index_property_map.h>
-#include <CGAL/Shape_detection/Region_growing/Tools/Random_access_index_to_item_property_map.h>
+#include <CGAL/Shape_detection/Region_growing/Property_maps/Hashable_item_to_index_property_map.h>
+#include <CGAL/Shape_detection/Region_growing/Property_maps/Random_access_index_to_item_property_map.h>
 
 namespace CGAL {
 

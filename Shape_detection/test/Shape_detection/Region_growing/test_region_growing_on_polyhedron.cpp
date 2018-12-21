@@ -15,8 +15,8 @@
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
 #include <CGAL/Shape_detection/Region_growing/Region_growing_on_face_graph.h>
 
-#include <CGAL/Shape_detection/Region_growing/Tools/Generic_index_to_item_property_map.h>
-#include <CGAL/Shape_detection/Region_growing/Tools/Hashable_item_to_index_property_map.h>
+#include <CGAL/Shape_detection/Region_growing/Property_maps/Generic_index_to_item_property_map.h>
+#include <CGAL/Shape_detection/Region_growing/Property_maps/Hashable_item_to_index_property_map.h>
 
 template<class Kernel>
 bool test_region_growing_on_polyhedron(int argc, char *argv[]) {

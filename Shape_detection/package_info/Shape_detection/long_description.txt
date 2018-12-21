@@ -1,10 +1,10 @@
 ﻿Shape Detection
 
-Sven Oesau, Yannick Verdie, Clément Jamin and Pierre Alliez
+Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez, Florent Lafarge, Simon Giraudot, Thien Hoang, and Dmitry Anisimov
 
 This CGAL package implements an efficient RANSAC (random sample consensus) approach for detecting shapes in a point set with unoriented normals. 
-Five canonical shapes can be detected: planes, spheres, cylinders, cones and tori. Additional shapes can be detected, provided a class derived from the base shape is implemented.
+Five canonical shapes can be detected: planes, spheres, cylinders, cones, and tori. Additional shapes can be detected, given a custom shape class by the user.
 
-In addition to the RANSAC approach Thien Hoang during Google Summer of Code 2018 under the supervision of Dmitry Anisimov implemented a general region growing algorithm that can
-grow regions and thus detecting shapes over a set of arbitrary items. In particular, CGAL provides three instances of the algorithm: detecting lines over 2D points, 
-detecting planes over 3D points, and detecting planes over an arbitrary face graph. However, other instances for detecting shapes can be easily added by the user.
+In addition to the RANSAC approach, a generic region growing algorithm is implemented. This algorithm can grow regions 
+and detect shapes over a set of arbitrary items. In particular, CGAL provides three instances of the algorithm: detecting lines over 2D points, 
+detecting planes over 3D points, and detecting planes over an arbitrary face graph. Other instances can be easily added by the user.

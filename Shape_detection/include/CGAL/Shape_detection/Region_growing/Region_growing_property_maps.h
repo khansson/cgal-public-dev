@@ -1,0 +1,8 @@
+#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_PROPERTY_MAPS_H
+#define CGAL_SHAPE_DETECTION_REGION_GROWING_PROPERTY_MAPS_H
+
+#include <CGAL/Shape_detection/Region_growing/Property_maps/Generic_index_to_item_property_map.h>
+#include <CGAL/Shape_detection/Region_growing/Property_maps/Hashable_item_to_index_property_map.h>
+#include <CGAL/Shape_detection/Region_growing/Property_maps/Random_access_index_to_item_property_map.h>
+
+#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_PROPERTY_MAPS_H
