@@ -1,3 +1,25 @@
+// Copyright (c) 2018 INRIA Sophia-Antipolis (France).
+// All rights reserved.
+//
+// This file is part of CGAL (www.cgal.org).
+// You can redistribute it and/or modify it under the terms of the GNU
+// General Public License as published by the Free Software Foundation,
+// either version 3 of the License, or (at your option) any later version.
+//
+// Licensees holding a valid commercial license may use this file in
+// accordance with the commercial license agreement provided with the software.
+//
+// This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+// WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+//
+// $URL$
+// $Id$
+// SPDX-License-Identifier: GPL-3.0+
+//
+//
+// Author(s)     : Florent Lafarge, Simon Giraudot, Thien Hoang, Dmitry Anisimov
+//
+
 #ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_CONNECTIVITY_ON_FACE_GRAPH_H
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_CONNECTIVITY_ON_FACE_GRAPH_H
 
@@ -25,6 +47,9 @@ namespace CGAL {
             \ingroup PkgShapeDetection
             \brief Find all faces that share an edge with a given face.
             \tparam FaceGraph General face graph. Model of `FaceGraph`.
+            \tparam FaceRange An arbitrary range with graph faces, given an IndexToFaceMap is provided. The default one is random access.
+            \tparam IndexToFaceMap An `LvaluePropertyMap` that maps face to `Index`, which is any signed integer type, the default `Index` is `long`.
+            \tparam FaceToIndexMap An `LvaluePropertyMap` that `Index` to face, opposite to IndexToFaceMap.
             \cgalModels `RegionGrowingConnectivity`
         */
         template<class FaceGraph, 
@@ -35,24 +60,32 @@ namespace CGAL {
 
         public:
 
+            /// \name Types
+            /// @{
+
             using Face_graph                   = FaceGraph;
             ///< General face graph. Model of `FaceGraph`.
 
             using Face_range                   = FaceRange;
-            ///< An `LvaluePropertyMap` that maps to `Face_descriptor`.
-
-            using Face_to_index_map            = FaceToIndexMap;
+            ///< An arbitrary range with graph faces.
 
             using Index_to_face_map            = IndexToFaceMap;
-            ///< An `LvaluePropertyMap` that maps to an arbitrary item.
+            ///< An `LvaluePropertyMap` that maps `Index` to face.
+
+            using Face_to_index_map            = FaceToIndexMap;
+            ///< An `LvaluePropertyMap` that maps face index to face.
 
             ///< \cond SKIP_IN_MANUAL
             using Index                        = long;
             ///< \endcond
 
+            /// @}
+
+            /// \name Initialization
+            /// @{
+
             /*!
-                The constructor takes an arbitrary face graph.
-                In addition, you can provide an instance of the face descriptor map class.
+                The constructor that takes an arbitrary face graph.
             */
             Connectivity_on_face_graph(const Face_graph &face_graph) :
             m_face_graph(face_graph),
@@ -61,6 +94,9 @@ namespace CGAL {
             m_face_to_index_map(m_face_range)
             { }
 
+            /*!
+                The constructor that takes an arbitrary face graph and an index_to_face_map to access a face given its index in the face range from the `face_graph`.
+            */
             Connectivity_on_face_graph(const Face_graph &face_graph, const Index_to_face_map index_to_face_map) :
             m_face_graph(face_graph),
             m_face_range(CGAL::faces(m_face_graph)),
@@ -68,12 +104,21 @@ namespace CGAL {
             m_face_to_index_map(m_face_range)
             { }
 
+            /*!
+                The constructor that takes an arbitrary face graph, an index_to_face_map to access a face given its index in the face range from the `face_graph`,
+                and a face_to_index_map to access face index given a face.
+            */
             Connectivity_on_face_graph(const Face_graph &face_graph, const Index_to_face_map index_to_face_map, const Face_to_index_map face_to_index_map) :
             m_face_graph(face_graph),
             m_face_range(CGAL::faces(m_face_graph)),
             m_index_to_face_map(index_to_face_map),
             m_face_to_index_map(face_to_index_map)
             { }
+
+            /// @}
+
+            /// \name Access
+            /// @{ 
 
             /*!
                 Using a query index `query_index`, this function retrieves indices of all neighboring faces and stores them in `neighbors`.
@@ -95,6 +140,8 @@ namespace CGAL {
                     if (face_index >= 0) neighbors.push_back(face_index);
                 }
             }
+
+            /// @}
 
         private:
 

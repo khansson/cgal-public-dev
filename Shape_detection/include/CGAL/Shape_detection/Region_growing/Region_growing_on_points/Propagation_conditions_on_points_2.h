@@ -1,3 +1,25 @@
+// Copyright (c) 2018 INRIA Sophia-Antipolis (France).
+// All rights reserved.
+//
+// This file is part of CGAL (www.cgal.org).
+// You can redistribute it and/or modify it under the terms of the GNU
+// General Public License as published by the Free Software Foundation,
+// either version 3 of the License, or (at your option) any later version.
+//
+// Licensees holding a valid commercial license may use this file in
+// accordance with the commercial license agreement provided with the software.
+//
+// This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+// WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+//
+// $URL$
+// $Id$
+// SPDX-License-Identifier: GPL-3.0+
+//
+//
+// Author(s)     : Florent Lafarge, Simon Giraudot, Thien Hoang, Dmitry Anisimov
+//
+
 #ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_PROPAGATION_CONDITIONS_ON_POINTS_2_H
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_PROPAGATION_CONDITIONS_ON_POINTS_2_H
 
@@ -21,10 +43,12 @@ namespace CGAL {
 
         /*! 
             \ingroup PkgShapeDetection
-            \brief Local and global conditions for the region growing algorithm on a 2D point cloud.
+            \brief Local and global conditions for the region growing algorithm on a 2D point set.
+            \tparam Traits Model of `Kernel`
+            \tparam InputRange An arbitrary range with user-defined items.
             \tparam PointMap An `LvaluePropertyMap` that maps to `Point_2`.
             \tparam NormalMap An `LvaluePropertyMap` that maps to `Vector_2`.
-            \tparam Traits Model of `RegionGrowingOnPointsTraits`
+            \tparam IndexToItemMap An `LvaluePropertyMap` that maps item to `Index`, which is any signed integer type, the default `Index` is `long`.
             \cgalModels `RegionGrowingPropagationConditions`
         */
         template<class Traits, class InputRange, class PointMap, class NormalMap, 
@@ -32,6 +56,9 @@ namespace CGAL {
         class Propagation_conditions_on_points_2 {
 
         public:
+
+            /// \name Types
+            /// @{
 
             using Input_range            = InputRange;
             ///< An arbitrary range with user-defined items.
@@ -43,7 +70,7 @@ namespace CGAL {
             ///< An `LvaluePropertyMap` that maps to `Vector_2`.
 
             using Index_to_item_map      = IndexToItemMap;
-            ///< An `LvaluePropertyMap` that maps to an arbitrary item.
+            ///< An `LvaluePropertyMap` that maps `Index` to item.
 
             using FT                     = typename Traits::FT;       ///< Number type
             using Point_2                = typename Traits::Point_2;  ///< Point type
@@ -67,8 +94,13 @@ namespace CGAL {
             using Index                  = long;
             ///< \endcond
 
+            /// @}
+
+            /// \name Initialization
+            /// @{
+
             /*!
-                Each region is represented by a line. The constructor requires three parameters, in order: 
+                Each region is represented by a line. The constructor requires an input range with items and three parameters can be provided, in order: 
                 the maximum distance from a point to the region, 
                 the minimum dot product between the normal associated with the point and the normal of the region, 
                 and the minimum number of points a region must have.
@@ -94,6 +126,15 @@ namespace CGAL {
                 CGAL_precondition(min_region_size    > 1);
             }        
 
+
+            /*!
+                Each region is represented by a line. The constructor requires an input range with items and three parameters can be provided, in order: 
+                the maximum distance from a point to the region, 
+                the minimum dot product between the normal associated with the point and the normal of the region, 
+                and the minimum number of points a region must have.
+                In addition, you can provide instances of the Point_map, Normal_map, and Traits classes.
+                This constructor also allows to specify an index_to_item_map to access an item given its index in the `input_range`.
+            */
             Propagation_conditions_on_points_2(const Input_range &input_range, const Index_to_item_map index_to_item_map,
             const FT distance_threshold = FT(1), const FT normal_threshold = FT(9) / FT(10), const std::size_t min_region_size = 2, 
             const Point_map point_map = Point_map(), const Normal_map normal_map = Normal_map(), const Traits traits = Traits()) :
@@ -113,6 +154,11 @@ namespace CGAL {
                 CGAL_precondition(normal_threshold   >= FT(0) && normal_threshold <= FT(1));
                 CGAL_precondition(min_region_size    > 1);
             }
+
+            /// @}
+
+            /// \name Access
+            /// @{ 
 
             /*!
                 Local conditions that check if a query item belongs to the given region.
@@ -211,6 +257,8 @@ namespace CGAL {
                     m_normal_of_best_fit = normal / normal_length;
                 }
             }
+
+            /// @}
 
         private:
         

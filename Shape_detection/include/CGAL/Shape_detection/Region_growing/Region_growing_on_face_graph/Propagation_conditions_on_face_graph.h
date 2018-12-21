@@ -1,3 +1,25 @@
+// Copyright (c) 2018 INRIA Sophia-Antipolis (France).
+// All rights reserved.
+//
+// This file is part of CGAL (www.cgal.org).
+// You can redistribute it and/or modify it under the terms of the GNU
+// General Public License as published by the Free Software Foundation,
+// either version 3 of the License, or (at your option) any later version.
+//
+// Licensees holding a valid commercial license may use this file in
+// accordance with the commercial license agreement provided with the software.
+//
+// This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+// WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+//
+// $URL$
+// $Id$
+// SPDX-License-Identifier: GPL-3.0+
+//
+//
+// Author(s)     : Florent Lafarge, Simon Giraudot, Thien Hoang, Dmitry Anisimov
+//
+
 #ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_PROPAGATION_CONDITIONS_ON_FACE_GRAPH_H
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_PROPAGATION_CONDITIONS_ON_FACE_GRAPH_H
 
@@ -31,8 +53,11 @@ namespace CGAL {
         /*!
             \ingroup PkgShapeDetection.
             \brief Local and global conditions for the region growing algorithm on a face graph.
+            \tparam Traits Model of `Kernel`
             \tparam FaceGraph General face graph. Model of `FaceGraph`.
-            \tparam Mesh Has model `CGAL::Surface_mesh`.
+            \tparam FaceRange An arbitrary range with graph faces, given an IndexToFaceMap is provided. The default one is random access.
+            \tparam IndexToFaceMap An `LvaluePropertyMap` that maps face to `Index`, which is any signed integer type, the default `Index` is `long`.
+            \tparam VertexToPointMap An `LvaluePropertyMap` that maps a graph vertex to `Point_3`.
             \cgalModels `RegionGrowingPropagationConditions`
         */
         template<class Traits, class FaceGraph,
@@ -43,17 +68,20 @@ namespace CGAL {
 
         public:
 
+            /// \name Types
+            /// @{
+
             using Face_graph             = FaceGraph;
-            ///< An arbitrary range with user-defined items.
+            ///< General face graph. Model of `FaceGraph`.
 
             using Face_range             = FaceRange;
+            ///< An arbitrary range with graph faces.
 
             using Index_to_face_map      = IndexToFaceMap;
-            ///< An `LvaluePropertyMap` that maps to an arbitrary item.
+            ///< An `LvaluePropertyMap` that maps `Index` to face.
 
             using Vertex_to_point_map    = VertexToPointMap;
-
-            using Face                   = typename Index_to_face_map::value_type;
+            ///< An `LvaluePropertyMap` that maps a graph vertex to `Point_3`.
 
             using FT                     = typename Traits::FT;       ///< Number type
             using Point_3                = typename Traits::Point_3;  ///< Point type
@@ -61,6 +89,8 @@ namespace CGAL {
             using Plane_3                = typename Traits::Plane_3;  ///< Plane type
 
             ///< \cond SKIP_IN_MANUAL
+            using Face                   = typename Index_to_face_map::value_type;
+
             using Local_traits           = Exact_predicates_inexact_constructions_kernel;
             using Local_FT               = typename Local_traits::FT;
             using Local_point_3          = typename Local_traits::Point_3;
@@ -77,12 +107,14 @@ namespace CGAL {
             using Index                  = long;
             ///< \endcond
 
+            /// @}
+
             /*!
-                Each region is represented by a plane. The constructor requires three parameters, in order: 
+                Each region is represented by a plane. The constructor requires an input range with graph faces and three parameters can be provided, in order: 
                 the maximum distance from a point to the region, 
                 the minimum dot product between the normal associated with the point and the normal of the region, 
                 and the minimum number of points a region must have.
-                In addition, you can provide instances of the Face_descriptor_map and Traits classes.
+                In addition, you can provide instances of the Vertex_to_point_map and Traits classes.
             */
             Propagation_conditions_on_face_graph(const Face_graph &face_graph,
             const FT distance_threshold = FT(1), const FT normal_threshold = FT(9) / FT(10), const std::size_t min_region_size = 1, 
@@ -104,6 +136,14 @@ namespace CGAL {
                 CGAL_precondition(min_region_size    > 0);
             }        
             
+            /*!
+                Each region is represented by a plane. The constructor requires an input range with graph faces and three parameters can be provided, in order: 
+                the maximum distance from a point to the region, 
+                the minimum dot product between the normal associated with the point and the normal of the region, 
+                and the minimum number of points a region must have.
+                In addition, you can provide instances of the Vertex_to_point_map and Traits classes.
+                This constructor also allows to specify an index_to_face_map to access a graph face given its index in the face range from the `face_graph`.
+            */
             Propagation_conditions_on_face_graph(const Face_graph &face_graph, const Index_to_face_map index_to_face_map,
             const FT distance_threshold = FT(1), const FT normal_threshold = FT(9) / FT(10), const std::size_t min_region_size = 1, 
             const Vertex_to_point_map vertex_to_point_map = Vertex_to_point_map(), const Traits traits = Traits()) : 
@@ -123,6 +163,11 @@ namespace CGAL {
                 CGAL_precondition(normal_threshold   >= FT(0) && normal_threshold <= FT(1));
                 CGAL_precondition(min_region_size    > 0);
             }    
+
+            /// @}
+
+            /// \name Access
+            /// @{ 
 
             /*!
                 Local conditions that check if a query item belongs to the given region.
@@ -220,6 +265,8 @@ namespace CGAL {
                     m_normal_of_best_fit = normal / normal_length;
                 }
             }
+
+            /// @}
 
         private:
         
