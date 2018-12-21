@@ -32,7 +32,7 @@
 namespace CGAL {
   namespace Shape_detection {
     /*!
-      \ingroup PkgPointSetShapeDetection3Ref
+      \ingroup PkgShapeDetectionRef
       \brief %Default traits class to use the shape detection class `Efficient_RANSAC`.
       \cgalModels `Shape_detection::Traits`
 

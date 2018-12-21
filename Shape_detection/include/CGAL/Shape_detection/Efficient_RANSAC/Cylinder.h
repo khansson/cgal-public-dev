@@ -42,7 +42,7 @@ namespace CGAL {
      unbounded, thus caps are not modelled.
      \tparam Traits a model of `EfficientRANSACTraits` with the additional 
              requirement for cylinders (see `EfficientRANSACTraits` documentation).
-     \ingroup PkgPointSetShapeDetection3Shapes
+     \ingroup PkgShapeDetectionShapes
      */
   template <class Traits>
   class Cylinder : public Shape_base<Traits> {

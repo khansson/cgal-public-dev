@@ -80,7 +80,7 @@ namespace CGAL {
                 \tparam Neighbors CGAL::Shape_detection::Region_growing::Neighbors
             */
             template<class Neighbors>
-            void get_neighbors(const Index query_index, Neighbors &neighbors) {
+            void get_neighbors(const Index query_index, Neighbors &neighbors) const {
                     
                 CGAL_precondition(query_index < m_face_range.size());
                 neighbors.clear();

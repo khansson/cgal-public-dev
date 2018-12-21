@@ -56,7 +56,7 @@ namespace CGAL {
   }
     
     /*!
-     \ingroup PkgPointSetShapeDetection3Shapes
+     \ingroup PkgShapeDetectionShapes
      \brief Base class for shape types defining an interface to construct a
             shape from a set of points and to compute the point distance and normal
             deviation from the surface normal. It is used during detection to

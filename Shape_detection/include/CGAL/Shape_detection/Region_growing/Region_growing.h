@@ -1,3 +1,25 @@
+// Copyright (c) 2018 INRIA Sophia-Antipolis (France).
+// All rights reserved.
+//
+// This file is part of CGAL (www.cgal.org).
+// You can redistribute it and/or modify it under the terms of the GNU
+// General Public License as published by the Free Software Foundation,
+// either version 3 of the License, or (at your option) any later version.
+//
+// Licensees holding a valid commercial license may use this file in
+// accordance with the commercial license agreement provided with the software.
+//
+// This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+// WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+//
+// $URL$
+// $Id$
+// SPDX-License-Identifier: GPL-3.0+
+//
+//
+// Author(s)     : Florent Lafarge, Simon Giraudot, Thien Hoang, Dmitry Anisimov
+//
+
 #ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_H
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_H
 
@@ -24,11 +46,14 @@ namespace CGAL {
 
         public:
 
+            /// \name Types
+            /// @{
+
             using Input_range             = InputRange;
             ///< An arbitrary range with user-defined items. The range must implement the function size().
             
             using Item_index              = long;
-            ///< Index of a given item.
+            ///< Index type of a given item.
 
             ///< \cond SKIP_IN_MANUAL
             using Visited_items           = std::vector<bool>;
@@ -56,6 +81,11 @@ namespace CGAL {
             using Unassigned_range        = CGAL::Iterator_range<typename Unassigned_items::const_iterator>;
             ///< An `Iterator_range` of the iterators in `CGAL::Shape_detection::Region_growing::Unassigned_items`. Here, we store indices of all unassigned items.
 
+            /// @}
+
+            /// \name Initialization
+            /// @{
+
             /*!
                 The constructor requires an input range and instances of the Connectivity class and Conditions class.
             */
@@ -64,6 +94,11 @@ namespace CGAL {
                 m_connectivity(connectivity),
                 m_conditions(conditions)
                 { }
+
+            /// @}
+
+            /// \name Detection 
+            /// @{
 
             /*!
                 Perform the region growing algorithm over the input range, using the Connectivity class to find neighbors and the Conditions class to validate regions.
@@ -75,7 +110,7 @@ namespace CGAL {
 
                 for (Item_index seed_index = 0; seed_index < m_input_range.size(); ++seed_index) {
                     
-                    // Try to grow a new region from the seed item.
+                    // Try to grow a new region from the index of the seed item.
                     if (!m_visited[seed_index]) {
                         propagate(seed_index, region);
 
@@ -88,21 +123,30 @@ namespace CGAL {
                 }
                 m_output_regions = Region_range(m_regions.begin(), m_regions.end());
 
-                // Return unassigned items.
+                // Return indices of all unassigned items.
                 for (Item_index item_index = 0; item_index < m_input_range.size(); ++item_index)
                     if (!m_visited[item_index]) m_unassigned.push_back(item_index);
 
                 m_output_unassigned = Unassigned_range(m_unassigned.begin(), m_unassigned.end());
             }
 
+            /// @}
+
+            /// \name Access
+            /// @{  
+
             /*!
-                Return a pair of begin iterator and pass-the-end iterator of the container with found regions. If the function `CGAL::Shape_detection::Region_growing::detect()` has not been called,
-                the first and second of the pair will be the same, which implies an empty container.
+                Return a pair of begin iterator and pass-the-end iterator of the container with found regions. If the function `CGAL::Shape_detection::Region_growing::detect()` 
+                has not been called, the first and second of the pair will be the same, which implies an empty container.
             */
             const Region_range &regions() {
                 return m_output_regions;
             }
 
+            /*!
+                Return a pair of begin iterator and pass-the-end iterator of the container with indices of all unassigned items. If the function `CGAL::Shape_detection::Region_growing::detect()` 
+                has not been called, the first and second of the pair will be the same, which implies an empty container.
+            */
             const Unassigned_range &unassigned_items() {
                 return m_output_unassigned;
             }
@@ -121,6 +165,11 @@ namespace CGAL {
                 return m_unassigned.size();
             }
 
+            /// @}
+
+            /// \name Memory Management
+            /// @{
+
             /*!
                 Clear all internal data structures.
             */
@@ -133,6 +182,8 @@ namespace CGAL {
                 m_visited.resize(m_input_range.size(), false);
             }
 
+            /// @}
+
         private:
 
             void propagate(const Item_index seed_index, Region &region) {
@@ -144,7 +195,7 @@ namespace CGAL {
                 Running_queue running_queue[2];
                 bool depth_index = 0;
 
-                // Once an item is pushed to the queue, it is pushed to the region too.
+                // Once the index of an item is pushed to the queue, it is pushed to the region too.
                 m_visited[seed_index] = true;
                 running_queue[depth_index].push(seed_index);
                 region.push_back(seed_index);
@@ -154,7 +205,7 @@ namespace CGAL {
 
                 while (!running_queue[depth_index].empty() || !running_queue[!depth_index].empty()) {
 
-                    // Call the next item of the queue and remove it from the queue.
+                    // Call the next item index of the queue and remove it from the queue.
                     const Item_index item_index = running_queue[depth_index].front();
                     running_queue[depth_index].pop();
 

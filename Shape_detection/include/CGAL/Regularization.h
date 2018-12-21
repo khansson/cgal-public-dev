@@ -17,13 +17,13 @@
 // SPDX-License-Identifier: GPL-3.0+
 //
 //
-// Author(s) : Dmitry Anisimov
+// Author(s)     : Dmitry Anisimov
 //
 
 /**
 * \ingroup PkgShapeDetection
 * \file CGAL/Regularization.h
-* A header file that includes all headers of this package.
+* A header file that includes all headers for regularizing planes in 3D.
 */
 
 #ifndef CGAL_REGULARIZATION_H

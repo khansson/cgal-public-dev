@@ -17,7 +17,7 @@
 // SPDX-License-Identifier: GPL-3.0+
 //
 //
-// Author(s) : Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez
+// Author(s)     : Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez, Florent Lafarge, Simon Giraudot, Thien Hoang, Dmitry Anisimov
 //
 
 /**

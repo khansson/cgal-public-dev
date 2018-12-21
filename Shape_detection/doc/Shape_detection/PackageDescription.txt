@@ -33,8 +33,8 @@ For the region growing approach, CGAL provides three particular instances of the
 
 ## Concepts ##
 - `EfficientRANSACTraits`
-- `RegionGrowingConditions`
 - `RegionGrowingConnectivity`
+- `RegionGrowingPropagationConditions`
 
 ## Main Classes ##
 - `CGAL::Shape_detection::Efficient_RANSAC_traits<Kernel, InputRange, InputPointMap, InputNormalMap>`

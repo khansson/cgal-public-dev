@@ -42,7 +42,7 @@ namespace CGAL {
     The cone is represented by its apex, the axis and the opening angle.
     This representation models an open infinite single-cone.
     \tparam Traits a model of `EfficientRANSACTraits`
-   \ingroup PkgPointSetShapeDetection3Shapes
+   \ingroup PkgShapeDetectionShapes
    */
 
   template <class Traits>

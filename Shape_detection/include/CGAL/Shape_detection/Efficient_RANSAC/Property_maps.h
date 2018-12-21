@@ -32,12 +32,10 @@ namespace CGAL {
 namespace Shape_detection {
 
 /*!
-   \ingroup PkgPointSetShapeDetection3Ref
+   \ingroup PkgShapeDetectionRef
 
    Property map that associate a point index to its assigned shape
-   found by a shape detection algorithm (such as
-   `CGAL::Shape_detection::Efficient_RANSAC` or
-   `CGAL::Shape_detection::Region_growing`).
+   found by `CGAL::Shape_detection::Efficient_RANSAC` algorithm).
  */
   template <typename Traits>
   class Point_to_shape_index_map
@@ -87,7 +85,7 @@ namespace Shape_detection {
   };
 
 /*!
-   \ingroup PkgPointSetShapeDetection3Ref
+   \ingroup PkgShapeDetectionRef
 
    Property map that associates a detected plane object
    (`CGAL::Shape_detection::Plane`) to a `CGAL::Plane_3` object.

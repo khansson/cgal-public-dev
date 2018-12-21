@@ -35,7 +35,7 @@
 namespace CGAL {
   namespace Shape_detection {
     /*!
-     \ingroup PkgPointSetShapeDetection3Shapes
+     \ingroup PkgShapeDetectionShapes
      \brief Plane implements Shape_base. The plane is represented by the normal vector and the distance to the origin.
      \tparam Traits a model of `EfficientRANSACTraits` with the additional 
              requirement for planes (see `EfficientRANSACTraits` documentation).

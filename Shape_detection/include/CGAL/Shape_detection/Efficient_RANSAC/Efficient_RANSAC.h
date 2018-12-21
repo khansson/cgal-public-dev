@@ -59,7 +59,7 @@ namespace CGAL {
   namespace Shape_detection {
 
 /*!
-\ingroup PkgPointSetShapeDetection3Ref
+\ingroup PkgShapeDetectionRef
 \brief A shape detection algorithm using a RANSAC method.
 
 Given a point set in 3D space with unoriented normals, sampled on surfaces,
@@ -67,7 +67,7 @@ this class enables to detect subsets of connected points lying on the surface of
 Each input point is assigned to either none or at most one detected primitive
 shape. The implementation follows \cgalCite{schnabel2007efficient}.
 
-\tparam Traits a model of `ShapeDetectionTraits`
+\tparam Traits a model of `EfficientRANSACTraits`
 
 */
   template <class Traits>
@@ -166,7 +166,7 @@ shape. The implementation follows \cgalCite{schnabel2007efficient}.
     /// @{
       /*!
        %Parameters for the shape detection algorithm. They are explained in detail 
-       in Section \ref Point_set_shape_detectionParameters  of the User Manual.
+       in Section \ref Shape_detectionParameters  of the User Manual.
        */
     struct Parameters {
       Parameters()

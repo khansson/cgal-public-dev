@@ -1,20 +1,19 @@
 /*!
-\ingroup PkgGeneralizedRegionGrowingConcepts
+\ingroup PkgShapeDetectionConcepts
 \cgalConcept
 
-Concept describing the set of types and methods required by the class `CGAL::Region_growing::Generalized_region_growing`.
+A concept that describes the set of types and methods required by the class `CGAL::Shape_detection::Region_growing`.
 
-\cgalHasModel `CGAL::Region_growing::Region_growing_with_points::Points_connectivity_circular_query` `CGAL::Region_growing::Region_growing_with_points::Points_connectivity_nearest_neighbors` `CGAL::Region_growing::Region_growing_with_mesh::Mesh_connectivity`
+\cgalHasModel `CGAL::Shape_detection::Fuzzy_sphere_connectivity_on_points` `CGAL::Shape_detection::Nearest_neighbor_connectivity_on_points` `CGAL::Shape_detection::Connectivity_on_face_graph`
 */
 
 class RegionGrowingConnectivity {
 
 public:
 
-    /// Find all elements that have connection with `query_element` and push into `neighbors`
-    template < class ElementWithProperties, class Neighbors_ >
-    void get_neighbors(ElementWithProperties query_element, Neighbors_ neighbors) {
+    /// Find all items, which are connected to an item with the index `query_index`, and push their indices into `neighbors`, where `Index` is any signed integer and `Neighbors` is a random access container.
+    template<class Neighbors>
+    void get_neighbors(Index query_index, Neighbors &neighbors) const {
         
     }
-
 };
