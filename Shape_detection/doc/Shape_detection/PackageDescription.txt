@@ -14,7 +14,7 @@
 
 \cgalPkgSummaryBegin
 \cgalPkgAuthors{Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez, Florent Lafarge, Simon Giraudot, Thien Hoang, and Dmitry Anisimov}
-\cgalPkgDesc{This CGAL package implements an efficient RANSAC approach for detecting arbitrary shapes in an unorganized point set with unoriented normals and a region growing approach for detecting arbitrary shapes
+\cgalPkgDesc{This CGAL package implements an efficient RANSAC (RANdom SAmple Consensus) approach for detecting arbitrary shapes in an unorganized point set with unoriented normals and a region growing approach for detecting arbitrary shapes
 over a set of arbitrary items. With the efficient RANSAC, five canonical shapes can be detected: planes, spheres, cylinders, cones, and tori. Additional shapes can be detected, given a custom shape class by the user.
 For the region growing approach, CGAL provides three particular instances of the algorithm: detecting lines over 2D points, detecting planes over 3D points, and detecting planes over an arbitrary face graph.}
 \cgalPkgManuals{Chapter_Shape_Detection, PkgShapeDetectionRef}

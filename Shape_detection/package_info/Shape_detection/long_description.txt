@@ -2,7 +2,7 @@
 
 Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez, Florent Lafarge, Simon Giraudot, Thien Hoang, and Dmitry Anisimov
 
-This CGAL package implements an efficient RANSAC (random sample consensus) approach for detecting shapes in a point set with unoriented normals. 
+This CGAL package implements an efficient RANSAC (RANdom SAmple Consensus) approach for detecting shapes in a point set with unoriented normals. 
 Five canonical shapes can be detected: planes, spheres, cylinders, cones, and tori. Additional shapes can be detected, given a custom shape class by the user.
 
 In addition to the RANSAC approach, a generic region growing algorithm is implemented. This algorithm can grow regions 
