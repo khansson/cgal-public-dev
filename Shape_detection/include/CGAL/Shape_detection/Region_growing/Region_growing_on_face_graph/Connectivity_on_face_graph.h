@@ -44,12 +44,12 @@ namespace CGAL {
     namespace Shape_detection {
 
         /*!
-            \ingroup PkgShapeDetection
+            \ingroup PkgShapeDetectionRGOnGraph
             \brief Find all faces that share an edge with a given face.
             \tparam FaceGraph General face graph. Model of `FaceGraph`.
             \tparam FaceRange An arbitrary range with graph faces, given an IndexToFaceMap is provided. The default one is random access.
-            \tparam IndexToFaceMap An `LvaluePropertyMap` that maps face to `Index`, which is any signed integer type, the default `Index` is `long`.
-            \tparam FaceToIndexMap An `LvaluePropertyMap` that `Index` to face, opposite to IndexToFaceMap.
+            \tparam IndexToFaceMap An `LvaluePropertyMap` that maps face to `Item_index`, which is any signed integer type, the default `Item_index` is `long`.
+            \tparam FaceToIndexMap An `LvaluePropertyMap` that `Item_index` to face, opposite to IndexToFaceMap.
             \cgalModels `RegionGrowingConnectivity`
         */
         template<class FaceGraph, 
@@ -70,13 +70,13 @@ namespace CGAL {
             ///< An arbitrary range with graph faces.
 
             using Index_to_face_map            = IndexToFaceMap;
-            ///< An `LvaluePropertyMap` that maps `Index` to face.
+            ///< An `LvaluePropertyMap` that maps `Item_index` to face.
 
             using Face_to_index_map            = FaceToIndexMap;
             ///< An `LvaluePropertyMap` that maps face index to face.
 
             ///< \cond SKIP_IN_MANUAL
-            using Index                        = long;
+            using Item_index                   = long;
             ///< \endcond
 
             /// @}
@@ -125,7 +125,7 @@ namespace CGAL {
                 \tparam Neighbors CGAL::Shape_detection::Region_growing::Neighbors
             */
             template<class Neighbors>
-            void get_neighbors(const Index query_index, Neighbors &neighbors) const {
+            void get_neighbors(const Item_index query_index, Neighbors &neighbors) const {
                     
                 CGAL_precondition(query_index < m_face_range.size());
                 neighbors.clear();
@@ -136,7 +136,7 @@ namespace CGAL {
                 const auto &faces = CGAL::faces_around_face(query_halfedge, m_face_graph);
                 for (auto face = faces.begin(); face != faces.end(); ++face) {
 
-                    const Index face_index = get(m_face_to_index_map, *face);
+                    const Item_index face_index = get(m_face_to_index_map, *face);
                     if (face_index >= 0) neighbors.push_back(face_index);
                 }
             }

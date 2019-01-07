@@ -1,6 +1,4 @@
 1. Add the callback mechanism to region growing. See the RANSAC code or the current version of the Region Growing in CGAL. There is an example in RANSAC folder.
 2. Add a sorting class by line/plane quality. See the current version of the Region Growing in CGAL or my code.
-3. Implement feedback on the manuals.
-4. Implement feedback on the code.
-5. Test different use cases on different data.
-6. Add all necessary property maps to be able to use plane regularization with region growing on points 3.
+3. Test different use cases on different data.
+4. Add all necessary property maps to be able to use plane regularization with region growing on points 3.

@@ -52,7 +52,7 @@
 
 
 /*! 
-  \file Efficient_RANSAC.h
+  \file CGAL/Shape_detection/Efficient_RANSAC/Efficient_RANSAC.h
 */
 
 namespace CGAL {
@@ -166,7 +166,7 @@ shape. The implementation follows \cgalCite{schnabel2007efficient}.
     /// @{
       /*!
        %Parameters for the shape detection algorithm. They are explained in detail 
-       in Section \ref Shape_detectionParameters  of the User Manual.
+       in Section \ref Shape_detection_RANSACParameters  of the User Manual.
        */
     struct Parameters {
       Parameters()

@@ -38,7 +38,7 @@
 namespace CGAL {
   namespace Shape_detection {
     /*!
-     \ingroup PkgShapeDetectionShapes
+     \ingroup PkgShapeDetectionRANSACShapes
      \brief Sphere implements Shape_base. The sphere is represented by its center and the radius.
      \tparam Traits a model of `EfficientRANSACTraits` with the additional 
              requirement for spheres (see `EfficientRANSACTraits` documentation).

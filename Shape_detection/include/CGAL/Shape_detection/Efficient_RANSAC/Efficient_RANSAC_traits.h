@@ -27,14 +27,16 @@
 
 #include <CGAL/Search_traits_3.h>
 
-/// \cond SKIP_IN_MANUAL
+/*! 
+  \file CGAL/Shape_detection/Efficient_RANSAC/Efficient_RANSAC_traits.h
+*/
 
 namespace CGAL {
   namespace Shape_detection {
     /*!
       \ingroup PkgShapeDetectionRef
       \brief %Default traits class to use the shape detection class `Efficient_RANSAC`.
-      \cgalModels `Shape_detection::Traits`
+      \cgalModels `EfficientRANSACTraits`
 
       \tparam Gt a model of the concept `#Kernel` with `Gt::FT` being `float` or `double`.
 
@@ -194,7 +196,5 @@ namespace CGAL {
   };
 
 } } // end of namespace CGAL::Shape_detection
-
-/// \endcond
 
 #endif // CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_TRAITS_H

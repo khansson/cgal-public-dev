@@ -2,7 +2,7 @@
 \ingroup PkgShapeDetectionConcepts
 \cgalConcept
 
-Concept describing the set of types required by the class `CGAL::Shape_detection::Efficient_RANSAC` and all shape classes.
+Concept describing the set of types required by the class `CGAL::Shape_detection::Efficient_RANSAC` and all RANSAC shape classes.
 
 To avoid copying potentially large input data, the shape detection class
 `CGAL::Shape_detection::Efficient_RANSAC` will work on the input
@@ -14,7 +14,7 @@ be provided to extract the points and the normals from the input.
 \cgalHasModel `CGAL::Shape_detection::Efficient_RANSAC_traits`
 
 */
-class ShapeDetectionTraits{
+class EfficientRANSACTraits{
 public:
   
 /// \name Types

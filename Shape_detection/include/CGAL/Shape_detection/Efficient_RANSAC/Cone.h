@@ -39,10 +39,10 @@ namespace CGAL {
   namespace Shape_detection {
   /*!
    \brief Cone implements Shape_base.
-    The cone is represented by its apex, the axis and the opening angle.
+    The cone is represented by its apex, the axis, and the opening angle.
     This representation models an open infinite single-cone.
     \tparam Traits a model of `EfficientRANSACTraits`
-   \ingroup PkgShapeDetectionShapes
+   \ingroup PkgShapeDetectionRANSACShapes
    */
 
   template <class Traits>

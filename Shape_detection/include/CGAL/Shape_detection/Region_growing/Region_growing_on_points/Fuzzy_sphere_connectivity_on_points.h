@@ -49,12 +49,12 @@ namespace CGAL {
     namespace Shape_detection {
 
         /*!
-            \ingroup PkgShapeDetection
+            \ingroup PkgShapeDetectionRGOnPoints
             \brief Fuzzy sphere search for neighbors on a set of `Point_2` or `Point_3`.
             \tparam Traits Model of `Kernel`
             \tparam InputRange An arbitrary range with user-defined items, given an IndexToItemMap is provided. The default one is random access.
             \tparam PointMap An `LvaluePropertyMap` that maps to `Point_2` or `Point_3`.
-            \tparam IndexToItemMap An `LvaluePropertyMap` that maps item to `Index`, which is any signed integer type, the default `Index` is `long`.
+            \tparam IndexToItemMap An `LvaluePropertyMap` that maps item to `Item_index`, which is any signed integer type, the default `Item_index` is `long`.
             \cgalModels `RegionGrowingConnectivity`
         */
         template<class Traits, class InputRange, class PointMap,
@@ -73,13 +73,13 @@ namespace CGAL {
             ///< An `LvaluePropertyMap` that maps to `Point_2` or `Point_3`.
 
             using Index_to_item_map       = IndexToItemMap;
-            ///< An `LvaluePropertyMap` that maps `Index` to item.
+            ///< An `LvaluePropertyMap` that maps `Item_index` to item.
 
             using Point                   = typename Point_map::value_type;
             ///< Point type, can only be `Point_2` or `Point_3`.
 
             ///< \cond SKIP_IN_MANUAL
-            using Index                   = long;
+            using Item_index              = long;
 
             using Index_to_point_map      = CGAL::Shape_detection::Item_property_map<Index_to_item_map, Point_map>;
             ///< \endcond
@@ -98,7 +98,7 @@ namespace CGAL {
 
                 struct Search_structures {
                     
-					using Search_traits   = CGAL::Search_traits_adapter<Index, Index_to_point_map, Search_base>;
+					using Search_traits   = CGAL::Search_traits_adapter<Item_index, Index_to_point_map, Search_base>;
                     using Splitter        = CGAL::Sliding_midpoint<Search_traits>;
                     using Fuzzy_sphere    = CGAL::Fuzzy_sphere<Search_traits>;
                     using Tree            = CGAL::Kd_tree<Search_traits, Splitter, CGAL::Tag_true>;
@@ -130,8 +130,8 @@ namespace CGAL {
             m_point_map(point_map),
             m_index_to_point_map(m_index_to_item_map, m_point_map),
             m_tree(
-                boost::counting_iterator<Index>(0),
-                boost::counting_iterator<Index>(m_input_range.size()),
+                boost::counting_iterator<Item_index>(0),
+                boost::counting_iterator<Item_index>(m_input_range.size()),
                 typename Search_structures::Splitter(),
                 typename Search_structures::Search_traits(m_index_to_point_map)) { 
 
@@ -149,8 +149,8 @@ namespace CGAL {
             m_point_map(point_map),
             m_index_to_point_map(m_index_to_item_map, m_point_map),
             m_tree(
-                boost::counting_iterator<Index>(0),
-                boost::counting_iterator<Index>(m_input_range.size()),
+                boost::counting_iterator<Item_index>(0),
+                boost::counting_iterator<Item_index>(m_input_range.size()),
                 typename Search_structures::Splitter(),
                 typename Search_structures::Search_traits(m_index_to_point_map)) { 
 
@@ -169,7 +169,7 @@ namespace CGAL {
                 \tparam Neighbors CGAL::Shape_detection::Region_growing::Neighbors
             */
             template<class Neighbors>
-            void get_neighbors(const Index query_index, Neighbors &neighbors) const {
+            void get_neighbors(const Item_index query_index, Neighbors &neighbors) const {
                 
                 CGAL_precondition(query_index < m_input_range.size());
                 neighbors.clear();

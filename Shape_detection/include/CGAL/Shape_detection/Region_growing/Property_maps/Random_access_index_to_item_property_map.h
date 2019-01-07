@@ -31,8 +31,8 @@ namespace CGAL {
     namespace Shape_detection {
 
         /*! 
-            \ingroup PkgShapeDetection
-            \brief An `LvaluePropertyMap` that maps `Index` to an item from the InputRange, where `Index` is any signed integer type, the default `Index` is `long`. This map works only on a random access container.
+            \ingroup PkgShapeDetectionRGPM
+            \brief An `LvaluePropertyMap` that maps `Item_index` to an item from the InputRange, where `Item_index` is any signed integer type, the default `Item_index` is `long`. This map works only on a random access container.
             \tparam InputRange A random access range with user-defined items.
         */
         template<class InputRange>

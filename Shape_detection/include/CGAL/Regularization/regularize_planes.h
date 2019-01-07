@@ -20,13 +20,6 @@
 // Author(s)     : Florent Lafarge, Simon Giraudot
 //
 
-/**
- * \ingroup PkgShapeDetectionRef
- * \file CGAL/Regularization/regularize_planes.h
- *
- */
-
-
 #ifndef CGAL_REGULARIZE_PLANES_H
 #define CGAL_REGULARIZE_PLANES_H
 
@@ -547,11 +540,11 @@ void subgraph_mutually_orthogonal_clusters (std::vector<Plane_cluster<Traits> >&
     Given a set of detected planes with their respective inlier sets,
     this function enables to regularize the planes: 
 
-    - Planes near parallel can be made exactly parallel.
+    - Planes near parallel can be made exactly parallel;
 
-    - Planes near orthogonal can be made exactly orthogonal.
+    - Planes near orthogonal can be made exactly orthogonal;
 
-    - Planes parallel and near coplanar can be made exactly coplanar.
+    - Planes parallel and near coplanar can be made exactly coplanar;
 
     - Planes near symmetrical with a user-defined axis can be made
     exactly symmetrical.
@@ -562,10 +555,10 @@ void subgraph_mutually_orthogonal_clusters (std::vector<Plane_cluster<Traits> >&
 
     The implementation follows \cgalCite{cgal:vla-lod-15}.
 
-    \tparam PointRange range of points, model of `ConstRange`
+    \tparam PointRange range of points, model of `ConstRange`.
     \tparam PointPMap is a model of `ReadablePropertyMap` with value type `Kernel::Point_3`.
     It can be omitted if the value type of the iterator of `PointRange` is convertible to `Point_3<Kernel>`.
-    \tparam PlaneRange range of planes, model of `Range`
+    \tparam PlaneRange range of planes, model of `Range`.
     \tparam PlaneMap is a model of `WritablePropertyMap` with value type `Kernel::Plane_3`.
     It can be omitted if the value type of the iterator of `PlaneRange` is convertible to `Plane_3<Kernel>`.
     \tparam IndexMap is a model of `ReadablePropertyMap` with value type `int`.
@@ -573,10 +566,10 @@ void subgraph_mutually_orthogonal_clusters (std::vector<Plane_cluster<Traits> >&
     It can be omitted and deduced automatically from the value type of `PointMap`.
 
     \param points range of points.
-    \param point_map property map: value_type of `typename PointRange::const_iterator` -> `Point_3`
+    \param point_map property map: value_type of `typename PointRange::const_iterator` -> `Point_3`.
     \param planes range of planes.
-    \param plane_map property map: value_type of `typename PlaneRange::iterator` -> `Plane_3`
-    \param index_map property map: index of point `std::size_t` -> index of plane `int` (-1 if the point is not assigned to a plane)
+    \param plane_map property map: value_type of `typename PlaneRange::iterator` -> `Plane_3`.
+    \param index_map property map: index of point `std::size_t` -> index of plane `int` (-1 if the point is not assigned to a plane).
 
     \param regularize_parallelism Select whether parallelism is
     regularized or not.

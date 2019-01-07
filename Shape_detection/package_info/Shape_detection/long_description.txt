@@ -6,5 +6,5 @@ This CGAL package implements an efficient RANSAC (RANdom SAmple Consensus) appro
 Five canonical shapes can be detected: planes, spheres, cylinders, cones, and tori. Additional shapes can be detected, given a custom shape class by the user.
 
 In addition to the RANSAC approach, a generic region growing algorithm is implemented. This algorithm can grow regions 
-and detect shapes over a set of arbitrary items. In particular, CGAL provides three instances of the algorithm: detecting lines over 2D points, 
-detecting planes over 3D points, and detecting planes over an arbitrary face graph. Other instances can be easily added by the user.
+and detect shapes over a set of arbitrary items. In particular, CGAL provides three instances of the algorithm: detecting lines on 2D points, 
+detecting planes on 3D points, and detecting planes on an arbitrary face graph. Other instances can be easily added by the user.

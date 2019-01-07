@@ -20,12 +20,6 @@
 // Author(s)     : Florent Lafarge, Simon Giraudot, Thien Hoang, Dmitry Anisimov
 //
 
-/**
-* \ingroup PkgShapeDetection
-* \file CGAL/Shape_detection/Region_growing.h
-* A header file that includes all headers related to the region growing algorithm.
-*/
-
 #ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_HEADERS_H
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_HEADERS_H
 

@@ -34,8 +34,8 @@ namespace CGAL {
     namespace Shape_detection {
 
         /*! 
-            \ingroup PkgShapeDetection
-            \brief An `LvaluePropertyMap` that maps a hashable item to `Index`, where `Index` is any signed integer type, the default `Index` is `long`. This map works on an arbitrary container with items.
+            \ingroup PkgShapeDetectionRGPM
+            \brief An `LvaluePropertyMap` that maps a hashable item to `Item_index`, where `Item_index` is any signed integer type, the default `Item_index` is `long`. This map works on an arbitrary container with items.
             \tparam InputRange A range with user-defined items, where each item is hashable.
         */
         template<class InputRange>

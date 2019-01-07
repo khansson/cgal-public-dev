@@ -35,7 +35,7 @@ namespace CGAL {
     namespace Shape_detection {
 
         /*!
-            \ingroup PkgShapeDetection
+            \ingroup PkgShapeDetectionRef
             \brief Region growing algorithm
             \tparam InputRange An arbitrary range with user-defined items.
             \tparam Connectivity Model of `RegionGrowingConnectivity`

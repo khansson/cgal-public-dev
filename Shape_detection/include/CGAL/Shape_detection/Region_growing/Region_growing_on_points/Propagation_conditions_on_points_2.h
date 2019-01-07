@@ -42,13 +42,13 @@ namespace CGAL {
     namespace Shape_detection {
 
         /*! 
-            \ingroup PkgShapeDetection
+            \ingroup PkgShapeDetectionRGOnPoints
             \brief Local and global conditions for the region growing algorithm on a 2D point set.
             \tparam Traits Model of `Kernel`
             \tparam InputRange An arbitrary range with user-defined items.
             \tparam PointMap An `LvaluePropertyMap` that maps to `Point_2`.
             \tparam NormalMap An `LvaluePropertyMap` that maps to `Vector_2`.
-            \tparam IndexToItemMap An `LvaluePropertyMap` that maps item to `Index`, which is any signed integer type, the default `Index` is `long`.
+            \tparam IndexToItemMap An `LvaluePropertyMap` that maps item to `Item_index`, which is any signed integer type, the default `Item_index` is `long`.
             \cgalModels `RegionGrowingPropagationConditions`
         */
         template<class Traits, class InputRange, class PointMap, class NormalMap, 
@@ -70,7 +70,7 @@ namespace CGAL {
             ///< An `LvaluePropertyMap` that maps to `Vector_2`.
 
             using Index_to_item_map      = IndexToItemMap;
-            ///< An `LvaluePropertyMap` that maps `Index` to item.
+            ///< An `LvaluePropertyMap` that maps `Item_index` to item.
 
             using FT                     = typename Traits::FT;       ///< Number type
             using Point_2                = typename Traits::Point_2;  ///< Point type
@@ -91,7 +91,7 @@ namespace CGAL {
             using Get_sqrt               = CGAL::Shape_detection::Get_sqrt<Traits>;
             using Sqrt                   = typename Get_sqrt::Sqrt;
 
-            using Index                  = long;
+            using Item_index             = long;
             ///< \endcond
 
             /// @}
@@ -165,7 +165,7 @@ namespace CGAL {
                 \tparam Region CGAL::Shape_detection::Region_growing::Region
             */
             template<class Region>
-            bool belongs_to_region(const Index query_index, const Region &region) const {
+            bool belongs_to_region(const Item_index query_index, const Region &region) const {
 
                 const auto &query_item = get(m_index_to_item_map, query_index);
                 const auto &key        = *query_item;
@@ -222,7 +222,7 @@ namespace CGAL {
                     Local_FT y = Local_FT(0);
 
                     std::vector<Local_point_2> points(region.size());
-                    for (Index i = 0; i < region.size(); ++i) {
+                    for (Item_index i = 0; i < region.size(); ++i) {
 
                         const auto &item = get(m_index_to_item_map, region[i]);
                         const auto &key  = *item;

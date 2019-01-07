@@ -20,12 +20,6 @@
 // Author(s)     : Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez, Florent Lafarge, Simon Giraudot, Thien Hoang, Dmitry Anisimov
 //
 
-/**
-* \ingroup PkgShapeDetection
-* \file CGAL/Shape_detection.h
-* A header file that includes all headers of this package.
-*/
-
 #ifndef CGAL_SHAPE_DETECTION_H
 #define CGAL_SHAPE_DETECTION_H
 
