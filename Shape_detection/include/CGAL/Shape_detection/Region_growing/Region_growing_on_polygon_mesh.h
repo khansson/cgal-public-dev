@@ -20,11 +20,10 @@
 // Author(s)     : Florent Lafarge, Simon Giraudot, Thien Hoang, Dmitry Anisimov
 //
 
-#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_PROPERTY_MAPS_H
-#define CGAL_SHAPE_DETECTION_REGION_GROWING_PROPERTY_MAPS_H
+#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_ON_POLYGON_MESH_H
+#define CGAL_SHAPE_DETECTION_REGION_GROWING_ON_POLYGON_MESH_H
 
-#include <CGAL/Shape_detection/Region_growing/Property_maps/Generic_index_to_item_property_map.h>
-#include <CGAL/Shape_detection/Region_growing/Property_maps/Hashable_item_to_index_property_map.h>
-#include <CGAL/Shape_detection/Region_growing/Property_maps/Random_access_index_to_item_property_map.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_polygon_mesh/Polygon_mesh_adjacent_faces_connectivity.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_polygon_mesh/Polygon_mesh_least_squares_plane_fit_conditions.h>
 
-#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_PROPERTY_MAPS_H
+#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_ON_POLYGON_MESH_H

@@ -23,10 +23,10 @@
 #ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_ON_POINTS_H
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_ON_POINTS_H
 
-#include <CGAL/Shape_detection/Region_growing/Region_growing_on_points/Fuzzy_sphere_connectivity_on_points.h>
-#include <CGAL/Shape_detection/Region_growing/Region_growing_on_points/Nearest_neighbor_connectivity_on_points.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_points/Points_fuzzy_sphere_connectivity.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_points/Points_k_nearest_neighbors_connectivity.h>
 
-#include <CGAL/Shape_detection/Region_growing/Region_growing_on_points/Propagation_conditions_on_points_2.h>
-#include <CGAL/Shape_detection/Region_growing/Region_growing_on_points/Propagation_conditions_on_points_3.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_points/Points_2_least_squares_line_fit_conditions.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_points/Points_3_least_squares_plane_fit_conditions.h>
 
 #endif // CGAL_SHAPE_DETECTION_REGION_GROWING_ON_POINTS_H

@@ -20,15 +20,6 @@
 // Author(s)     : Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez
 //
 
-/*! 
-  \file CGAL/Shape_detection/Efficient_RANSAC.h
-*/
-
-/**
-* \ingroup PkgShapeDetectionRef
-* A header file that includes all headers related to the efficient RANSAC algorithm.
-*/
-
 #ifndef CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_HEADERS_H
 #define CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_HEADERS_H
 

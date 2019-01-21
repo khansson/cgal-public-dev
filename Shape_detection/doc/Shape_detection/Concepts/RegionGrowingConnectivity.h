@@ -11,8 +11,9 @@ class RegionGrowingConnectivity {
 
 public:
     
-    /// Find all items, which are connected to an item with the index `query_index`, and push their indices into `neighbors`, where `Item_index` is any signed integer and `Neighbors` is a random access container.
-    void get_neighbors(Item_index query_index, Neighbors &neighbors) const {
+  /// Find all items, which are connected to an item with the index `query_index`, and push their indices into `neighbors`, where `Item_index` is any signed integer and `Neighbors` is a random access container.
+  void get_neighbors(
+    std::size_t query_index, Neighbors &neighbors) const {
         
-    }
+  }
 };

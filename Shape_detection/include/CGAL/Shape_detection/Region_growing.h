@@ -25,7 +25,6 @@
 
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
 #include <CGAL/Shape_detection/Region_growing/Region_growing_on_points.h>
-#include <CGAL/Shape_detection/Region_growing/Region_growing_on_face_graph.h>
-#include <CGAL/Shape_detection/Region_growing/Region_growing_property_maps.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_polygon_mesh.h>
 
 #endif // CGAL_SHAPE_DETECTION_REGION_GROWING_HEADERS_H
