@@ -20,8 +20,8 @@
 // Author(s)     : Florent Lafarge, Simon Giraudot, Thien Hoang, Dmitry Anisimov
 //
 
-#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_NEAREST_NEIGHBOR_CONNECTIVITY_ON_POINTS_H
-#define CGAL_SHAPE_DETECTION_REGION_GROWING_NEAREST_NEIGHBOR_CONNECTIVITY_ON_POINTS_H
+#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_K_NEAREST_NEIGHBORS_CONNECTIVITY_H
+#define CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_K_NEAREST_NEIGHBORS_CONNECTIVITY_H
 
 // STL includes.
 #include <vector>
@@ -40,179 +40,161 @@
 #include <CGAL/Search_traits_adapter.h>
 #include <CGAL/Orthogonal_k_neighbor_search.h>
 
-// Local includes.
-#include <CGAL/Shape_detection/Region_growing/Internal/Item_property_map.h>
-#include <CGAL/Shape_detection/Region_growing/Property_maps/Random_access_index_to_item_property_map.h>
+// Internal includes.
+#include <CGAL/Shape_detection/Region_growing/internal/property_maps.h>
 
 namespace CGAL {
+namespace Shape_detection {
 
-    namespace Shape_detection {
+  /*!
+    \ingroup PkgShapeDetectionRGOnPoints
+    \brief K nearest neighbors (kNN) search on a set of `Point_2` or `Point_3`.
+    \tparam Traits Model of `Kernel`
+    \tparam InputRange An arbitrary range with user-defined items, given an IndexToItemMap is provided. The default one is random access.
+    \tparam PointMap An `LvaluePropertyMap` that maps to `Point_2` or `Point_3`.
+    \cgalModels `RegionGrowingConnectivity`
+  */
+  template<class GeomTraits, class InputRange, class PointMap>
+  class Points_k_nearest_neighbor_connectivity {
 
-        /*!
-            \ingroup PkgShapeDetectionRGOnPoints
-            \brief K nearest neighbors (kNN) search on a set of `Point_2` or `Point_3`.
-            \tparam Traits Model of `Kernel`
-            \tparam InputRange An arbitrary range with user-defined items, given an IndexToItemMap is provided. The default one is random access.
-            \tparam PointMap An `LvaluePropertyMap` that maps to `Point_2` or `Point_3`.
-            \tparam IndexToItemMap An `LvaluePropertyMap` that maps item to `Item_index`, which is any signed integer type, the default `Item_index` is `long`.
-            \cgalModels `RegionGrowingConnectivity`
-        */
-        template<class Traits, class InputRange, class PointMap,
-        class IndexToItemMap = CGAL::Shape_detection::Random_access_index_to_item_property_map<InputRange> >
-        class Nearest_neighbor_connectivity_on_points {
+  public:
 
-        public:
+    /// \name Types
+    /// @{
 
-            /// \name Types
-            /// @{
-            
-            using Input_range             = InputRange;
-            ///< An arbitrary range with user-defined items.
+    using Traits = GeomTraits;
 
-            using Point_map               = PointMap;
-            ///< An `LvaluePropertyMap` that maps to `Point_2` or `Point_3`.
+    using Input_range = InputRange;
+    ///< An arbitrary range with user-defined items.
 
-            using Index_to_item_map       = IndexToItemMap;
-            ///< An `LvaluePropertyMap` that maps `Item_index` to item.
+    using Point_map = PointMap;
+    ///< An `LvaluePropertyMap` that maps to `Point_2` or `Point_3`.
 
-            using Point                   = typename Point_map::value_type;
-            ///< Point type, can only be `Point_2` or `Point_3`.
+    using Point = typename Point_map::value_type;
+    ///< Point type, can only be `Point_2` or `Point_3`.
 
-            ///< \cond SKIP_IN_MANUAL
-            using Item_index              = long;
+    ///< \cond SKIP_IN_MANUAL
+    using Index_to_point_map = 
+    internal::Item_property_map<Input_range, Point_map>;
 
-            using Index_to_point_map      = CGAL::Shape_detection::Item_property_map<Index_to_item_map, Point_map>;
-            ///< \endcond
+    using Search_base = typename std::conditional<
+      std::is_same<typename Traits::Point_2, Point>::value, 
+      CGAL::Search_traits_2<Traits>, 
+      CGAL::Search_traits_3<Traits> >::type;
 
-            #ifdef DOXYGEN_RUNNING
+    using Search_traits = 
+    CGAL::Search_traits_adapter<std::size_t, Index_to_point_map, Search_base>;
+
+    using Distance = 
+    CGAL::Distance_adapter<
+      std::size_t, 
+      Index_to_point_map, 
+      CGAL::Euclidean_distance<Search_base> >;
+
+    using Splitter = 
+    CGAL::Sliding_midpoint<Search_traits>;
+
+    using Search_tree = 
+    CGAL::Kd_tree<Search_traits, Splitter, CGAL::Tag_true>;
+
+    using Neighbor_search = 
+    CGAL::Orthogonal_k_neighbor_search<
+      Search_traits, 
+      Distance, 
+      Splitter, 
+      Search_tree>;
+
+    using Tree = 
+    typename Neighbor_search::Tree;
+    ///< \endcond
+
+    /// @}
+
+    /// \name Initialization
+    /// @{
+
+    /*!
+      The constructor that takes a set of items, provided a point_map 
+      to access a `Point` from an item, 
+      and a number of nearest neighbors (the value "k" in "kNN").
+    */
+    Points_k_nearest_neighbor_connectivity(
+      const Input_range& input_range, 
+      const std::size_t number_of_neighbors = 12, 
+      const Point_map point_map = Point_map()) :
+    m_input_range(input_range),
+    m_number_of_neighbors(number_of_neighbors),
+    m_point_map(point_map),
+    m_index_to_point_map(m_input_range, m_point_map),
+    m_distance(m_index_to_point_map),
+    m_tree(
+      boost::counting_iterator<std::size_t>(0),
+      boost::counting_iterator<std::size_t>(m_input_range.size()),
+      Splitter(),
+      Search_traits(m_index_to_point_map)) { 
+
+      m_tree.build();
+      CGAL_precondition(number_of_neighbors > 0);
+    }
+
+    /// @}
+
+    /// \name Access
+    /// @{ 
+
+    /*!
+    This function takes the index `query_index` of a query item and 
+    returns indices of the k closest items around it. The result is stored in `neighbors`.
+    \tparam Neighbors CGAL::Shape_detection::Region_growing::Neighbors
+    */
+    template<class OutputIterator>
+    void get_neighbors(
+      const std::size_t query_index, 
+      OutputIterator neighbors) const {
+      
+      CGAL_precondition(query_index < m_input_range.size());
+
+      Neighbor_search neighbor_search(
+        m_tree, 
+        get(m_index_to_point_map, query_index), 
+        m_number_of_neighbors, 
+        0, 
+        true, 
+        m_distance);
                 
-                using Search_base         = unspecified_type;
-                ///< Can be `CGAL::Search_traits_2` or `CGAL::Search_traits_3`, automatically deduced based on whether the point type is `Point_2` or `Point_3`.
+      for (auto it = neighbor_search.begin(); it != neighbor_search.end(); ++it)
+        *(neighbors++) = it->first;
+    }
 
-                using Search_structures   = unspecified_type;
-                ///< Kd tree configuration class.
+    /// @}
 
-            #else
-                
-                using Search_base         = typename std::conditional<std::is_same<typename Traits::Point_2, Point>::value, CGAL::Search_traits_2<Traits>, CGAL::Search_traits_3<Traits> >::type;
+    /// \name Memory Management
+    /// @{
 
-                struct Search_structures {
-                    
-					using Search_traits   = CGAL::Search_traits_adapter<Item_index, Index_to_point_map, Search_base>;
-                    using Distance        = CGAL::Distance_adapter<Item_index, Index_to_point_map, CGAL::Euclidean_distance<Search_base> >;
-                    using Splitter        = CGAL::Sliding_midpoint<Search_traits>;
-                    using Search_tree     = CGAL::Kd_tree<Search_traits, Splitter, CGAL::Tag_true>;
-                    using Neighbor_search = CGAL::Orthogonal_k_neighbor_search<Search_traits, Distance, Splitter, Search_tree>;
-                    using Tree            = typename Neighbor_search::Tree;
-                };
+    /*!
+      Clear all internal data structures.
+    */
+    void clear() {
+      m_tree.clear();
+    }
 
-            #endif
-                
-            using Neighbor_search         = typename Search_structures::Neighbor_search;
-            ///< A search class `CGAL::Orthogonal_k_neighbor_search` that implements a Kd tree.
-                
-            ///< \cond SKIP_IN_MANUAL
-            using Distance                = typename Search_structures::Distance;
-            ///< \endcond
+    /// @}
 
-            using Tree                    = typename Search_structures::Tree;
-            ///< The Kd tree member type of the search class.
+  private:
 
-            /// @}
+    // Fields.
+    const Input_range& m_input_range;
+    
+    const std::size_t m_number_of_neighbors;
 
-            /// \name Initialization
-            /// @{
+    const Point_map m_point_map;
+    const Index_to_point_map m_index_to_point_map;
 
-            /*!
-                The constructor that takes a set of items, provided a point_map to access a `Point` from an item, and a number of nearest neighbors (the value "k" in "kNN").
-            */
-            Nearest_neighbor_connectivity_on_points(const Input_range &input_range, const std::size_t number_of_neighbors = 12, const Point_map point_map = Point_map()) :
-            m_input_range(input_range),
-            m_number_of_neighbors(number_of_neighbors),
-            m_index_to_item_map(m_input_range),
-            m_point_map(point_map),
-            m_index_to_point_map(m_index_to_item_map, m_point_map),
-            m_distance(m_index_to_point_map),
-            m_tree(
-                boost::counting_iterator<Item_index>(0),
-                boost::counting_iterator<Item_index>(m_input_range.size()),
-                typename Search_structures::Splitter(),
-                typename Search_structures::Search_traits(m_index_to_point_map)) { 
+    Distance m_distance;
+    Tree m_tree;
+  };
 
-                    m_tree.build();
-                    CGAL_precondition(number_of_neighbors >= 0);
-                }
-
-            /*!
-                The constructor that takes a set of items, provided a point_map to access a `Point` from an item, a number of nearest neighbors (the value "k" in "kNN"), and an index_to_item_map to access an item given its index in the `input_range`.
-            */
-            Nearest_neighbor_connectivity_on_points(const Input_range &input_range, const Index_to_item_map index_to_item_map, const std::size_t number_of_neighbors = 12, const Point_map point_map = Point_map()) :
-            m_input_range(input_range),
-            m_number_of_neighbors(number_of_neighbors),
-            m_index_to_item_map(index_to_item_map),
-            m_point_map(point_map),
-            m_index_to_point_map(m_index_to_item_map, m_point_map),
-            m_distance(m_index_to_point_map),
-            m_tree(
-                boost::counting_iterator<Item_index>(0),
-                boost::counting_iterator<Item_index>(m_input_range.size()),
-                typename Search_structures::Splitter(),
-                typename Search_structures::Search_traits(m_index_to_point_map)) { 
-
-                    m_tree.build();
-                    CGAL_precondition(number_of_neighbors >= 0);
-                }
-
-            /// @}
-
-            /// \name Access
-            /// @{ 
-
-            /*!
-                This function takes the index `query_index` of a query item and returns indices of the k closest items around it. The result is stored in `neighbors`.
-                \tparam Neighbors CGAL::Shape_detection::Region_growing::Neighbors
-            */
-            template<class Neighbors>
-            void get_neighbors(const Item_index query_index, Neighbors &neighbors) const {
-                CGAL_precondition(query_index < m_input_range.size());
-
-                neighbors.clear();
-                Neighbor_search neighbor_search(m_tree, get(m_index_to_point_map, query_index), m_number_of_neighbors, 0, true, m_distance);
-                
-                for (auto it = neighbor_search.begin(); it != neighbor_search.end(); ++it)
-                    neighbors.push_back(it->first);
-            }
-
-            /// @}
-
-            /// \name Memory Management
-            /// @{
-
-            /*!
-                Clear all internal data structures.
-            */
-            void clear() {
-                m_tree.clear();
-            }
-
-            /// @}
-
-        private:
-
-            // Fields.
-            const Input_range              &m_input_range;
-            const std::size_t               m_number_of_neighbors;
-
-            const Index_to_item_map         m_index_to_item_map;
-            const Point_map                 m_point_map;
-            const Index_to_point_map        m_index_to_point_map;
-
-            Distance                        m_distance;
-            Tree                            m_tree;
-        };
-
-    } // namespace Shape_detection
-
+} // namespace Shape_detection
 } // namespace CGAL
 
-#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_NEAREST_NEIGHBOR_CONNECTIVITY_ON_POINTS_H
+#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_K_NEAREST_NEIGHBORS_CONNECTIVITY_H

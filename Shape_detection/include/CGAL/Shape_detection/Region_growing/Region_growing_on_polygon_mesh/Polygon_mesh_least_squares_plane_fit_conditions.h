@@ -20,8 +20,8 @@
 // Author(s)     : Florent Lafarge, Simon Giraudot, Thien Hoang, Dmitry Anisimov
 //
 
-#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_PROPAGATION_CONDITIONS_ON_FACE_GRAPH_H
-#define CGAL_SHAPE_DETECTION_REGION_GROWING_PROPAGATION_CONDITIONS_ON_FACE_GRAPH_H
+#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_LEAST_SQUARES_PLANE_FIT_CONDITIONS_H
+#define CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_LEAST_SQUARES_PLANE_FIT_CONDITIONS_H
 
 // STL includes.
 #include <vector>
@@ -42,31 +42,30 @@
 #include <CGAL/linear_least_squares_fitting_3.h>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 
-// Local includes.
-#include <CGAL/Shape_detection/Region_growing/Internal/Sqrt.h>
-#include <CGAL/Shape_detection/Region_growing/Property_maps/Random_access_index_to_item_property_map.h>
+// Internal includes.
+#include <CGAL/Shape_detection/Region_growing/internal/utilities.h>
+#include <CGAL/Shape_detection/Region_growing/internal/Random_access_index_to_item_property_map.h>
 
 namespace CGAL {
+namespace Shape_detection {
 
-    namespace Shape_detection {
+  /*!
+    \ingroup PkgShapeDetectionRGOnGraph
+    \brief Local and global conditions for the region growing algorithm on a face graph.
+    \tparam Traits Model of `Kernel`
+    \tparam FaceGraph General face graph. Model of `FaceGraph`.
+    \tparam FaceRange An arbitrary range with graph faces, given an IndexToFaceMap is provided. The default one is random access.
+    \tparam IndexToFaceMap An `LvaluePropertyMap` that maps face to `Item_index`, which is any signed integer type, the default `Item_index` is `long`.
+    \tparam VertexToPointMap An `LvaluePropertyMap` that maps a graph vertex to `Point_3`.
+    \cgalModels `RegionGrowingPropagationConditions`
+  */
+  template<class GeomTraits, class FaceGraph,
+  class FaceRange = typename FaceGraph::Face_range,
+  class IndexToFaceMap   = CGAL::Shape_detection::Random_access_index_to_item_property_map<FaceRange>,
+  class VertexToPointMap = typename boost::property_map<FaceGraph, CGAL::vertex_point_t>::type>
+  class Polygon_mesh_least_squares_plane_fit_conditions {
 
-        /*!
-            \ingroup PkgShapeDetectionRGOnGraph
-            \brief Local and global conditions for the region growing algorithm on a face graph.
-            \tparam Traits Model of `Kernel`
-            \tparam FaceGraph General face graph. Model of `FaceGraph`.
-            \tparam FaceRange An arbitrary range with graph faces, given an IndexToFaceMap is provided. The default one is random access.
-            \tparam IndexToFaceMap An `LvaluePropertyMap` that maps face to `Item_index`, which is any signed integer type, the default `Item_index` is `long`.
-            \tparam VertexToPointMap An `LvaluePropertyMap` that maps a graph vertex to `Point_3`.
-            \cgalModels `RegionGrowingPropagationConditions`
-        */
-        template<class Traits, class FaceGraph,
-        class FaceRange = typename FaceGraph::Face_range,
-        class IndexToFaceMap   = CGAL::Shape_detection::Random_access_index_to_item_property_map<FaceRange>,
-        class VertexToPointMap = typename boost::property_map<FaceGraph, CGAL::vertex_point_t>::type>
-        class Propagation_conditions_on_face_graph {
-
-        public:
+  public:
 
             /// \name Types
             /// @{
@@ -341,4 +340,4 @@ namespace CGAL {
 
 } // namespace CGAL
 
-#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_PROPAGATION_CONDITIONS_ON_FACE_GRAPH_H
+#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_LEAST_SQUARES_PLANE_FIT_CONDITIONS_H
