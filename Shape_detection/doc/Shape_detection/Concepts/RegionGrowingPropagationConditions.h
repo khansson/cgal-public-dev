@@ -4,27 +4,27 @@
 
 A concept that describes the set of types and methods required by the class `CGAL::Shape_detection::Region_growing`.
 
-\cgalHasModel `CGAL::Shape_detection::Propagation_conditions_on_points_2`, `CGAL::Shape_detection::Propagation_conditions_on_points_3`, and `CGAL::Shape_detection::Propagation_conditions_on_face_graph`
+\cgalHasModel `CGAL::Shape_detection::Points_2_least_squares_line_fit_conditions`, `CGAL::Shape_detection::Points_3_least_squares_plane_fit_conditions`, and `CGAL::Shape_detection::Polygon_mesh_least_squares_plane_fit_conditions`
 */
 
 class RegionGrowingPropagationConditions {
 
 public:
     
-  /// A local condition that checks if an item with the index `query_index` belongs to a `region`, where `Item_index` is any signed integer and `Region` is a random access container with indices of other items.
+  /// A local condition that checks if an item with the index `query_index` belongs to a `region`.
   bool belongs_to_region(
     const std::size_t query_index, 
     const ItemRange& region) {
         
   }
 
-  /// A global condition that checks the validity of the whole `region`, where `Region` is a random access container with item indices.
+  /// A global condition that checks the validity of the whole `region`.
   bool are_valid(
     const ItemRange& region) {
         
   }
 
-  /// Update all necessary conditions for the given `region` of the type `Region`, which is a random access container with item indices.
+  /// Update all necessary conditions for the given `region`.
   void update(
     const ItemRange& region) {
     

@@ -49,7 +49,7 @@ namespace Shape_detection {
     \ingroup PkgShapeDetectionRGOnPoints
     \brief Fuzzy sphere search for neighbors on a set of `Point_2` or `Point_3`.
     \tparam Traits Model of `Kernel`
-    \tparam InputRange An arbitrary range with user-defined items, given an IndexToItemMap is provided. 
+    \tparam InputRange A random access range with user-defined items. 
     The default one is random access.
     \tparam PointMap An `LvaluePropertyMap` that maps to `Point_2` or `Point_3`.
     \cgalModels `RegionGrowingConnectivity`
@@ -68,7 +68,7 @@ namespace Shape_detection {
     using Traits = GeomTraits;
 
     using Input_range = InputRange;
-    ///< An arbitrary range with user-defined items. The default implementation is random access.
+    ///< A random access range with user-defined items.
 
     using Point_map = PointMap;
     ///< An `LvaluePropertyMap` that maps to `Point_2` or `Point_3`.
@@ -135,7 +135,7 @@ namespace Shape_detection {
     /*!
       From a query item with the index `query_index`, this function creates a search sphere centered at this item.
       It then uses `CGAL::Kd_tree::search()` to look for the neighbors of the given query and push their indices to `neighbors`.
-      \tparam Neighbors CGAL::Shape_detection::Region_growing::Neighbors
+      \tparam OutputIterator
     */
     template<typename OutputIterator>
     void get_neighbors(

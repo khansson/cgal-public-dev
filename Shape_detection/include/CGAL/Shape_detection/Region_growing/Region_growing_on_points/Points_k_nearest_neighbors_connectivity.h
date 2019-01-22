@@ -49,7 +49,7 @@ namespace Shape_detection {
     \ingroup PkgShapeDetectionRGOnPoints
     \brief K nearest neighbors (kNN) search on a set of `Point_2` or `Point_3`.
     \tparam Traits Model of `Kernel`
-    \tparam InputRange An arbitrary range with user-defined items, given an IndexToItemMap is provided. The default one is random access.
+    \tparam InputRange A random access range with user-defined items.
     \tparam PointMap An `LvaluePropertyMap` that maps to `Point_2` or `Point_3`.
     \cgalModels `RegionGrowingConnectivity`
   */
@@ -57,7 +57,7 @@ namespace Shape_detection {
   typename GeomTraits, 
   typename InputRange, 
   typename PointMap>
-  class Points_k_nearest_neighbor_connectivity {
+  class Points_k_nearest_neighbors_connectivity {
 
   public:
 
@@ -67,7 +67,7 @@ namespace Shape_detection {
     using Traits = GeomTraits;
 
     using Input_range = InputRange;
-    ///< An arbitrary range with user-defined items.
+    ///< A random access range with user-defined items.
 
     using Point_map = PointMap;
     ///< An `LvaluePropertyMap` that maps to `Point_2` or `Point_3`.
@@ -120,7 +120,7 @@ namespace Shape_detection {
       to access a `Point` from an item, 
       and a number of nearest neighbors (the value "k" in "kNN").
     */
-    Points_k_nearest_neighbor_connectivity(
+    Points_k_nearest_neighbors_connectivity(
       const Input_range& input_range, 
       const std::size_t number_of_neighbors = 12, 
       const Point_map point_map = Point_map()) :
@@ -147,7 +147,7 @@ namespace Shape_detection {
     /*!
     This function takes the index `query_index` of a query item and 
     returns indices of the k closest items around it. The result is stored in `neighbors`.
-    \tparam Neighbors CGAL::Shape_detection::Region_growing::Neighbors
+    \tparam OutputIterator
     */
     template<typename OutputIterator>
     void get_neighbors(

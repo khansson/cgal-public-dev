@@ -269,15 +269,15 @@ which are used to parameterize the `Shape_detection::Region_growing` main class 
 
 If the item type is a 2D or 3D point, the component provides two different ways to search for neighbors around this point:
 
-- Fuzzy sphere search via `Shape_detection::Fuzzy_sphere_connectivity_on_points`: 
+- Fuzzy sphere search via `Shape_detection::Points_fuzzy_sphere_connectivity`: 
 The class creates a circle (if the point is 2D) or a sphere (if the point is 3D) with the query point being its center and the user-given search radius. 
 All points that lie within this spherical search space will be treated as neighbors of the query point;
 
-- Nearest neighbor search via `Shape_detection::Nearest_neighbor_connectivity_on_points`: 
+- Nearest neighbor search via `Shape_detection::Points_k_nearest_neighbors_connectivity`: 
 The class returns k (given by the user) nearest neighbors of the query point either 2D or 3D.
 
 To check if a query point belongs to a given region, the program associates this region to a best-fit hyperplane (2D line or 3D plane), 
-using the least squares method via `Shape_detection::Propagation_conditions_on_points_2` for 2D points or `Shape_detection::Propagation_conditions_on_points_3` for 3D points. 
+using the least squares method via `Shape_detection::Points_2_least_squares_line_fit_conditions` for 2D points or `Shape_detection::Points_3_least_squares_plane_fit_conditions` for 3D points. 
 If the distance from the query point to the hyperplane is within a user-defined value, and the dot product between the normal of the query point and the normal of the hyperplane is large enough, 
 this query point is assigned to the region.
 
@@ -298,8 +298,8 @@ A 3D point set depicted with one color per detected planar shape.
 
 \subsection Shape_detection_RegionGrowingFaceGraph Region Growing On Polygon Mesh
 
-If the item type is a graph face, the neighbors of a face can be retrieved by selecting all faces that share an edge with the query face by using the class `Shape_detection::Connectivity_on_face_graph`. 
-To grow the region, we need to check conditions, which are very similar to the 3D point case and given by the class `Shape_detection::Propagation_conditions_on_face_graph`.
+If the item type is a graph face, the neighbors of a face can be retrieved by selecting all faces that share an edge with the query face by using the class `Shape_detection::Polygon_mesh_adjacent_faces_connectivity`. 
+To grow the region, we need to check conditions, which are very similar to the 3D point case and given by the class `Shape_detection::Polygon_mesh_least_squares_plane_fit_conditions`.
 The faces are broken down to their vertices and a plane is fitted to them, 
 however, the distance from a face to the fitted plane is simplifed down to the distance from the centroid of the face to the plane. 
 Vertices do not need normals linked with them, instead, the normal of a face is calculated from the face vertices and the dot product between the face's normal and the fitted plane's normal is computed as usual.
@@ -318,9 +318,9 @@ A surface mesh depicted with one color per detected planar shape.
 The concept `RegionGrowingConnectivity` provides the means for getting connectivity among given items. 
 For points, we provide two different types of connectivity as mentioned in Section \ref Shape_detection_RegionGrowingPoints,
 
-- `Shape_detection::Fuzzy_sphere_connectivity_on_points`: The user must provide the `search_radius` of the hypersphere that defines the neighborhood search space;
+- `Shape_detection::Points_fuzzy_sphere_connectivity`: The user must provide the `search_radius` of the hypersphere that defines the neighborhood search space;
 
-- `Shape_detection::Nearest_neighbor_connectivity_on_points`: The user must provide the `number_of_neighbors` returned in each search query.
+- `Shape_detection::Points_k_nearest_neighbors_connectivity`: The user must provide the `number_of_neighbors` returned in each search query.
 
 The right choice for the `search_radius` or `number_of_neighbors` parameters plays an important role in producing a good result. 
 For example, if we consider the fuzzy sphere connectivity, when `search_radius` is too large, we have fewer regions, and the details are not clearly separated. 
@@ -337,7 +337,7 @@ Each region is painted with a unique color. As `search_radius` increases, the de
 
 For a face graph, the connectivity method is discussed in Section \ref Shape_detection_RegionGrowingFaceGraph,
 
-- `Shape_detection::Connectivity_on_face_graph`: The user must provide the face graph that defines the connectivity between its faces.
+- `Shape_detection::Polygon_mesh_adjacent_faces_connectivity`: The user must provide the face graph that defines the connectivity between its faces.
 
 
 \subsection Shape_detection_RegionGrowingConditions Conditions
@@ -392,7 +392,7 @@ Given a 3D point set, we detect 3D planes on this set using k nearest neighbours
 
 We perform a region growing for detecting planes on a general face graph that, in this example, can be either `CGAL::Surface_mesh` or `CGAL::Polyhedron_3`.
 
-\cgalExample{Shape_detection/Region_growing/example_region_growing_on_face_graph.cpp}
+\cgalExample{Shape_detection/Region_growing/example_region_growing_on_polygon_mesh.cpp}
 
 
 \subsubsection Shape_detection_RegionGrowingExample_with_custom_classes Region Growing With Custom Classes

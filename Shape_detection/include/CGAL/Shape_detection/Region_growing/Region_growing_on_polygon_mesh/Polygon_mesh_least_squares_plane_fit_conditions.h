@@ -53,7 +53,7 @@ namespace Shape_detection {
     \brief Local and global conditions for the region growing algorithm on a face graph.
     \tparam Traits Model of `Kernel`
     \tparam FaceGraph General face graph. Model of `FaceGraph`.
-    \tparam FaceRange An arbitrary range with graph faces, given an IndexToFaceMap is provided.
+    \tparam FaceRange A random access range with graph faces.
     \tparam VertexToPointMap An `LvaluePropertyMap` that maps a graph vertex to `Point_3`.
     \cgalModels `RegionGrowingPropagationConditions`
   */
@@ -75,7 +75,7 @@ namespace Shape_detection {
     ///< General face graph. Model of `FaceGraph`.
 
     using Face_range = FaceRange;
-    ///< An arbitrary range with graph faces.
+    ///< A random access range with graph faces.
 
     using Vertex_to_point_map = VertexToPointMap;
     ///< An `LvaluePropertyMap` that maps a graph vertex to `Point_3`.
@@ -141,7 +141,7 @@ namespace Shape_detection {
 
     /*!
       Local conditions that check if a query item belongs to the given region.
-      \tparam Region CGAL::Shape_detection::Region_growing::Region
+      \tparam ItemRange CGAL::Shape_detection::Region_growing::Items
     */
     template<typename ItemRange>
     bool belongs_to_region(
@@ -168,7 +168,7 @@ namespace Shape_detection {
 
     /*!
       Global conditions that check if a region size is large enough to be accepted.
-      \tparam Region CGAL::Shape_detection::Region_growing::Region
+      \tparam ItemRange CGAL::Shape_detection::Region_growing::Items
     */
     template<typename ItemRange>
     inline bool is_valid_region(const ItemRange& region) const {
@@ -177,7 +177,7 @@ namespace Shape_detection {
 
     /*!
       Update the class's best fit plane that will be used later by local conditions.
-      \tparam Region CGAL::Shape_detection::Region_growing::Region
+      \tparam ItemRange CGAL::Shape_detection::Region_growing::Items
     */
     template<typename ItemRange>
     void update(const ItemRange& region) {

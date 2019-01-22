@@ -44,9 +44,8 @@ namespace Shape_detection {
   /*!
     \ingroup PkgShapeDetectionRGOnGraph
     \brief Find all faces that share an edge with a given face.
-    \tparam FaceGraph General face graph. Model of `FaceGraph`.
-    \tparam FaceRange An arbitrary range with graph faces, given an IndexToFaceMap is provided. The default one is random access.
-    \tparam FaceToIndexMap An `LvaluePropertyMap` that `Item_index` to face, opposite to IndexToFaceMap.
+    \tparam FaceGraph General face graph. Model of `FaceListGraph`.
+    \tparam FaceRange A random access range with graph faces.
     \cgalModels `RegionGrowingConnectivity`
   */
   template<
@@ -63,7 +62,7 @@ namespace Shape_detection {
     ///< General face graph. Model of `FaceGraph`.
 
     using Face_range = FaceRange;
-    ///< An arbitrary range with graph faces.
+    ///< A random access range with graph faces.
 
     ///< \cond SKIP_IN_MANUAL
     using Face_to_index_map 
@@ -93,7 +92,7 @@ namespace Shape_detection {
     /*!
       Using a query index `query_index`, this function retrieves indices 
       of all neighboring faces and stores them in `neighbors`.
-      \tparam Neighbors CGAL::Shape_detection::Region_growing::Neighbors
+      \tparam OutputIterator
     */
     template<typename OutputIterator>
     void get_neighbors(

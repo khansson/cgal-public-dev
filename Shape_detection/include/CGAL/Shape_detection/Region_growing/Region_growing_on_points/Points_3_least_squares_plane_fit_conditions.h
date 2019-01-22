@@ -63,7 +63,7 @@ namespace Shape_detection {
     using Traits = GeomTraits;
 
     using Input_range = InputRange;
-    ///< An arbitrary range with user-defined items.
+    ///< A random access range with user-defined items.
 
     using Point_map = PointMap;
     ///< An `LvaluePropertyMap` that maps to `Point_3`.
@@ -135,7 +135,7 @@ namespace Shape_detection {
 
     /*!
       Local conditions that check if a query item belongs to the given region.
-      \tparam Region CGAL::Shape_detection::Region_growing::Region
+      \tparam ItemRange CGAL::Shape_detection::Region_growing::Items
     */
     template<typename ItemRange>
     bool belongs_to_region(
@@ -165,7 +165,7 @@ namespace Shape_detection {
 
     /*!
       Global conditions that check if a region size is large enough to be accepted.
-      \tparam Region CGAL::Shape_detection::Region_growing::Region
+      \tparam ItemRange CGAL::Shape_detection::Region_growing::Items
     */
     template<typename ItemRange>
     inline bool is_valid_region(const ItemRange& region) const {
@@ -174,7 +174,7 @@ namespace Shape_detection {
 
     /*!
       Update the class's best fit plane that will be used later by local conditions.
-      \tparam Region CGAL::Shape_detection::Region_growing::Region
+      \tparam ItemRange CGAL::Shape_detection::Region_growing::Items
     */
     template<typename ItemRange>
     void update(const ItemRange& region) {

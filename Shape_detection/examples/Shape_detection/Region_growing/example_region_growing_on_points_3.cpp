@@ -29,7 +29,7 @@ using Input_range = CGAL::Point_set_3<Point_3>;
 using Point_map   = typename Input_range::Point_map;
 using Normal_map  = typename Input_range::Vector_map;
 
-using Connectivity   = SD::Points_k_nearest_neighbor_connectivity<Kernel, Input_range, Point_map>;
+using Connectivity   = SD::Points_k_nearest_neighbors_connectivity<Kernel, Input_range, Point_map>;
 using Conditions     = SD::Points_3_least_squares_plane_fit_conditions<Kernel, Input_range, Point_map, Normal_map>;
 using Region_growing = SD::Region_growing<Input_range, Connectivity, Conditions>;
 
