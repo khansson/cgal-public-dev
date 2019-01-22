@@ -24,6 +24,7 @@
 #include <map>
 
 // CGAL includes.
+#include <CGAL/assertions.h>
 #include <CGAL/property_map.h>
 
 #ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_PROPERTY_MAPS_H

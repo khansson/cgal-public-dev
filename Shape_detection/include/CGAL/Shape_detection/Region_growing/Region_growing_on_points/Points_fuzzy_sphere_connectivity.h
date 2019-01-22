@@ -24,7 +24,6 @@
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_FUZZY_SPHERE_CONNECTIVITY_H
 
 // STL includes.
-#include <vector>
 #include <typeinfo>
 #include <type_traits>
 

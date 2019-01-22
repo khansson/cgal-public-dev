@@ -18,3 +18,4 @@ STL_Extension
 Solver_interface
 Spatial_searching
 Stream_support
+BGL

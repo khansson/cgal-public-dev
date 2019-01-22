@@ -262,7 +262,7 @@ Together with the generic algorithm's implementation `Shape_detection::Region_gr
 
 Other instances can be easily added by the user. 
 To do that, the user needs to implement its own version of the \ref Shape_detection_RegionGrowingConnectivity and \ref Shape_detection_RegionGrowingConditions classes, 
-which are used to parameterize the `Shape_detection::Region_growing` main class.
+which are used to parameterize the `Shape_detection::Region_growing` main class (see \ref Shape_detection_RegionGrowingExample_with_custom_classes).
 
 
 \subsection Shape_detection_RegionGrowingPoints Region Growing On Points
@@ -296,7 +296,7 @@ A 3D point set depicted with one color per detected planar shape.
 \cgalFigureEnd
 
 
-\subsection Shape_detection_RegionGrowingFaceGraph Region Growing On Face Graph
+\subsection Shape_detection_RegionGrowingFaceGraph Region Growing On Polygon Mesh
 
 If the item type is a graph face, the neighbors of a face can be retrieved by selecting all faces that share an edge with the query face by using the class `Shape_detection::Connectivity_on_face_graph`. 
 To grow the region, we need to check conditions, which are very similar to the 3D point case and given by the class `Shape_detection::Propagation_conditions_on_face_graph`.
@@ -374,13 +374,6 @@ Typical usage of the region growing component consists of five steps:
 -# Postprocess.
 
 
-\subsubsection Shape_detection_RegionGrowingExample_basic Basic Line Detection
-
-Given a 2D point set, we detect 2D lines on this set.
-
-\cgalExample{Shape_detection/Region_growing/example_region_growing_basic.cpp}
-
-
 \subsubsection Shape_detection_RegionGrowingExample_points_2 Region Growing On 2D Points With Fuzzy Sphere Search
 
 Given a 2D point set, we detect 2D lines on this set using fuzzy sphere neighbours search, color these regions, and save them in a file.
@@ -395,21 +388,21 @@ Given a 3D point set, we detect 3D planes on this set using k nearest neighbours
 \cgalExample{Shape_detection/Region_growing/example_region_growing_on_points_3.cpp}
 
 
-\subsubsection Shape_detection_RegionGrowingExample_face_graph Region Growing on Face Graph
+\subsubsection Shape_detection_RegionGrowingExample_face_graph Region Growing On Polygon Mesh
 
 We perform a region growing for detecting planes on a general face graph that, in this example, can be either `CGAL::Surface_mesh` or `CGAL::Polyhedron_3`.
 
 \cgalExample{Shape_detection/Region_growing/example_region_growing_on_face_graph.cpp}
 
 
-\subsubsection Shape_detection_RegionGrowingExample_surface_mesh Region Growing on Surface Mesh
+\subsubsection Shape_detection_RegionGrowingExample_with_custom_classes Region Growing With Custom Classes
 
-In this particular example, we show how `CGAL::Surface_mesh` can be efficiently and easily used for detecting planar shapes on urban data.
+In this particular example, we show how to use custom user-defined classes in region growing.
 
-\cgalExample{Shape_detection/Region_growing/example_region_growing_on_surface_mesh.cpp}
+\cgalExample{Shape_detection/Region_growing/example_region_growing_with_custom_classes.cpp}
 
 
-\subsection Shape_detection_RegionGrowingPerformance Performance
+\subsection Shape_detection_RegionGrowingPerformance Performance On Points
 
 The main parameter that affects the region growing algorithm is the neighborhood size (`search_radius` or `number_of_neighbors`) at each retrieval. 
 Larger neighbor lists are often followed by smaller number of regions, 

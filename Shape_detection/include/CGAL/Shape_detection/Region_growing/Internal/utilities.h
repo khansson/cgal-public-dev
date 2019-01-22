@@ -28,6 +28,7 @@
 #include <boost/optional/optional.hpp>
 
 // CGAL includes.
+#include <CGAL/assertions.h>
 #include <CGAL/number_utils.h>
 
 namespace CGAL {

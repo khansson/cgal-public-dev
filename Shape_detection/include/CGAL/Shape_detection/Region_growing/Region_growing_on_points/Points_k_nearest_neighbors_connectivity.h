@@ -24,7 +24,6 @@
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_K_NEAREST_NEIGHBORS_CONNECTIVITY_H
 
 // STL includes.
-#include <vector>
 #include <typeinfo>
 #include <type_traits>
 
