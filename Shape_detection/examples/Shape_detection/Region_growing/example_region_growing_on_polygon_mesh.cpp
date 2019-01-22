@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
   const Face_range face_range = CGAL::faces(polygon_mesh);
 
   std::cout << 
-    "* cube mesh with " 
+    "* polygon mesh with " 
   << face_range.size() << 
     " faces is loaded" 
   << std::endl;
