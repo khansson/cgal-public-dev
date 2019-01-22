@@ -48,7 +48,11 @@ namespace Shape_detection {
     \tparam NormalMap An `LvaluePropertyMap` that maps to `Vector_3`.
     \cgalModels `RegionGrowingPropagationConditions`
   */
-  template<class GeomTraits, class InputRange, class PointMap, class NormalMap>
+  template<
+  typename GeomTraits, 
+  typename InputRange, 
+  typename PointMap, 
+  typename NormalMap>
   class Points_3_least_squares_plane_fit_conditions {
 
   public:
@@ -133,7 +137,7 @@ namespace Shape_detection {
       Local conditions that check if a query item belongs to the given region.
       \tparam Region CGAL::Shape_detection::Region_growing::Region
     */
-    template<class ItemRange>
+    template<typename ItemRange>
     bool belongs_to_region(
       const std::size_t query_index, 
       const ItemRange& region) const {
@@ -163,7 +167,7 @@ namespace Shape_detection {
       Global conditions that check if a region size is large enough to be accepted.
       \tparam Region CGAL::Shape_detection::Region_growing::Region
     */
-    template<class ItemRange>
+    template<typename ItemRange>
     inline bool is_valid_region(const ItemRange& region) const {
       return ( region.size() >= m_min_region_size );
     }
@@ -172,7 +176,7 @@ namespace Shape_detection {
       Update the class's best fit plane that will be used later by local conditions.
       \tparam Region CGAL::Shape_detection::Region_growing::Region
     */
-    template<class ItemRange>
+    template<typename ItemRange>
     void update(const ItemRange& region) {
 
       CGAL_precondition(region.size() > 0);

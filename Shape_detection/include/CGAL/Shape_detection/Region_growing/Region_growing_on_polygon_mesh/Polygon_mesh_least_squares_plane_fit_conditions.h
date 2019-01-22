@@ -58,9 +58,11 @@ namespace Shape_detection {
     \tparam VertexToPointMap An `LvaluePropertyMap` that maps a graph vertex to `Point_3`.
     \cgalModels `RegionGrowingPropagationConditions`
   */
-  template<class GeomTraits, class FaceGraph,
-  class FaceRange = typename FaceGraph::Face_range,
-  class VertexToPointMap = typename boost::property_map<FaceGraph, CGAL::vertex_point_t>::type>
+  template<
+  typename GeomTraits, 
+  typename FaceGraph,
+  typename FaceRange = typename FaceGraph::Face_range,
+  typename VertexToPointMap = typename boost::property_map<FaceGraph, CGAL::vertex_point_t>::type>
   class Polygon_mesh_least_squares_plane_fit_conditions {
 
   public:
@@ -142,7 +144,7 @@ namespace Shape_detection {
       Local conditions that check if a query item belongs to the given region.
       \tparam Region CGAL::Shape_detection::Region_growing::Region
     */
-    template<class ItemRange>
+    template<typename ItemRange>
     bool belongs_to_region(
       const std::size_t query_index, 
       const ItemRange& region) const {
@@ -169,7 +171,7 @@ namespace Shape_detection {
       Global conditions that check if a region size is large enough to be accepted.
       \tparam Region CGAL::Shape_detection::Region_growing::Region
     */
-    template<class ItemRange>
+    template<typename ItemRange>
     inline bool is_valid_region(const ItemRange& region) const {
       return ( region.size() >= m_min_region_size );
     }
@@ -178,7 +180,7 @@ namespace Shape_detection {
       Update the class's best fit plane that will be used later by local conditions.
       \tparam Region CGAL::Shape_detection::Region_growing::Region
     */
-    template<class ItemRange>
+    template<typename ItemRange>
     void update(const ItemRange& region) {
 
       CGAL_precondition(region.size() > 0);

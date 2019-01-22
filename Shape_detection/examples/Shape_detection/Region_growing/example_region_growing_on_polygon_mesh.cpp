@@ -53,7 +53,7 @@ using Region_growing = SD::Region_growing<Face_range, Connectivity, Conditions>;
 int main(int argc, char *argv[]) {
 
   std::cout << std::endl << 
-    "region_growing_on_face_graph example started" 
+    "region_growing_on_polygon_mesh example started" 
   << std::endl << std::endl;
 
   // Load data.
@@ -115,14 +115,14 @@ int main(int argc, char *argv[]) {
       if (!created) {
               
         std::cout << std::endl << 
-          "region_growing_on_surface_mesh example finished" 
+          "region_growing_on_polygon_mesh example finished" 
         << std::endl << std::endl;
           
         return EXIT_FAILURE;
       }
 
       const std::string path     = argv[2];
-      const std::string fullpath = path + "regions_surface_mesh.off";
+      const std::string fullpath = path + "regions_polygon_mesh.off";
 
       std::ofstream out(fullpath);
 
@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
   #endif
 
   std::cout << std::endl << 
-    "region_growing_on_face_graph example finished" 
+    "region_growing_on_polygon_mesh example finished" 
   << std::endl << std::endl;
     
   return EXIT_SUCCESS;

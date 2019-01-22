@@ -34,7 +34,7 @@ namespace CGAL {
 namespace Shape_detection {
 namespace internal {
 
-  template<class GeomTraits> 
+  template<typename GeomTraits> 
   class Default_sqrt {
     
   private:
@@ -50,7 +50,7 @@ namespace internal {
   BOOST_MPL_HAS_XXX_TRAIT_NAMED_DEF(Has_nested_type_Sqrt, Sqrt, false)
 
   // Case: do_not_use_default = false.
-  template<class GeomTraits, 
+  template<typename GeomTraits, 
   bool do_not_use_default = Has_nested_type_Sqrt<GeomTraits>::value>
   class Get_sqrt {
         
@@ -64,7 +64,7 @@ namespace internal {
   };
 
   // Case: do_not_use_default = true.
-  template<class GeomTraits>
+  template<typename GeomTraits>
   class Get_sqrt<GeomTraits, true> {
         
   public:

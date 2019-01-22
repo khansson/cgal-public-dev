@@ -30,7 +30,9 @@ namespace CGAL {
 namespace Shape_detection {
 namespace internal {
 
-  template<class ItemRange, class PropertyMap>
+  template<
+  typename ItemRange, 
+  typename PropertyMap>
   class Item_property_map {
                         
   public: 
@@ -67,7 +69,7 @@ namespace internal {
     const Property_map& m_property_map;
   };
 
-  template<class ItemRange>
+  template<typename ItemRange>
   class Item_to_index_property_map {
                         
   public:

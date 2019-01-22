@@ -55,7 +55,10 @@ namespace Shape_detection {
     \tparam PointMap An `LvaluePropertyMap` that maps to `Point_2` or `Point_3`.
     \cgalModels `RegionGrowingConnectivity`
   */
-  template<class GeomTraits, class InputRange, class PointMap>
+  template<
+  typename GeomTraits, 
+  typename InputRange, 
+  typename PointMap>
   class Points_fuzzy_sphere_connectivity {
 
   public:
@@ -135,7 +138,7 @@ namespace Shape_detection {
       It then uses `CGAL::Kd_tree::search()` to look for the neighbors of the given query and push their indices to `neighbors`.
       \tparam Neighbors CGAL::Shape_detection::Region_growing::Neighbors
     */
-    template<class OutputIterator>
+    template<typename OutputIterator>
     void get_neighbors(
       const std::size_t query_index, 
       OutputIterator neighbors) const {

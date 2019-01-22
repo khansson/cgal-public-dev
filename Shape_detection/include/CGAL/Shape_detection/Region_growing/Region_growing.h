@@ -153,7 +153,7 @@ namespace Shape_detection {
       If the function `CGAL::Shape_detection::Region_growing::detect()` has not been called, 
       the first and second of the pair will be the same, which implies an empty container.
     */
-    const Region_range& regions() {
+    const Region_range& regions() const {
       return m_output_regions;
     }
 
@@ -162,21 +162,21 @@ namespace Shape_detection {
       If the function `CGAL::Shape_detection::Region_growing::detect()` has not been called, 
       the first and second of the pair will be the same, which implies an empty container.
     */
-    const Item_range& unassigned_items() {
+    const Item_range& unassigned_items() const {
       return m_output_unassigned;
     }
 
     /*!
       Return the number of found regions.
     */
-    std::size_t number_of_regions() {
+    const std::size_t number_of_regions() const {
       return m_regions.size();
     }
 
     /*!
       Return the number of unassigned items.
     */
-    std::size_t number_of_unassigned_items() {
+    const std::size_t number_of_unassigned_items() const {
       return m_unassigned.size();
     }
 

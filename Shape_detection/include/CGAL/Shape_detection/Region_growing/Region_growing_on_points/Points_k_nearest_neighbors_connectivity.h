@@ -54,7 +54,10 @@ namespace Shape_detection {
     \tparam PointMap An `LvaluePropertyMap` that maps to `Point_2` or `Point_3`.
     \cgalModels `RegionGrowingConnectivity`
   */
-  template<class GeomTraits, class InputRange, class PointMap>
+  template<
+  typename GeomTraits, 
+  typename InputRange, 
+  typename PointMap>
   class Points_k_nearest_neighbor_connectivity {
 
   public:
@@ -147,7 +150,7 @@ namespace Shape_detection {
     returns indices of the k closest items around it. The result is stored in `neighbors`.
     \tparam Neighbors CGAL::Shape_detection::Region_growing::Neighbors
     */
-    template<class OutputIterator>
+    template<typename OutputIterator>
     void get_neighbors(
       const std::size_t query_index, 
       OutputIterator neighbors) const {

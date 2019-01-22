@@ -49,7 +49,9 @@ namespace Shape_detection {
     \tparam FaceToIndexMap An `LvaluePropertyMap` that `Item_index` to face, opposite to IndexToFaceMap.
     \cgalModels `RegionGrowingConnectivity`
   */
-  template<class FaceGraph, class FaceRange = typename FaceGraph::Face_range>
+  template<
+  typename FaceGraph, 
+  typename FaceRange = typename FaceGraph::Face_range>
   class Polygon_mesh_adjacent_faces_connectivity {
 
   public:
@@ -93,7 +95,7 @@ namespace Shape_detection {
       of all neighboring faces and stores them in `neighbors`.
       \tparam Neighbors CGAL::Shape_detection::Region_growing::Neighbors
     */
-    template<class OutputIterator>
+    template<typename OutputIterator>
     void get_neighbors(
       const std::size_t query_index, 
       OutputIterator neighbors) const {

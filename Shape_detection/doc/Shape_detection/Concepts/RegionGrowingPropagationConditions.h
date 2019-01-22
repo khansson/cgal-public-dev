@@ -13,19 +13,20 @@ public:
     
   /// A local condition that checks if an item with the index `query_index` belongs to a `region`, where `Item_index` is any signed integer and `Region` is a random access container with indices of other items.
   bool belongs_to_region(
-    const std::size_t query_index, const Region &region) const {
+    const std::size_t query_index, 
+    const ItemRange& region) {
         
   }
 
   /// A global condition that checks the validity of the whole `region`, where `Region` is a random access container with item indices.
   bool are_valid(
-    const Region &region) const {
+    const ItemRange& region) {
         
   }
 
   /// Update all necessary conditions for the given `region` of the type `Region`, which is a random access container with item indices.
   void update(
-    const Region &region) {
+    const ItemRange& region) {
     
   }
 };
