@@ -36,8 +36,7 @@
 #include <CGAL/assertions.h>
 
 // Internal includes.
-#include <CGAL/Shape_detection/Region_growing/internal/Hashable_item_to_index_property_map.h>
-#include <CGAL/Shape_detection/Region_growing/internal/Random_access_index_to_item_property_map.h>
+#include <CGAL/Shape_detection/Region_growing/internal/property_maps.h>
 
 namespace CGAL {
 namespace Shape_detection {
@@ -47,14 +46,10 @@ namespace Shape_detection {
     \brief Find all faces that share an edge with a given face.
     \tparam FaceGraph General face graph. Model of `FaceGraph`.
     \tparam FaceRange An arbitrary range with graph faces, given an IndexToFaceMap is provided. The default one is random access.
-    \tparam IndexToFaceMap An `LvaluePropertyMap` that maps face to `Item_index`, which is any signed integer type, the default `Item_index` is `long`.
     \tparam FaceToIndexMap An `LvaluePropertyMap` that `Item_index` to face, opposite to IndexToFaceMap.
     \cgalModels `RegionGrowingConnectivity`
   */
-  template<class FaceGraph, 
-  class FaceRange = typename FaceGraph::Face_range, 
-  class IndexToFaceMap = CGAL::Shape_detection::Random_access_index_to_item_property_map<FaceRange>,
-  class FaceToIndexMap = CGAL::Shape_detection::Hashable_item_to_index_property_map<FaceRange> >
+  template<class FaceGraph, class FaceRange = typename FaceGraph::Face_range>
   class Polygon_mesh_adjacent_faces_connectivity {
 
   public:
@@ -68,11 +63,10 @@ namespace Shape_detection {
     using Face_range = FaceRange;
     ///< An arbitrary range with graph faces.
 
-    using Index_to_face_map = IndexToFaceMap;
-    ///< An `LvaluePropertyMap` that maps `Item_index` to face.
-
-    using Face_to_index_map = FaceToIndexMap;
-    ///< An `LvaluePropertyMap` that maps face index to face.
+    ///< \cond SKIP_IN_MANUAL
+    using Face_to_index_map 
+    = internal::Item_to_index_property_map<Face_range>;
+    ///< \endcond
 
     /// @}
 
@@ -86,36 +80,7 @@ namespace Shape_detection {
       const Face_graph& face_graph) :
     m_face_graph(face_graph),
     m_face_range(CGAL::faces(m_face_graph)),
-    m_index_to_face_map(m_face_range),
     m_face_to_index_map(m_face_range)
-    { }
-
-    /*!
-      The constructor that takes an arbitrary face graph and 
-      an index_to_face_map to access a face given its index in the face range from the `face_graph`.
-    */
-    Polygon_mesh_adjacent_faces_connectivity(
-      const Face_graph& face_graph, 
-      const Index_to_face_map index_to_face_map) :
-    m_face_graph(face_graph),
-    m_face_range(CGAL::faces(m_face_graph)),
-    m_index_to_face_map(index_to_face_map),
-    m_face_to_index_map(m_face_range)
-    { }
-
-    /*!
-      The constructor that takes an arbitrary face graph, 
-      an index_to_face_map to access a face given its index in the face range from the `face_graph`,
-      and a face_to_index_map to access face index given a face.
-    */
-    Polygon_mesh_adjacent_faces_connectivity(
-      const Face_graph& face_graph, 
-      const Index_to_face_map index_to_face_map, 
-      const Face_to_index_map face_to_index_map) :
-    m_face_graph(face_graph),
-    m_face_range(CGAL::faces(m_face_graph)),
-    m_index_to_face_map(index_to_face_map),
-    m_face_to_index_map(face_to_index_map)
     { }
 
     /// @}
@@ -133,18 +98,19 @@ namespace Shape_detection {
       const std::size_t query_index, 
       OutputIterator neighbors) const {
                     
+      CGAL_precondition(query_index >= 0);
       CGAL_precondition(query_index < m_face_range.size());
 
-      const auto& query_face = get(m_index_to_face_map, query_index);
-      const auto& query_halfedge = CGAL::halfedge(*query_face, m_face_graph);
+      const auto& query_face = *(m_face_range.begin() + query_index);
+      const auto& query_halfedge = CGAL::halfedge(query_face, m_face_graph);
 
       const auto& faces = CGAL::faces_around_face(query_halfedge, m_face_graph);
       
       for (auto face = faces.begin(); face != faces.end(); ++face) {
         const std::size_t face_index = get(m_face_to_index_map, *face);
         
-        if (face_index >= 0) 
-          neighbors.push_back(face_index);
+        if (face_index != std::size_t(-1)) // not a null face
+          *(neighbors++) = face_index;
       }
     }
 
@@ -156,7 +122,6 @@ namespace Shape_detection {
     const Face_graph& m_face_graph;
     const Face_range m_face_range;
 
-    const Index_to_face_map m_index_to_face_map;
     const Face_to_index_map m_face_to_index_map;
   };
 

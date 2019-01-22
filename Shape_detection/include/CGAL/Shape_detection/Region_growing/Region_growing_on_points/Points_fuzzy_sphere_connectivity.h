@@ -140,6 +140,7 @@ namespace Shape_detection {
       const std::size_t query_index, 
       OutputIterator neighbors) const {
                 
+      CGAL_precondition(query_index >= 0);
       CGAL_precondition(query_index < m_input_range.size());
       
       const Fuzzy_sphere sphere(

@@ -60,11 +60,11 @@ struct Timeout_callback
   }
 };
 
+int main (int argc, char** argv) {
+  
+  std::cout << "Efficient RANSAC" << std::endl;
+  const char* filename = (argc > 1) ? argv[1] : "../data/cube.pwn";
 
-// This program works for RANSAC
-template <typename ShapeDetection>
-int run(const char* filename)
-{
   Pwn_vector points;
   std::ifstream stream(filename);
 
@@ -78,23 +78,15 @@ int run(const char* filename)
       return EXIT_FAILURE;
   }
 
-  ShapeDetection shape_detection;
-  shape_detection.set_input(points);
-  shape_detection.template add_shape_factory<Plane>();
+  Efficient_ransac ransac;
+  ransac.set_input(points);
+  ransac.add_shape_factory<Plane>();
 
   // Create callback that interrupts the algorithm if it takes more than half a second
   Timeout_callback timeout_callback(0.5);
   
   // Detects registered shapes with default parameters.
-  shape_detection.detect(typename ShapeDetection::Parameters(),
-                         timeout_callback);
+  ransac.detect(Efficient_ransac::Parameters(), timeout_callback);
 
   return EXIT_SUCCESS;
-}
-
-
-int main (int argc, char** argv)
-{
-    std::cout << "Efficient RANSAC" << std::endl;
-    return run<Efficient_ransac> ((argc > 1) ? argv[1] : "../data/cube.pwn");
 }

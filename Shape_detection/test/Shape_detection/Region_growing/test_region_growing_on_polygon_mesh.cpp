@@ -1,4 +1,3 @@
-
 // STL includes.
 #include <string>
 #include <fstream>
@@ -11,10 +10,12 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
-#include <CGAL/Shape_detection/Region_growing/Region_growing_on_face_graph.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_polygon_mesh.h>
+
+namespace SD = CGAL::Shape_detection;
 
 template<class Kernel>
-bool test_region_growing_on_surface_mesh(int argc, char *argv[]) {
+bool test_region_growing_on_polygon_mesh(int argc, char *argv[]) {
 
     using FT      = typename Kernel::FT;
     using Point_3 = typename Kernel::Point_3;
@@ -22,9 +23,9 @@ bool test_region_growing_on_surface_mesh(int argc, char *argv[]) {
     using Surface_mesh = CGAL::Surface_mesh<Point_3>;
     using Face_range   = typename Surface_mesh::Face_range;
 
-    using Connectivity   = CGAL::Shape_detection::Connectivity_on_face_graph<Surface_mesh>;
-    using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_face_graph<Kernel, Surface_mesh>;
-    using Region_growing = CGAL::Shape_detection::Region_growing<Face_range, Connectivity, Conditions>;
+    using Connectivity   = SD::Polygon_mesh_adjacent_faces_connectivity<Surface_mesh>;
+    using Conditions     = SD::Polygon_mesh_least_squares_plane_fit_conditions<Kernel, Surface_mesh>;
+    using Region_growing = SD::Region_growing<Face_range, Connectivity, Conditions>;
 
     // Default parameter values for the cube mesh below.
     const FT          max_distance_to_plane = FT(1);
@@ -58,16 +59,16 @@ bool test_region_growing_on_surface_mesh(int argc, char *argv[]) {
     // Test data.
     const auto &regions = region_growing.regions();
 
-    CGAL_assertion(regions.size() == 330 && regions.size() == region_growing.number_of_regions());
-    if (regions.size() != 330) return false;
+    CGAL_assertion(regions.size() == 334 && regions.size() == region_growing.number_of_regions());
+    if (regions.size() != 334) return false;
 
     for (auto region = regions.begin(); region != regions.end(); ++region)
-        if (!conditions.are_valid(*region)) return false;
+        if (!conditions.is_valid_region(*region)) return false;
 
     const auto &unassigned_faces = region_growing.unassigned_items();
 
-    CGAL_assertion(unassigned_faces.size() == 846 && unassigned_faces.size() == region_growing.number_of_unassigned_items());
-    if (unassigned_faces.size() != 846) return false;
+    CGAL_assertion(unassigned_faces.size() == 858 && unassigned_faces.size() == region_growing.number_of_unassigned_items());
+    if (unassigned_faces.size() != 858) return false;
 
     return true;
 }
@@ -77,7 +78,7 @@ int main(int argc, char *argv[]) {
     // ------>
 
     bool cartesian_double_test_success = true;
-    if (!test_region_growing_on_surface_mesh< CGAL::Simple_cartesian<double> >(argc, argv)) cartesian_double_test_success = false;
+    if (!test_region_growing_on_polygon_mesh< CGAL::Simple_cartesian<double> >(argc, argv)) cartesian_double_test_success = false;
     
     std::cout << "cartesian_double_test_success: " << cartesian_double_test_success << std::endl;
     CGAL_assertion(cartesian_double_test_success);
@@ -85,7 +86,7 @@ int main(int argc, char *argv[]) {
     // ------>
 
     bool exact_inexact_test_success = true;
-    if (!test_region_growing_on_surface_mesh<CGAL::Exact_predicates_inexact_constructions_kernel>(argc, argv)) exact_inexact_test_success = false;
+    if (!test_region_growing_on_polygon_mesh<CGAL::Exact_predicates_inexact_constructions_kernel>(argc, argv)) exact_inexact_test_success = false;
     
     std::cout << "exact_inexact_test_success: " << exact_inexact_test_success << std::endl;
     CGAL_assertion(exact_inexact_test_success);

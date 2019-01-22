@@ -27,10 +27,11 @@ typedef CGAL::Shape_detection::Efficient_RANSAC_traits
 typedef CGAL::Shape_detection::Efficient_RANSAC<Traits>    Efficient_ransac;
 typedef CGAL::Shape_detection::Plane<Traits>               Plane;
 
-// This program works for RANSAC
-template <typename ShapeDetection>
-int run(const char* filename)
-{
+int main (int argc, char** argv) {
+  
+  std::cout << "Efficient RANSAC" << std::endl;
+  const char* filename = (argc > 1) ? argv[1] : "../data/cube.pwn";
+
   // Points with normals.
   Pwn_vector points;
 
@@ -50,26 +51,19 @@ int run(const char* filename)
   }
 
   // Instantiates shape detection engine.
-  ShapeDetection shape_detection;
+  Efficient_ransac ransac;
 
   // Provides the input data.
-  shape_detection.set_input(points);
+  ransac.set_input(points);
 
   // Registers planar shapes via template method.
-  shape_detection.template add_shape_factory<Plane>();
+  ransac.template add_shape_factory<Plane>();
 
   // Detects registered shapes with default parameters.
-  shape_detection.detect();
+  ransac.detect();
 
   // Prints number of detected shapes.
-  std::cout << shape_detection.shapes().end() - shape_detection.shapes().begin() << " shapes detected." << std::endl;
+  std::cout << ransac.shapes().end() - ransac.shapes().begin() << " shapes detected." << std::endl;
 
   return EXIT_SUCCESS;
-}
-
-
-int main (int argc, char** argv)
-{
-    std::cout << "Efficient RANSAC" << std::endl;
-    return run<Efficient_ransac> ((argc > 1) ? argv[1] : "../data/cube.pwn");
 }

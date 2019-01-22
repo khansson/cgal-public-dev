@@ -1,4 +1,3 @@
-
 // STL includes.
 #include <string>
 #include <fstream>
@@ -16,6 +15,8 @@
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
 #include <CGAL/Shape_detection/Region_growing/Region_growing_on_points.h>
 
+namespace SD = CGAL::Shape_detection;
+
 template<class Kernel>
 bool test_region_growing_on_points_3(int argc, char *argv[]) {
 
@@ -26,9 +27,9 @@ bool test_region_growing_on_points_3(int argc, char *argv[]) {
     using Point_map   = typename Input_range::Point_map;
     using Normal_map  = typename Input_range::Vector_map;
 
-    using Connectivity   = CGAL::Shape_detection::Nearest_neighbor_connectivity_on_points<Kernel, Input_range, Point_map>;
-    using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_points_3<Kernel, Input_range, Point_map, Normal_map>;
-    using Region_growing = CGAL::Shape_detection::Region_growing<Input_range, Connectivity, Conditions>;
+    using Connectivity   = SD::Points_k_nearest_neighbor_connectivity<Kernel, Input_range, Point_map>;
+    using Conditions     = SD::Points_3_least_squares_plane_fit_conditions<Kernel, Input_range, Point_map, Normal_map>;
+    using Region_growing = SD::Region_growing<Input_range, Connectivity, Conditions>;
 
     // Default parameter values for the data file points_3.xyz.
     const std::size_t num_neighbors         = 100;
@@ -64,7 +65,7 @@ bool test_region_growing_on_points_3(int argc, char *argv[]) {
     if (regions.size() != 1108) return false;
 
     for (auto region = regions.begin(); region != regions.end(); ++region)
-        if (!conditions.are_valid(*region)) return false;
+        if (!conditions.is_valid_region(*region)) return false;
 
     const auto &unassigned_points = region_growing.unassigned_items();
  

@@ -20,6 +20,9 @@
 // Author(s)     : Florent Lafarge, Simon Giraudot, Thien Hoang, Dmitry Anisimov
 //
 
+// STL includes.
+#include <map>
+
 #ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_PROPERTY_MAPS_H
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_PROPERTY_MAPS_H
 
@@ -62,6 +65,56 @@ namespace internal {
   private:
     const Item_range& m_item_range;
     const Property_map& m_property_map;
+  };
+
+  template<class ItemRange>
+  class Item_to_index_property_map {
+                        
+  public:
+
+    using Item_range = ItemRange;
+            
+    using Iterator = typename Item_range::const_iterator;
+    using Item = typename Iterator::value_type;
+
+    using value_type = std::size_t;
+    using key_type = Item;
+    using category = boost::lvalue_property_map_tag;
+
+    using Item_map = std::map<key_type, value_type>;
+
+    Item_to_index_property_map(const Item_range& item_range) : 
+    m_item_range(item_range) { 
+
+      value_type i = 0;
+      for (auto item = m_item_range.begin(); 
+        item != m_item_range.end(); 
+        ++item, ++i) {
+      
+        m_item_map[*item] = i;
+      }
+    }
+
+    value_type operator[](const key_type& key) const { 
+
+      const auto& value = m_item_map.find(key);
+    
+      if (value == m_item_map.end()) 
+        return value_type(-1);
+    
+      return value->second;
+    }
+
+    friend inline value_type get(
+      const Item_to_index_property_map& item_to_index_map, 
+      const key_type &key) { 
+      
+      return item_to_index_map[key];
+    }
+                
+  private:
+    const Item_range& m_item_range;
+    Item_map m_item_map;
   };
 
 } // internal

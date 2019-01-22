@@ -1,4 +1,3 @@
-
 // STL includes.
 #include <string>
 #include <vector>
@@ -16,6 +15,8 @@
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
 #include <CGAL/Shape_detection/Region_growing/Region_growing_on_points.h>
 
+namespace SD = CGAL::Shape_detection;
+
 template<class Kernel>
 bool test_region_growing_on_points_2(int argc, char *argv[]) {
     
@@ -28,9 +29,9 @@ bool test_region_growing_on_points_2(int argc, char *argv[]) {
     using Point_map         = CGAL::First_of_pair_property_map<Point_with_normal>;
     using Normal_map        = CGAL::Second_of_pair_property_map<Point_with_normal>;
 
-    using Connectivity   = CGAL::Shape_detection::Fuzzy_sphere_connectivity_on_points<Kernel, Input_range, Point_map>;
-    using Conditions     = CGAL::Shape_detection::Propagation_conditions_on_points_2<Kernel, Input_range, Point_map, Normal_map>;
-    using Region_growing = CGAL::Shape_detection::Region_growing<Input_range, Connectivity, Conditions>;
+    using Connectivity   = SD::Points_fuzzy_sphere_connectivity<Kernel, Input_range, Point_map>;
+    using Conditions     = SD::Points_2_least_squares_line_fit_conditions<Kernel, Input_range, Point_map, Normal_map>;
+    using Region_growing = SD::Region_growing<Input_range, Connectivity, Conditions>;
 
     // Default parameter values for the data file points_2.xyz.
     const FT          search_radius        = FT(5);
@@ -68,7 +69,7 @@ bool test_region_growing_on_points_2(int argc, char *argv[]) {
     if (regions.size() != 65) return false;
 
     for (auto region = regions.begin(); region != regions.end(); ++region)
-        if (!conditions.are_valid(*region)) return false;
+        if (!conditions.is_valid_region(*region)) return false;
 
     const auto &unassigned_points = region_growing.unassigned_items();
 

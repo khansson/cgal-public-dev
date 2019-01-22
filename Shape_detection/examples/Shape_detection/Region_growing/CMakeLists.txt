@@ -19,10 +19,10 @@ if(CGAL_FOUND)
     "example_region_growing_on_points_2.cpp")
   create_single_source_cgal_program(
     "example_region_growing_on_points_3.cpp")
-  # create_single_source_cgal_program(
-    # "example_region_growing_on_polygon_mesh.cpp")
-  # create_single_source_cgal_program(
-    # "example_region_growing_with_custom_classes.cpp")
+  create_single_source_cgal_program(
+    "example_region_growing_on_polygon_mesh.cpp")
+  create_single_source_cgal_program(
+    "example_region_growing_with_custom_classes.cpp")
 
 else()
   message(WARNING 
