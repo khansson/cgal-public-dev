@@ -308,7 +308,7 @@ The same as before, the condition class above also verifies if the size of a reg
 
 A picture below gives an example of the region growing algorithm for detecting 3D planes on a surface mesh.
 
-\cgalFigureBegin{Region_growing_on_surface_mesh, Region_growing/region_growing_on_surface_mesh.png}
+\cgalFigureBegin{Region_growing_on_surface_mesh, Region_growing/region_growing_on_polygon_mesh.png}
 A surface mesh depicted with one color per detected planar shape.
 \cgalFigureEnd
 

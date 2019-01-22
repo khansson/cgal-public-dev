@@ -83,8 +83,11 @@ int main(int argc, char *argv[]) {
   in >> input_range;    
   in.close();
 
-  std::cout << "* loaded " 
-  << input_range.size() << " points with normals" << std::endl;
+  std::cout << 
+    "* loaded " 
+  << input_range.size() << 
+    " points with normals" 
+  << std::endl;
 
   // Default parameter values for the data file points_3.xyz.
   const size_t num_neighbors         = 100;
@@ -110,8 +113,9 @@ int main(int argc, char *argv[]) {
   region_growing.detect();
 
   // Print the number of found regions.
-  std::cout << "* " << 
-  region_growing.number_of_regions() << " regions have been found" << std::endl;
+  std::cout << "* " << region_growing.number_of_regions() << 
+    " regions have been found" 
+  << std::endl;
 
   // Get all found regions.
   const auto& regions = region_growing.regions();
@@ -161,12 +165,11 @@ int main(int argc, char *argv[]) {
   }
 
   // Print the number of unassigned points.
-  std::cerr << "* " << 
-  region_growing.number_of_unassigned_items() << 
+  std::cerr << "* " << region_growing.number_of_unassigned_items() << 
     " points do not belong to any region" 
   << std::endl;
 
-  // Get all unassigned items.
+  // Get all unassigned points.
   const auto &unassigned_items = region_growing.unassigned_items();
 
   // Store all unassigned points.
@@ -179,8 +182,7 @@ int main(int argc, char *argv[]) {
     unassigned_points.push_back(point);
   }
 
-  std::cout << "* " << 
-  unassigned_points.size() << 
+  std::cout << "* " << unassigned_points.size() << 
     " unassigned points are stored" 
   << std::endl;
   

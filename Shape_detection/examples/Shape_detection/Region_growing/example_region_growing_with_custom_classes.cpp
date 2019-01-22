@@ -13,8 +13,12 @@ using Kernel = CGAL::Exact_predicates_inexact_constructions_kernel;
 using FT      = typename Kernel::FT;
 using Point_3 = typename Kernel::Point_3;
 
+// Custom Connectivity and Conditions classes for region growing.
 namespace custom {
 
+  // A 3D sphere of the fixed radius 
+  // that stores its center point and 
+  // indices of all adjacent to it other spheres.
   struct Sphere {
     const FT radius = FT(1);
 
@@ -22,8 +26,13 @@ namespace custom {
     std::vector<std::size_t> neighbors;
   };
 
+  // A range of spheres.
   using Spheres = std::vector<Sphere>;
 
+  // Connectivity class, where the function get_neighbors()
+  // simply returns indices of all neighbors stored in
+  // the sphere struct above. This is the only function that 
+  // we have to define.
   class Connectivity {
     const Spheres &m_spheres;
 
@@ -42,6 +51,11 @@ namespace custom {
     }
   };
 
+  // Conditions class, where the function belongs_to_region() checks
+  // a very specific condition that the first and second spheres in the
+  // range are in fact neighbors; is_valid_region() function always 
+  // returns true after the first call to the update() function.
+  // These are the only functions that we have to define.
   class Conditions {
     bool m_is_valid = false;
 
@@ -72,6 +86,7 @@ namespace custom {
   };
 }
 
+// Type declarations.
 using Spheres      = custom::Spheres;
 using Connectivity = custom::Connectivity;
 using Conditions   = custom::Conditions;
@@ -84,6 +99,8 @@ int main(int argc, char *argv[]) {
     "region_growing_with_custom_classes example started" 
   << std::endl << std::endl;
 
+  // Define a range of spheres, where the first two spheres form
+  // the first region, while the thrid sphere forms the second region.
   Spheres spheres(3);
 
   // Region 1.
@@ -106,7 +123,7 @@ int main(int argc, char *argv[]) {
   // Run the algorithm.
   region_growing.detect();
 
-  // Print the number of found regions.
+  // Print the number of found regions. It must be two regions.
   std::cout << "* " << 
   region_growing.number_of_regions() << 
     " regions have been found among 3 spheres" 

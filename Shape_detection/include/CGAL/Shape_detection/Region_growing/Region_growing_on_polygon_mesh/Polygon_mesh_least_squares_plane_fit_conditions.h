@@ -24,7 +24,6 @@
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_LEAST_SQUARES_PLANE_FIT_CONDITIONS_H
 
 // STL includes.
-#include <limits>
 #include <vector>
 
 // Boost includes.
@@ -132,7 +131,7 @@ namespace Shape_detection {
 
       CGAL_precondition(distance_threshold >= FT(0));
       CGAL_precondition(normal_threshold >= FT(0) && normal_threshold <= FT(1));
-      CGAL_precondition(min_region_size >= 1);
+      CGAL_precondition(min_region_size > 0);
     }
 
     /// @}
@@ -216,7 +215,7 @@ namespace Shape_detection {
             points[i] = m_to_local_converter(tmp_point);
           }
         }
-        CGAL_precondition(points.size() >= 3);
+        CGAL_precondition(points.size() > 0);
 
         Local_plane_3 fitted_plane;
         Local_point_3 fitted_centroid;
@@ -312,7 +311,7 @@ namespace Shape_detection {
       const auto& halfedge = CGAL::halfedge(face, m_face_graph);
       const auto& vertices = CGAL::vertices_around_face(halfedge, m_face_graph);
 
-      FT max_face_distance = -std::numeric_limits<FT>::max();
+      FT max_face_distance = -FT(1);
       for (auto vertex = vertices.begin(); vertex != vertices.end(); ++vertex) {
         
         const Point_3& point = 
@@ -324,7 +323,7 @@ namespace Shape_detection {
         max_face_distance = 
         CGAL::max(distance, max_face_distance);
       }
-      CGAL_postcondition(max_face_distance != -std::numeric_limits<FT>::max());
+      CGAL_postcondition(max_face_distance != -FT(1));
 
       return max_face_distance;
     }

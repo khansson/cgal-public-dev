@@ -23,6 +23,9 @@
 // STL includes.
 #include <map>
 
+// CGAL includes.
+#include <CGAL/property_map.h>
+
 #ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_PROPERTY_MAPS_H
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_PROPERTY_MAPS_H
 
@@ -53,6 +56,9 @@ namespace internal {
 
     reference operator[](key_type item_index) const { 
                 
+      CGAL_precondition(item_index >= 0);
+      CGAL_precondition(item_index < m_item_range.size());
+
       const auto& key = *(m_item_range.begin() + item_index);
       return get(m_property_map, key);
     }

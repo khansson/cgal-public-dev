@@ -43,6 +43,8 @@ namespace internal {
 
   public:
     FT operator()(const FT value) const { 
+      
+      CGAL_precondition(value >= FT(0));
       return static_cast<FT>(CGAL::sqrt(CGAL::to_double(value)));
     }
   };

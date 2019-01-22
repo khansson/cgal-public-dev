@@ -125,7 +125,7 @@ namespace Shape_detection {
 
       CGAL_precondition(distance_threshold >= FT(0));
       CGAL_precondition(normal_threshold >= FT(0) && normal_threshold <= FT(1));
-      CGAL_precondition(min_region_size >= 2);
+      CGAL_precondition(min_region_size > 0);
     }
 
     /// @}
@@ -208,7 +208,7 @@ namespace Shape_detection {
           const auto& key = *(m_input_range.begin() + region[i]);
           points[i] = m_to_local_converter(get(m_point_map, key));
         }
-        CGAL_precondition(points.size() >= 2);
+        CGAL_precondition(points.size() > 0);
 
         Local_line_2  fitted_line;
         Local_point_2 fitted_centroid;

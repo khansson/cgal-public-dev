@@ -137,7 +137,7 @@ namespace Shape_detection {
       Search_traits(m_index_to_point_map)) { 
 
       m_tree.build();
-      CGAL_precondition(number_of_neighbors > 0);
+      CGAL_precondition(number_of_neighbors >= 0);
     }
 
     /// @}

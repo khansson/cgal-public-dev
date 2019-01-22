@@ -86,8 +86,11 @@ int main(int argc, char *argv[]) {
       std::make_pair(Point_2(a, b), Vector_2(d, e)));
     
   in.close();
-  std::cout << "* loaded " 
-  << input_range.size() << " points with normals" << std::endl;
+  std::cout << 
+    "* loaded " 
+  << input_range.size() << 
+    " points with normals" 
+  << std::endl;
 
   // Default parameter values for the data file points_2.xyz.
   const FT     search_radius        = FT(5);
@@ -111,8 +114,9 @@ int main(int argc, char *argv[]) {
   region_growing.detect();
 
   // Print the number of found regions.
-  std::cerr << "* " << 
-  region_growing.number_of_regions() << " regions have been found" << std::endl;
+  std::cerr << "* " << region_growing.number_of_regions() << 
+    " regions have been found" 
+  << std::endl;
 
   // Get all found regions.
   const auto& regions = region_growing.regions();
@@ -157,7 +161,9 @@ int main(int argc, char *argv[]) {
           CGAL::PLY_property<unsigned char>("green"),
           CGAL::PLY_property<unsigned char>("blue")));
 
-    std::cout << "* found regions are saved in " << fullpath << std::endl;
+    std::cout << 
+      "* found regions are saved in " 
+    << fullpath << std::endl;
     out.close();
   }
 

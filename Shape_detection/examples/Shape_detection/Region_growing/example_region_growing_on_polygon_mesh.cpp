@@ -33,7 +33,7 @@ using Color = CGAL::Color;
 #if defined(USE_SURFACE_MESH)
 
     using Polygon_mesh = CGAL::Surface_mesh<Point_3>;
-    using Face_range = typename Polygon_mesh::Face_range;
+    using Face_range   = typename Polygon_mesh::Face_range;
 
     using Connectivity = SD::Polygon_mesh_adjacent_faces_connectivity<Polygon_mesh>;
     using Conditions   = SD::Polygon_mesh_least_squares_plane_fit_conditions<Kernel, Polygon_mesh>;
@@ -66,20 +66,24 @@ int main(int argc, char *argv[]) {
   in.close();
   const Face_range face_range = CGAL::faces(polygon_mesh);
 
-  std::cout << "* cube mesh with " << face_range.size() << 
-    " faces is loaded" << std::endl;
+  std::cout << 
+    "* cube mesh with " 
+  << face_range.size() << 
+    " faces is loaded" 
+  << std::endl;
 
-  // Default parameter values for the cube mesh below.
+  // Default parameter values for the data file polygon_mesh.off.
   const FT          max_distance_to_plane = FT(1);
   const FT          normal_threshold      = FT(7) / FT(10);
   const std::size_t min_region_size       = 5;
 
+  // Create instances of the classes Connectivity and Conditions.
+  Connectivity connectivity(
+    polygon_mesh);
+
   using Vertex_to_point_map = typename Conditions::Vertex_to_point_map;
   const Vertex_to_point_map vertex_to_point_map(
     get(CGAL::vertex_point, polygon_mesh));
-
-  Connectivity connectivity(
-    polygon_mesh);
 
   Conditions conditions(
     polygon_mesh, 
@@ -94,9 +98,12 @@ int main(int argc, char *argv[]) {
 
   // Print the number of found regions.
   std::cout << "* " << region_growing.number_of_regions() << 
-    " regions have been found" << std::endl;
+    " regions have been found" 
+  << std::endl;
 
+  // Save result in a file only if it is stored in CGAL::Surface_mesh.
   #if defined(USE_SURFACE_MESH)
+  
     using Face_index = typename Polygon_mesh::Face_index;
 
     // Get all found regions.
@@ -143,7 +150,9 @@ int main(int argc, char *argv[]) {
       out << polygon_mesh;
       out.close();
 
-      std::cerr << "* polygon mesh is saved in " << fullpath << std::endl;
+      std::cout << 
+        "* polygon mesh is saved in " 
+      << fullpath << std::endl;
     }
 
   #endif
