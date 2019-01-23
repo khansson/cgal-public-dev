@@ -23,6 +23,8 @@
 #ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_ADJACENT_FACES_CONNECTIVITY_H
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_ADJACENT_FACES_CONNECTIVITY_H
 
+// #include <CGAL/license/Shape_detection.h>
+
 // Boost includes.
 #include <boost/graph/properties.hpp>
 #include <boost/graph/graph_traits.hpp>
@@ -42,7 +44,7 @@ namespace CGAL {
 namespace Shape_detection {
 
   /*!
-    \ingroup PkgShapeDetectionRGOnGraph
+    \ingroup PkgShapeDetectionRGOnMesh
     \brief Find all faces that share an edge with a given face.
     \tparam FaceGraph General face graph. Model of `FaceListGraph`.
     \tparam FaceRange A random access range with graph faces.

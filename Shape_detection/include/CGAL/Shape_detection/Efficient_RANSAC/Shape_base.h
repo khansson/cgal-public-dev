@@ -37,10 +37,6 @@
 #include <CGAL/Random.h>
 #include <CGAL/Origin.h>
 
-/*!
- \file Shape_base.h
- */
-
 #ifndef CGAL_M_PI_2
 #define CGAL_M_PI_2 1.57079632679489661923
 #endif

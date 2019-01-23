@@ -27,14 +27,10 @@
 
 #include <CGAL/Search_traits_3.h>
 
-/*! 
-  \file CGAL/Shape_detection/Efficient_RANSAC/Efficient_RANSAC_traits.h
-*/
-
 namespace CGAL {
   namespace Shape_detection {
     /*!
-      \ingroup PkgShapeDetectionRef
+      \ingroup PkgShapeDetectionRANSAC
       \brief %Default traits class to use the shape detection class `Efficient_RANSAC`.
       \cgalModels `EfficientRANSACTraits`
 

@@ -23,6 +23,8 @@
 #ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_H
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_H
 
+// #include <CGAL/license/Shape_detection.h>
+
 // STL includes.
 #include <queue>
 #include <vector>
@@ -34,13 +36,23 @@ namespace CGAL {
 namespace Shape_detection {
 
   /*!
-    \ingroup PkgShapeDetectionRef
-    \brief Region growing algorithm
-    \tparam InputRange An arbitrary range with user-defined items.
-    \tparam Connectivity_ Model of `RegionGrowingConnectivity`
-    \tparam Conditions_ Model of `RegionGrowingPropagationConditions`
+    \ingroup PkgShapeDetectionRG
+    
+    \brief Generic Region Growing algorithm.
+    
+    \tparam InputRange 
+    is a model of `ConstRange`. Its iterator type is `RandomAccessIterator`. 
+    Its value type depends on the item type used in Region Growing, 
+    for example it can be `CGAL::Point_2`, `std::pair<CGAL::Point_3, int>`, 
+    or any user-defined type.
+
+    \tparam Connectivity 
+    is a model of `RegionGrowingConnectivity`.
+
+    \tparam Conditions
+    is a model of `RegionGrowingPropagationConditions`
   */
-  template<class InputRange, class Connectivity_, class Conditions_>
+  template<class InputRange, class Connectivity, class Conditions>
   class Region_growing {
 
   public:
@@ -48,30 +60,17 @@ namespace Shape_detection {
     /// \name Types
     /// @{
 
+    /// \cond SKIP_IN_MANUAL
     using Input_range = InputRange;
-    ///< An arbitrary range with user-defined items. The range must implement the function size().
 
-    using Connectivity = Connectivity_;
-
-    using Conditions = Conditions_;
-
-    ///< \cond SKIP_IN_MANUAL
     using Visited_items = std::vector<bool>;
 
-    using Running_queue = std::queue<std::size_t>;
+    using Running_queue = std::queue<std::size_t>;    
+    /// \endcond
 
     using Items = std::vector<std::size_t>;
 
     using Regions = std::vector<Items>;
-    ///< \endcond
-
-    #ifdef DOXYGEN_RUNNING
-
-      using Regions = unspecified_type;
-      
-      using Items = unspecified_type;
-
-    #endif
 
     using Region_range = CGAL::Iterator_range<typename Regions::const_iterator>;
     ///< An `Iterator_range` of the iterators in `CGAL::Shape_detection::Region_growing::Regions`.

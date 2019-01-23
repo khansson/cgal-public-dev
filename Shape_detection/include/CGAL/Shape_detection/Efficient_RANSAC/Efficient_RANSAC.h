@@ -50,16 +50,11 @@
 #include <boost/make_shared.hpp>
 //---------------------
 
-
-/*! 
-  \file CGAL/Shape_detection/Efficient_RANSAC/Efficient_RANSAC.h
-*/
-
 namespace CGAL {
   namespace Shape_detection {
 
 /*!
-\ingroup PkgShapeDetectionRef
+\ingroup PkgShapeDetectionRANSAC
 \brief A shape detection algorithm using a RANSAC method.
 
 Given a point set in 3D space with unoriented normals, sampled on surfaces,

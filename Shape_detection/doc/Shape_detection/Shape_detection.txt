@@ -8,7 +8,6 @@ namespace CGAL {
 
 \authors Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez, Florent Lafarge, Simon Giraudot, Thien Hoang, and Dmitry Anisimov
 
-\cgalModifBegin
 
 \section Shape_detection_Introduction Introduction
 
@@ -17,7 +16,6 @@ This \cgal component implements two algorithms for shape detection:
 - the __efficient RANSAC (RANdom SAmple Consensus)__ method, contributed by Schnabel et al. \cgalCite{schnabel2007efficient};
 - the __region growing__ method, contributed by Lafarge and Mallet \cgalCite{cgal:lm-clscm-12}.
 
-\cgalModifEnd
 
 \section Shape_detection_RANSAC Efficient RANSAC
 
@@ -241,7 +239,6 @@ The number of shapes is stable and the coverage increases when the `probability`
 The running time increases significantly as many more candidates are generated during each iteration of the algorithm.
 \cgalFigureEnd
 
-\cgalModifBegin
 
 \section Shape_detection_RegionGrowing Region Growing
 
@@ -434,7 +431,6 @@ against the `distance_threshold` parameter (for simplicity, we use the same valu
 A higher value for `search_radius`, i.e., larger neighborhood spheres, leads to longer computation time and to larger shapes.
 \cgalFigureEnd
 
-\cgalModifEnd
 
 \section Shape_detection_Comparison Comparison
 
@@ -453,7 +449,6 @@ Bottom right: the output of the region growing, \f$100\%\f$ of the shapes detect
 Unassigned points are in black in both output images.
 \cgalFigureEnd
 
-\cgalModifBegin
 
 \section Shape_detection_History History
 
@@ -463,8 +458,6 @@ Plane regularization was added by Simon Giraudot based on the prototype version 
 
 The region growing algorithm on 3D points was first developed by Simon Giraudot based on the prototype version developed by Florent Lafarge 
 and then generalized to arbitrary items including versions for 2D points, 3D points, and a face graph by Thien Hoang during the Google Summer of Code 2018 under the supervision of Dmitry Anisimov.
-
-\cgalModifEnd
 
 */ 
 } /* namespace CGAL */

@@ -1,5 +1,5 @@
 /*!
-\ingroup PkgShapeDetectionConcepts
+\ingroup PkgShapeDetectionRANSACConcepts
 \cgalConcept
 
 Concept describing the set of types required by the class `CGAL::Shape_detection::Efficient_RANSAC` and all RANSAC shape classes.

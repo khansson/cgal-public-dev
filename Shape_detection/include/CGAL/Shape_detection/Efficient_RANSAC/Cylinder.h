@@ -30,10 +30,6 @@
 #include <CGAL/number_utils.h>
 #include <cmath>
 
-/*!
- \file Cylinder.h
- */
-
 namespace CGAL {
   namespace Shape_detection {
     /*!

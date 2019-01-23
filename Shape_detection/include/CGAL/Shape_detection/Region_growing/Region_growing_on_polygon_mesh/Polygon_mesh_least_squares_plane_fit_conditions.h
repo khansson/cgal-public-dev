@@ -23,6 +23,8 @@
 #ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_LEAST_SQUARES_PLANE_FIT_CONDITIONS_H
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_LEAST_SQUARES_PLANE_FIT_CONDITIONS_H
 
+// #include <CGAL/license/Shape_detection.h>
+
 // STL includes.
 #include <vector>
 
@@ -49,7 +51,7 @@ namespace CGAL {
 namespace Shape_detection {
 
   /*!
-    \ingroup PkgShapeDetectionRGOnGraph
+    \ingroup PkgShapeDetectionRGOnMesh
     \brief Local and global conditions for the region growing algorithm on a face graph.
     \tparam Traits Model of `Kernel`
     \tparam FaceGraph General face graph. Model of `FaceGraph`.

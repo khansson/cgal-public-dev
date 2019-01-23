@@ -23,6 +23,8 @@
 #ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_FUZZY_SPHERE_CONNECTIVITY_H
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_FUZZY_SPHERE_CONNECTIVITY_H
 
+// #include <CGAL/license/Shape_detection.h>
+
 // STL includes.
 #include <typeinfo>
 #include <type_traits>

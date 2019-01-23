@@ -31,10 +31,6 @@
 #include <CGAL/number_utils.h>
 #include <cmath>
 
-/*!
- \file Torus.h
- */
-
 namespace CGAL {
   namespace Shape_detection {
     /*!

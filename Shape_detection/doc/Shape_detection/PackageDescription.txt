@@ -1,20 +1,33 @@
 /*!
 \defgroup PkgShapeDetectionRef Shape Detection Reference
 
-\defgroup PkgShapeDetectionConcepts Concepts
+\defgroup PkgShapeDetectionRG Region Growing
 \ingroup PkgShapeDetectionRef
 
-\defgroup PkgShapeDetectionRANSACShapes Efficient RANSAC Shapes
+\defgroup PkgShapeDetectionRGConcepts Concepts
+\ingroup PkgShapeDetectionRG
+
+\defgroup PkgShapeDetectionRGOnPoints Points
+\ingroup PkgShapeDetectionRG
+
+\defgroup PkgShapeDetectionRGOnMesh Polygon Mesh
+\ingroup PkgShapeDetectionRG
+
+\addtogroup PkgShapeDetectionRG
+
+\defgroup PkgShapeDetectionRANSAC Efficient RANSAC
 \ingroup PkgShapeDetectionRef
 
-\defgroup PkgShapeDetectionRANSACPM Efficient RANSAC Property Maps
-\ingroup PkgShapeDetectionRef
+\defgroup PkgShapeDetectionRANSACConcepts Concepts
+\ingroup PkgShapeDetectionRANSAC
 
-\defgroup PkgShapeDetectionRGOnPoints Region Growing On Points
-\ingroup PkgShapeDetectionRef
+\defgroup PkgShapeDetectionRANSACShapes Shapes
+\ingroup PkgShapeDetectionRANSAC
 
-\defgroup PkgShapeDetectionRGOnGraph Region Growing On Polygon Mesh
-\ingroup PkgShapeDetectionRef
+\defgroup PkgShapeDetectionRANSACPropertyMaps Property Maps
+\ingroup PkgShapeDetectionRANSAC
+
+\addtogroup PkgShapeDetectionRANSAC
 
 \addtogroup PkgShapeDetectionRef
 
@@ -23,9 +36,14 @@
 
 \cgalPkgSummaryBegin
 \cgalPkgAuthors{Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez, Florent Lafarge, Simon Giraudot, Thien Hoang, and Dmitry Anisimov}
-\cgalPkgDesc{This CGAL package implements an efficient RANSAC (RANdom SAmple Consensus) approach for detecting arbitrary shapes in an unorganized point set with unoriented normals and a region growing approach for detecting arbitrary shapes
-over a set of arbitrary items. With the efficient RANSAC, five canonical shapes can be detected: planes, spheres, cylinders, cones, and tori. Additional shapes can be detected, given a custom shape class by the user.
-For the region growing approach, CGAL provides three particular instances of the algorithm: detecting lines on 2D points, detecting planes on 3D points, and detecting planes on an arbitrary face graph.}
+\cgalPkgDesc{This CGAL package implements the Efficient RANSAC (RANdom SAmple Consensus) approach 
+for detecting arbitrary shapes in an unorganized point set with unoriented normals 
+and the Region Growing approach for detecting shapes in a set of arbitrary items. 
+With the Efficient RANSAC, five canonical shapes can be detected: planes, spheres, 
+cylinders, cones, and tori. Additional shapes can be detected, given a custom shape class by the user.
+For the Region Growing approach, CGAL provides three particular instances of the algorithm: 
+detecting lines on 2D points, detecting planes on 3D points, and detecting planes 
+on a polygon mesh.}
 \cgalPkgManuals{Chapter_Shape_Detection, PkgShapeDetectionRef}
 \cgalPkgSummaryEnd
 
@@ -66,7 +84,7 @@ For the region growing approach, CGAL provides three particular instances of the
 - `RegionGrowingPropagationConditions`
 
 ## Region Growing Main Class ##
-- `CGAL::Shape_detection::Region_growing<InputRange, Connectivity_, Conditions_>`
+- `CGAL::Shape_detection::Region_growing<InputRange, Connectivity, Conditions>`
 
 ## Region Growing On Points ##
 - `CGAL::Shape_detection::Points_fuzzy_sphere_connectivity<GeomTraits, InputRange, PointMap>`

@@ -32,7 +32,7 @@ namespace CGAL {
 namespace Shape_detection {
 
 /*!
-   \ingroup PkgShapeDetectionRANSACPM
+   \ingroup PkgShapeDetectionRANSACPropertyMaps
 
    Property map that associate a point index to its assigned shape
    found by `CGAL::Shape_detection::Efficient_RANSAC` algorithm.
@@ -85,7 +85,7 @@ namespace Shape_detection {
   };
 
 /*!
-   \ingroup PkgShapeDetectionRANSACPM
+   \ingroup PkgShapeDetectionRANSACPropertyMaps
 
    Property map that associates a detected plane object
    (`CGAL::Shape_detection::Plane`) to a `CGAL::Plane_3` object.

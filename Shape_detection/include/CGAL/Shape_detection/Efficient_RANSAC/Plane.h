@@ -29,9 +29,6 @@
 #include <CGAL/Shape_detection/Efficient_RANSAC/Shape_base.h>
 #include <CGAL/number_utils.h>
 
-/*!
- \file Plane.h
- */
 namespace CGAL {
   namespace Shape_detection {
     /*!
