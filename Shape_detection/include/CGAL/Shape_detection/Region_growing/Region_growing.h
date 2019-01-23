@@ -39,11 +39,16 @@ namespace Shape_detection {
     \ingroup PkgShapeDetectionRG
     
     \brief Generic Region Growing algorithm.
+
+    This version of Region Growing algorithm allows to grow regions on a set
+    of user-defined items given a way to access neighbors of each item via a 
+    `Connectivity` parameter class and control if items should form a region
+    via a `Conditions` class.
     
     \tparam InputRange 
     is a model of `ConstRange`. Its iterator type is `RandomAccessIterator`. 
     Its value type depends on the item type used in Region Growing, 
-    for example it can be `CGAL::Point_2`, `std::pair<CGAL::Point_3, int>`, 
+    for example it can be `CGAL::Point_2`, `std::pair<CGAL::Point_3, CGAL::Vector_3>`, 
     or any user-defined type.
 
     \tparam Connectivity 
@@ -62,33 +67,44 @@ namespace Shape_detection {
 
     /// \cond SKIP_IN_MANUAL
     using Input_range = InputRange;
+    using Input_connectivity = Connectivity;
+    using Input_conditions = Conditions;
 
     using Visited_items = std::vector<bool>;
-
     using Running_queue = std::queue<std::size_t>;    
     /// \endcond
 
+    /// An `std::vector` with indices of all input items provided via `InputRange`.
     using Items = std::vector<std::size_t>;
-
+    
+    /// An `std::vector` that stores all found regions, where each region is of type `Region_growing::Items`.
     using Regions = std::vector<Items>;
-
+    
+    /// An `Iterator_range` of the iterators in `Region_growing::Regions`.
     using Region_range = CGAL::Iterator_range<typename Regions::const_iterator>;
-    ///< An `Iterator_range` of the iterators in `CGAL::Shape_detection::Region_growing::Regions`.
-
+    
+    /// An `Iterator_range` of the iterators in `Region_growing::Items`.
     using Item_range = CGAL::Iterator_range<typename Items::const_iterator>;
-    ///< An `Iterator_range` of the iterators in `CGAL::Shape_detection::Region_growing::Items`.
-
+    
     /// @}
 
     /// \name Initialization
     /// @{
 
     /*!
-      The constructor requires an input range and instances 
-      of the Connectivity class and Conditions class.
+      \brief Initializes the Region Growing algorithm.
+      
+      \param input_range Contains items, which are planned to be used to grow
+      regions upon.
+
+      \param connectivity An instance of the `Connectivity` class that is used
+      internally to access item neighbors.
+
+      \param conditions An instance of the `Conditions` class that is used
+      internally to control if items should form a region.
     */
     Region_growing(
-      const Input_range& input_range, 
+      const InputRange& input_range, 
       Connectivity& connectivity, 
       Conditions& conditions) :
     m_input_range(input_range),
@@ -102,9 +118,11 @@ namespace Shape_detection {
     /// @{
 
     /*!
-      Perform the region growing algorithm over the input range, 
-      using the Connectivity class to find neighbors 
-      and the Conditions class to validate regions.
+      \brief Runs the Region Growing algorithm.
+
+      Runs the Region Growing algorithm on the input range with items, 
+      using a `Connectivity` class to find neighbors and a `Conditions` class 
+      to validate regions.
     */
     void detect() {
 
@@ -148,32 +166,36 @@ namespace Shape_detection {
     /// @{  
 
     /*!
-      Return a pair of begin iterator and pass-the-end iterator of the container with found regions. 
-      If the function `CGAL::Shape_detection::Region_growing::detect()` has not been called, 
-      the first and second of the pair will be the same, which implies an empty container.
+      \brief Returns found regions.      
+
+      Returns an `CGAL::Iterator_range` with a bidirectional iterator whose value type
+      is `Region_growing::Items`. It is empty if the function `Region_growing::detect()`
+      has not been called.
     */
     const Region_range& regions() const {
       return m_output_regions;
     }
 
     /*!
-      Return a pair of begin iterator and pass-the-end iterator of the container with indices of all unassigned items. 
-      If the function `CGAL::Shape_detection::Region_growing::detect()` has not been called, 
-      the first and second of the pair will be the same, which implies an empty container.
+      \brief Returns indices of all unassigned items.
+
+      Returns an `CGAL::Iterator_range` with a bidirectional iterator whose value type
+      is `std::size_t`. It is empty if the function `Region_growing::detect()`
+      has not been called.
     */
     const Item_range& unassigned_items() const {
       return m_output_unassigned;
     }
 
     /*!
-      Return the number of found regions.
+      \brief Returns the number of found regions.
     */
     const std::size_t number_of_regions() const {
       return m_regions.size();
     }
 
     /*!
-      Return the number of unassigned items.
+      \brief Returns the number of unassigned items.
     */
     const std::size_t number_of_unassigned_items() const {
       return m_unassigned.size();
@@ -185,7 +207,7 @@ namespace Shape_detection {
     /// @{
 
     /*!
-      Clear all internal data structures.
+      Clears all internal data structures.
     */
     void clear() {
                 
@@ -260,8 +282,8 @@ namespace Shape_detection {
 
     // Fields.
     const Input_range& m_input_range;
-    Connectivity& m_connectivity;
-    Conditions& m_conditions;
+    Input_connectivity& m_connectivity;
+    Input_conditions& m_conditions;
 
     Visited_items m_visited;
     Regions m_regions;

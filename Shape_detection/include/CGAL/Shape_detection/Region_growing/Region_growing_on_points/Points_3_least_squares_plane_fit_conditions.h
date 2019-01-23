@@ -43,11 +43,28 @@ namespace Shape_detection {
 
   /*! 
     \ingroup PkgShapeDetectionRGOnPoints
-    \brief Local and global conditions for the region growing algorithm on a 3D point set.
-    \tparam Traits Model of `Kernel`
-    \tparam InputRange An arbitrary range with user-defined items.
-    \tparam PointMap An `LvaluePropertyMap` that maps to `Point_3`.
-    \tparam NormalMap An `LvaluePropertyMap` that maps to `Vector_3`.
+
+    \brief Least squares plane fit conditions on 3D points.
+
+    This class implements propagation conditions for detecting planes 
+    on 3D points via the `Shape_detection::Region_growing` approach, 
+    where quality of detected planes is based on a local least squares plane fit.
+
+    \tparam GeomTraits 
+    is a model of `Kernel`.
+
+    \tparam InputRange 
+    is a model of `ConstRange`. Its iterator type is `RandomAccessIterator`. 
+    Its value type depends on the item type used in Region Growing, 
+    for example it can be `std::pair<CGAL::Point_3, CGAL::Vector_3>` 
+    or any user-defined type.
+
+    \tparam PointMap 
+    is an `LvaluePropertyMap` that maps to `CGAL::Point_3`.
+
+    \tparam NormalMap 
+    is an `LvaluePropertyMap` that maps to `CGAL::Vector_3`.
+    
     \cgalModels `RegionGrowingPropagationConditions`
   */
   template<
@@ -62,23 +79,26 @@ namespace Shape_detection {
     /// \name Types
     /// @{
 
+    /// \cond SKIP_IN_MANUAL
     using Traits = GeomTraits;
-
     using Input_range = InputRange;
-    ///< A random access range with user-defined items.
-
     using Point_map = PointMap;
-    ///< An `LvaluePropertyMap` that maps to `Point_3`.
-
     using Normal_map = NormalMap;
-    ///< An `LvaluePropertyMap` that maps to `Vector_3`.
+    /// \endcond
 
-    using FT = typename Traits::FT; ///< Number type
-    using Point_3 = typename Traits::Point_3; ///< Point type
-    using Vector_3 = typename Traits::Vector_3; ///< Vector type
-    using Plane_3 = typename Traits::Plane_3; ///< Plane type
+    /// Number type.
+    using FT = typename GeomTraits::FT;
 
-    ///< \cond SKIP_IN_MANUAL
+    /// Point type.
+    using Point_3 = typename GeomTraits::Point_3;
+
+    /// Vector type.
+    using Vector_3 = typename GeomTraits::Vector_3;
+
+    /// Type of the plane.
+    using Plane_3 = typename GeomTraits::Plane_3;
+
+    /// \cond SKIP_IN_MANUAL
     using Local_traits = Exact_predicates_inexact_constructions_kernel;
     using Local_FT = typename Local_traits::FT;
     using Local_point_3 = typename Local_traits::Point_3;
@@ -91,7 +111,7 @@ namespace Shape_detection {
 
     using Get_sqrt = internal::Get_sqrt<Traits>;
     using Sqrt = typename Get_sqrt::Sqrt;
-    ///< \endcond
+    /// \endcond
 
     /// @}
 
@@ -99,21 +119,47 @@ namespace Shape_detection {
     /// @{
 
     /*!
-      Each region is represented by a plane. The constructor requires 
-      an input range with items and three parameters can be provided, in order: 
-      the maximum distance from a point to the region, 
-      the minimum dot product between the normal associated with the point and the normal of the region, 
-      and the minimum number of points a region must have.
-      In addition, you can provide instances of the Point_map, Normal_map, and Traits classes.
+      \brief Initializes all internal data structures.
+
+      \param input_range 
+      An instance of an `InputRange` container with 3D points 
+      and 3D associated normal vectors.
+
+      \param distance_threshold 
+      Maximum distance from a point to the region represented by a plane of 
+      the type `CGAL::Plane_3`.
+
+      \param normal_threshold 
+      Minimum dot product between the normal assigned to the point and 
+      the normal assigned to the region represented by a plane 
+      of the type `CGAL::Plane_3`.
+
+      \param min_region_size 
+      The minimum number of 3D points a region must have.
+
+      \param point_map
+      An instance of an `LvaluePropertyMap` that maps an item from `input_range` 
+      to `CGAL::Point_3`.
+
+      \param normal_map
+      An instance of an `LvaluePropertyMap` that maps an item from `input_range` 
+      to `CGAL::Vector_3`.
+
+      \param traits
+      An instance of the `GeomTraits` class.
+
+      \pre `distance_threshold >= 0`
+      \pre `normal_threshold >= 0 && normal_threshold <= 1`
+      \pre `min_region_size > 0`
     */
     Points_3_least_squares_plane_fit_conditions(
-      const Input_range& input_range, 
+      const InputRange& input_range, 
       const FT distance_threshold = FT(1), 
       const FT normal_threshold = FT(9) / FT(10), 
       const std::size_t min_region_size = 3, 
-      const Point_map point_map = Point_map(), 
-      const Normal_map normal_map = Normal_map(), 
-      const Traits traits = Traits()) : 
+      const PointMap point_map = PointMap(), 
+      const NormalMap normal_map = NormalMap(), 
+      const GeomTraits traits = GeomTraits()) : 
     m_input_range(input_range),
     m_distance_threshold(distance_threshold),
     m_normal_threshold(normal_threshold),
@@ -136,13 +182,24 @@ namespace Shape_detection {
     /// @{ 
 
     /*!
-      Local conditions that check if a query item belongs to the given region.
-      \tparam ItemRange CGAL::Shape_detection::Region_growing::Items
+      \brief Controls if a point belongs to a region.
+
+      Controls if the point with the index `query_index` belongs to the region
+      that is currently getting developed using the `distance_threshold` and
+      `normal_threshold` values.
+
+      \param query_index
+      Index of the query point.
+
+      The second parameter is not used in this implementation.
+
+      Implements the function `RegionGrowingPropagationConditions::belongs_to_region()`.
+
+      \pre `query_index >= 0 && query_index < total_number_of_points`
     */
-    template<typename ItemRange>
     bool belongs_to_region(
       const std::size_t query_index, 
-      const ItemRange& region) const {
+      const std::vector<std::size_t>&) const {
 
       CGAL_precondition(query_index >= 0);
       CGAL_precondition(query_index < m_input_range.size());
@@ -166,20 +223,35 @@ namespace Shape_detection {
     }
 
     /*!
-      Global conditions that check if a region size is large enough to be accepted.
-      \tparam ItemRange CGAL::Shape_detection::Region_growing::Items
+      \brief Validates the final `region`.
+
+      Controls if the `region` that has been created contains at least 
+      `min_region_size` points.
+
+      \param region
+      Stores indices of all points that belong to the region.
+
+      Implements the function `RegionGrowingPropagationConditions::is_valid_region()`.
     */
-    template<typename ItemRange>
-    inline bool is_valid_region(const ItemRange& region) const {
+    inline bool is_valid_region(const std::vector<std::size_t>& region) const {
       return ( region.size() >= m_min_region_size );
     }
 
     /*!
-      Update the class's best fit plane that will be used later by local conditions.
-      \tparam ItemRange CGAL::Shape_detection::Region_growing::Items
+      \brief Recomputes a least squares plane.
+
+      Recomputes the internal least squares plane that represents the `region`
+      currently being developed. The plane is fitted to all points, 
+      which have been added to the `region` so far.
+
+      \param region
+      Stores indices of all points that belong to the region.
+
+      Implements the function `RegionGrowingPropagationConditions::update()`.
+
+      \pre `region.size() > 0`
     */
-    template<typename ItemRange>
-    void update(const ItemRange& region) {
+    void update(const std::vector<std::size_t>& region) {
 
       CGAL_precondition(region.size() > 0);
       if (region.size() == 1) { // create new reference plane and normal

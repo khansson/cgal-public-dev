@@ -49,10 +49,24 @@ namespace Shape_detection {
 
   /*!
     \ingroup PkgShapeDetectionRGOnPoints
-    \brief K nearest neighbors (kNN) search on a set of `Point_2` or `Point_3`.
-    \tparam Traits Model of `Kernel`
-    \tparam InputRange A random access range with user-defined items.
-    \tparam PointMap An `LvaluePropertyMap` that maps to `Point_2` or `Point_3`.
+
+    \brief Kd tree based K nearest neighbors search on a set of `Point_2` or `Point_3`.
+
+    This class uses a Kd tree to search for K points with the smallest distance
+    from the query point, and thus being its direct neighbors.
+
+    \tparam GeomTraits 
+    is a model of `Kernel`.
+
+    \tparam InputRange 
+    is a model of `ConstRange`. Its iterator type is `RandomAccessIterator`. 
+    Its value type depends on the item type used in Region Growing, 
+    for example it can be `CGAL::Point_2`, `CGAL::Point_3`, or 
+    or any user-defined type.
+
+    \tparam PointMap 
+    is an `LvaluePropertyMap` that maps to `CGAL::Point_2` or `CGAL::Point_3`.
+
     \cgalModels `RegionGrowingConnectivity`
   */
   template<
@@ -63,21 +77,13 @@ namespace Shape_detection {
 
   public:
 
-    /// \name Types
-    /// @{
-
+    /// \cond SKIP_IN_MANUAL
     using Traits = GeomTraits;
-
     using Input_range = InputRange;
-    ///< A random access range with user-defined items.
-
     using Point_map = PointMap;
-    ///< An `LvaluePropertyMap` that maps to `Point_2` or `Point_3`.
 
     using Point = typename Point_map::value_type;
-    ///< Point type, can only be `Point_2` or `Point_3`.
-
-    ///< \cond SKIP_IN_MANUAL
+    
     using Index_to_point_map = 
     internal::Item_property_map<Input_range, Point_map>;
 
@@ -110,22 +116,29 @@ namespace Shape_detection {
 
     using Tree = 
     typename Neighbor_search::Tree;
-    ///< \endcond
-
-    /// @}
+    /// \endcond
 
     /// \name Initialization
     /// @{
 
     /*!
-      The constructor that takes a set of items, provided a point_map 
-      to access a `Point` from an item, 
-      and a number of nearest neighbors (the value "k" in "kNN").
+      \brief Initializes all internal data structures.
+
+      \param input_range 
+      An instance of an `InputRange` container with 2D or 3D points.
+
+      \param number_of_neighbors 
+      The fixed number that defines how many clossest points to the query 
+      point should be identified.
+
+      \param point_map
+      An instance of an `LvaluePropertyMap` that maps an item from `input_range` 
+      to `CGAL::Point_2` or to `CGAL::Point_3`.
     */
     Points_k_nearest_neighbors_connectivity(
-      const Input_range& input_range, 
+      const InputRange& input_range, 
       const std::size_t number_of_neighbors = 12, 
-      const Point_map point_map = Point_map()) :
+      const PointMap point_map = PointMap()) :
     m_input_range(input_range),
     m_number_of_neighbors(number_of_neighbors),
     m_point_map(point_map),
@@ -147,9 +160,25 @@ namespace Shape_detection {
     /// @{ 
 
     /*!
-    This function takes the index `query_index` of a query item and 
-    returns indices of the k closest items around it. The result is stored in `neighbors`.
-    \tparam OutputIterator
+      \brief Returns all points, which are neighbors of a query point.
+
+      This function returns indices of the `number_of_neighbors` closest 
+      points to the point with the index `query_index`. These neighbors are
+      returned via an output iterator `neighbors`.
+
+      \tparam OutputIterator 
+      is an output iterator that accepts `std::size_t` values.
+
+      \param query_index
+      Index of the query point.
+
+      \param neighbors
+      An output iterator with the indices of points, which are neighbors of 
+      the point with the index `query_index`.
+
+      Implements the function `RegionGrowingConnectivity::get_neighbors()`.
+
+      \pre `query_index >= 0 && query_index < total_number_of_points`
     */
     template<typename OutputIterator>
     void get_neighbors(
@@ -177,7 +206,7 @@ namespace Shape_detection {
     /// @{
 
     /*!
-      Clear all internal data structures.
+      Clears all internal data structures.
     */
     void clear() {
       m_tree.clear();

@@ -49,11 +49,25 @@ namespace Shape_detection {
 
   /*!
     \ingroup PkgShapeDetectionRGOnPoints
-    \brief Fuzzy sphere search for neighbors on a set of `Point_2` or `Point_3`.
-    \tparam Traits Model of `Kernel`
-    \tparam InputRange A random access range with user-defined items. 
-    The default one is random access.
-    \tparam PointMap An `LvaluePropertyMap` that maps to `Point_2` or `Point_3`.
+
+    \brief Kd tree based fuzzy sphere search for neighbors on a set of `Point_2` or `Point_3`.
+
+    This class uses a Kd tree to search for all points, which belong to a sphere
+    of the fixed radius centered at the query point, and thus being its 
+    direct neighbors.
+
+    \tparam GeomTraits 
+    is a model of `Kernel`.
+
+    \tparam InputRange 
+    is a model of `ConstRange`. Its iterator type is `RandomAccessIterator`. 
+    Its value type depends on the item type used in Region Growing, 
+    for example it can be `CGAL::Point_2`, `CGAL::Point_3`, or 
+    or any user-defined type.
+
+    \tparam PointMap 
+    is an `LvaluePropertyMap` that maps to `CGAL::Point_2` or `CGAL::Point_3`.
+
     \cgalModels `RegionGrowingConnectivity`
   */
   template<
@@ -67,21 +81,18 @@ namespace Shape_detection {
     /// \name Types
     /// @{
 
+    /// \cond SKIP_IN_MANUAL
     using Traits = GeomTraits;
-
     using Input_range = InputRange;
-    ///< A random access range with user-defined items.
-
     using Point_map = PointMap;
-    ///< An `LvaluePropertyMap` that maps to `Point_2` or `Point_3`.
 
     using Point = typename Point_map::value_type;
-    ///< Point type, can only be `Point_2` or `Point_3`.
+    /// \endcond
 
-    using FT = typename Traits::FT;
-    ///< Number type.
+    /// Number type.
+    using FT = typename GeomTraits::FT;
 
-    ///< \cond SKIP_IN_MANUAL
+    /// \cond SKIP_IN_MANUAL
     using Index_to_point_map = 
     internal::Item_property_map<Input_range, Point_map>;
 
@@ -101,7 +112,7 @@ namespace Shape_detection {
       
     using Tree 
     = CGAL::Kd_tree<Search_traits, Splitter, CGAL::Tag_true>;
-    ///< \endcond
+    /// \endcond
                 
     /// @}
 
@@ -109,12 +120,22 @@ namespace Shape_detection {
     /// @{
 
     /*!
-      The constructor that takes a set of items, provided a point_map to access a `Point` from an item, and a search sphere radius.
+      \brief Initializes all internal data structures.
+
+      \param input_range 
+      An instance of an `InputRange` container with 2D or 3D points.
+
+      \param search_radius 
+      Fixed radius of the fuzzy sphere used for searching neighbors.
+
+      \param point_map
+      An instance of an `LvaluePropertyMap` that maps an item from `input_range` 
+      to `CGAL::Point_2` or to `CGAL::Point_3`.
     */
     Points_fuzzy_sphere_connectivity(
-      const Input_range& input_range, 
+      const InputRange& input_range, 
       const FT search_radius = FT(1), 
-      const Point_map point_map = Point_map()) :
+      const PointMap point_map = PointMap()) :
     m_input_range(input_range),
     m_search_radius(search_radius),
     m_point_map(point_map),
@@ -135,9 +156,26 @@ namespace Shape_detection {
     /// @{ 
 
     /*!
-      From a query item with the index `query_index`, this function creates a search sphere centered at this item.
-      It then uses `CGAL::Kd_tree::search()` to look for the neighbors of the given query and push their indices to `neighbors`.
-      \tparam OutputIterator
+      \brief Returns all points, which are neighbors of a query point.
+
+      This function returns indices of all points, which belong to a sphere
+      of the fixed radius `search_radius` centered at the query point with
+      the index `query_index`, and thus being its direct neighbors. These
+      neighbors are returned via an output iterator `neighbors`.
+
+      \tparam OutputIterator 
+      is an output iterator that accepts `std::size_t` values.
+
+      \param query_index
+      Index of the query point.
+
+      \param neighbors
+      An output iterator with the indices of points, which are neighbors of 
+      the point with the index `query_index`.
+
+      Implements the function `RegionGrowingConnectivity::get_neighbors()`.
+
+      \pre `query_index >= 0 && query_index < total_number_of_points`
     */
     template<typename OutputIterator>
     void get_neighbors(
@@ -162,7 +200,7 @@ namespace Shape_detection {
     /// @{
 
     /*!
-      Clear all internal data structures.
+      Clears all internal data structures.
     */
     void clear() {
       m_tree.clear();

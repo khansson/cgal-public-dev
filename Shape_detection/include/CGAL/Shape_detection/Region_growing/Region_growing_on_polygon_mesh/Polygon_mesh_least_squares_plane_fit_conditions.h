@@ -52,42 +52,45 @@ namespace Shape_detection {
 
   /*!
     \ingroup PkgShapeDetectionRGOnMesh
-    \brief Local and global conditions for the region growing algorithm on a face graph.
-    \tparam Traits Model of `Kernel`
-    \tparam FaceGraph General face graph. Model of `FaceGraph`.
-    \tparam FaceRange A random access range with graph faces.
-    \tparam VertexToPointMap An `LvaluePropertyMap` that maps a graph vertex to `Point_3`.
+
+    \brief Least squares plane fit conditions on a polygon mesh.
+
+    This class implements propagation conditions for detecting planes 
+    on a polygon mesh via the `Shape_detection::Region_growing` approach, 
+    where quality of detected planes is based on a local least squares plane fit.
+
+    \tparam GeomTraits 
+    is a model of `Kernel`.
+
+    \tparam FaceListGraph 
+    is a model of `FaceListGraph`.
+
+    \tparam FaceRange 
+    is a model of `ConstRange`, whose iterator type is `RandomAccessIterator` 
+    and value type is a face type used in `FaceListGraph`.
+
+    \tparam VertexToPointMap 
+    is an `LvaluePropertyMap` that maps a polygon mesh vertex to `CGAL::Point_3`.
+    
     \cgalModels `RegionGrowingPropagationConditions`
   */
   template<
   typename GeomTraits, 
-  typename FaceGraph,
-  typename FaceRange = typename FaceGraph::Face_range,
-  typename VertexToPointMap = typename boost::property_map<FaceGraph, CGAL::vertex_point_t>::type>
+  typename FaceListGraph,
+  typename FaceRange = typename FaceListGraph::Face_range,
+  typename VertexToPointMap = typename boost::property_map<FaceListGraph, CGAL::vertex_point_t>::type>
   class Polygon_mesh_least_squares_plane_fit_conditions {
 
   public:
 
-    /// \name Types
-    /// @{
-
+    /// \cond SKIP_IN_MANUAL
     using Traits = GeomTraits;
-
-    using Face_graph = FaceGraph;
-    ///< General face graph. Model of `FaceGraph`.
-
+    using Face_graph = FaceListGraph;
     using Face_range = FaceRange;
-    ///< A random access range with graph faces.
-
     using Vertex_to_point_map = VertexToPointMap;
-    ///< An `LvaluePropertyMap` that maps a graph vertex to `Point_3`.
 
-    using FT = typename Traits::FT; ///< Number type
-    using Point_3 = typename Traits::Point_3; ///< Point type
-    using Vector_3 = typename Traits::Vector_3; ///< Vector type
-    using Plane_3 = typename Traits::Plane_3; ///< Plane type
+    using Vector_3 = typename Traits::Vector_3;
 
-    ///< \cond SKIP_IN_MANUAL
     using Local_traits = Exact_predicates_inexact_constructions_kernel;
     using Local_FT = typename Local_traits::FT;
     using Local_point_3 = typename Local_traits::Point_3;
@@ -100,27 +103,62 @@ namespace Shape_detection {
 
     using Get_sqrt = internal::Get_sqrt<Traits>;
     using Sqrt = typename Get_sqrt::Sqrt;
-    ///< \endcond
+    /// \endcond
+
+    /// \name Types
+    /// @{
+
+    /// Number type.
+    using FT = typename GeomTraits::FT;
+
+    /// Point type.
+    using Point_3 = typename GeomTraits::Point_3; 
+
+    /// Type of the plane.
+    using Plane_3 = typename GeomTraits::Plane_3;
 
     /// @}
 
+    /// \name Initialization
+    /// @{
+
     /*!
-      Each region is represented by a plane. 
-      The constructor requires an input range with graph faces 
-      and three parameters can be provided, in order: 
-      the maximum distance from a point to the region, 
-      the minimum dot product between the normal associated with the point and the normal of the region, 
-      and the minimum number of points a region must have.
-      In addition, you can provide instances of the Vertex_to_point_map and Traits classes.
+      \brief Initializes all internal data structures.
+
+      \param polygon_mesh 
+      An instance of a `FaceListGraph` that represents
+      a polygon mesh.
+
+      \param distance_threshold 
+      Maximum distance from a face to the region represented by a plane of 
+      the type `CGAL::Plane_3`.
+
+      \param normal_threshold 
+      Minimum dot product between the face normal and the normal assigned 
+      to the region represented by a plane of the type `CGAL::Plane_3`.
+
+      \param min_region_size 
+      The minimum number of faces a region must have.
+      
+      \param vertex_to_point_map 
+      An instance of an `LvaluePropertyMap` that maps a polygon mesh 
+      vertex to `CGAL::Point_3`.
+
+      \param traits
+      An instance of the `GeomTraits` class.
+
+      \pre `distance_threshold >= 0`
+      \pre `normal_threshold >= 0 && normal_threshold <= 1`
+      \pre `min_region_size > 0`
     */
     Polygon_mesh_least_squares_plane_fit_conditions(
-      const Face_graph& face_graph,
+      const FaceListGraph& polygon_mesh,
       const FT distance_threshold = FT(1), 
       const FT normal_threshold = FT(9) / FT(10), 
       const std::size_t min_region_size = 1, 
-      const Vertex_to_point_map vertex_to_point_map = Vertex_to_point_map(), 
-      const Traits traits = Traits()) :
-    m_face_graph(face_graph),
+      const VertexToPointMap vertex_to_point_map = VertexToPointMap(), 
+      const GeomTraits traits = GeomTraits()) :
+    m_face_graph(polygon_mesh),
     m_face_range(CGAL::faces(m_face_graph)),
     m_distance_threshold(distance_threshold),
     m_normal_threshold(normal_threshold),
@@ -142,13 +180,24 @@ namespace Shape_detection {
     /// @{ 
 
     /*!
-      Local conditions that check if a query item belongs to the given region.
-      \tparam ItemRange CGAL::Shape_detection::Region_growing::Items
+      \brief Controls if a face belongs to a region.
+
+      Controls if the face with the index `query_index` belongs to the region
+      that is currently getting developed using the `distance_threshold` and
+      `normal_threshold` values.
+
+      \param query_index
+      Index of the query face.
+
+      The second parameter is not used in this implementation.
+
+      Implements the function `RegionGrowingPropagationConditions::belongs_to_region()`.
+
+      \pre `query_index >= 0 && query_index < total_number_of_faces`
     */
-    template<typename ItemRange>
     bool belongs_to_region(
       const std::size_t query_index, 
-      const ItemRange& region) const {
+      const std::vector<std::size_t>&) const {
 
       CGAL_precondition(query_index >= 0);
       CGAL_precondition(query_index < m_face_range.size());
@@ -169,20 +218,35 @@ namespace Shape_detection {
     }
 
     /*!
-      Global conditions that check if a region size is large enough to be accepted.
-      \tparam ItemRange CGAL::Shape_detection::Region_growing::Items
+      \brief Validates the final `region`.
+
+      Controls if the `region` that has been created contains at least 
+      `min_region_size` faces.
+
+      \param region
+      Stores indices of all faces that belong to the region.
+
+      Implements the function `RegionGrowingPropagationConditions::is_valid_region()`.
     */
-    template<typename ItemRange>
-    inline bool is_valid_region(const ItemRange& region) const {
+    inline bool is_valid_region(const std::vector<std::size_t>& region) const {
       return ( region.size() >= m_min_region_size );
     }
 
     /*!
-      Update the class's best fit plane that will be used later by local conditions.
-      \tparam ItemRange CGAL::Shape_detection::Region_growing::Items
+      \brief Recomputes a least squares plane.
+
+      Recomputes the internal least squares plane that represents the `region`
+      currently being developed. The plane is fitted to the polygon mesh
+      vertices of all faces, which have been added to the `region` so far.
+
+      \param region
+      Stores indices of all faces that belong to the region.
+
+      Implements the function `RegionGrowingPropagationConditions::update()`.
+
+      \pre `region.size() > 0`
     */
-    template<typename ItemRange>
-    void update(const ItemRange& region) {
+    void update(const std::vector<std::size_t>& region) {
 
       CGAL_precondition(region.size() > 0);
       if (region.size() == 1) { // create new reference plane and normal

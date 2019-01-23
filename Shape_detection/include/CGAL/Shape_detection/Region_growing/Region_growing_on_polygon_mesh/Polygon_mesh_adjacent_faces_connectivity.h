@@ -45,43 +45,49 @@ namespace Shape_detection {
 
   /*!
     \ingroup PkgShapeDetectionRGOnMesh
-    \brief Find all faces that share an edge with a given face.
-    \tparam FaceGraph General face graph. Model of `FaceListGraph`.
-    \tparam FaceRange A random access range with graph faces.
+
+    \brief Adjacent faces connectivity on a polygon mesh.
+
+    This class finds all faces, which are adjacent to a given face on a 
+    polygon mesh and can be used to parameterize the `Shape_detection::Region_growing` 
+    algorithm. The polygon mesh is represented as a `FaceListGraph`.
+
+    \tparam FaceListGraph 
+    is a model of `FaceListGraph`.
+
+    \tparam FaceRange 
+    is a model of `ConstRange`, whose iterator type is `RandomAccessIterator` 
+    and value type is a face type used in `FaceListGraph`.
+
     \cgalModels `RegionGrowingConnectivity`
   */
   template<
-  typename FaceGraph, 
-  typename FaceRange = typename FaceGraph::Face_range>
+  typename FaceListGraph, 
+  typename FaceRange = typename FaceListGraph::Face_range>
   class Polygon_mesh_adjacent_faces_connectivity {
 
   public:
 
-    /// \name Types
-    /// @{
-
-    using Face_graph = FaceGraph;
-    ///< General face graph. Model of `FaceGraph`.
-
+    /// \cond SKIP_IN_MANUAL
+    using Face_graph = FaceListGraph;
     using Face_range = FaceRange;
-    ///< A random access range with graph faces.
 
-    ///< \cond SKIP_IN_MANUAL
     using Face_to_index_map 
     = internal::Item_to_index_property_map<Face_range>;
-    ///< \endcond
-
-    /// @}
+    /// \endcond
 
     /// \name Initialization
     /// @{
 
     /*!
-      The constructor that takes an arbitrary face graph.
+      \brief Initializes all internal data structures.
+
+      \param polygon_mesh An instance of a `FaceListGraph` that represents
+      a polygon mesh.
     */
     Polygon_mesh_adjacent_faces_connectivity(
-      const Face_graph& face_graph) :
-    m_face_graph(face_graph),
+      const FaceListGraph& polygon_mesh) :
+    m_face_graph(polygon_mesh),
     m_face_range(CGAL::faces(m_face_graph)),
     m_face_to_index_map(m_face_range)
     { }
@@ -92,9 +98,25 @@ namespace Shape_detection {
     /// @{ 
 
     /*!
-      Using a query index `query_index`, this function retrieves indices 
-      of all neighboring faces and stores them in `neighbors`.
-      \tparam OutputIterator
+      \brief Returns adjacent faces to a given face.
+
+      This function returns indices of all faces, 
+      which are adjacent to the face with the index `query_index`, 
+      via an output iterator `neighbors`.
+
+      \tparam OutputIterator 
+      is an output iterator that accepts `std::size_t` values.
+
+      \param query_index
+      Index of the query face.
+
+      \param neighbors
+      An output iterator with the indices of faces, which are adjacent to the
+      face with the index `query_index`.
+
+      Implements the function `RegionGrowingConnectivity::get_neighbors()`.
+
+      \pre `query_index >= 0 && query_index < total_number_of_faces`
     */
     template<typename OutputIterator>
     void get_neighbors(
