@@ -7,3 +7,7 @@ Kernel_23
 Spatial_searching
 Principal_component_analysis
 BGL
+Point_set_3
+Shape_detection
+Surface_mesh
+Polyhedron

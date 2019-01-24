@@ -2,8 +2,8 @@
 \ingroup PkgShapeDetectionRGConcepts
 \cgalConcept
 
-A concept that describes the set of methods used to access connected items in a 
-given set by the `CGAL::Shape_detection::Region_growing` approach.
+A concept that describes the set of methods used by the `CGAL::Shape_detection::Region_growing` 
+approach to access connected items in a given set.
 
 \cgalHasModel 
 `CGAL::Shape_detection::Points_fuzzy_sphere_connectivity`, 

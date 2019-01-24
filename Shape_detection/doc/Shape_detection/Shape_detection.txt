@@ -236,71 +236,117 @@ Shapes are detected by growing regions from estimated seeds as follows:
 
 Together with the generic algorithm's implementation `Shape_detection::Region_growing`, three particular instances of this algorithm are provided:
 
-- Plane detection on a 3D point set;
-- Line detection on a 2D point set;
-- Plane detection on an arbitrary face graph.
+- Line detection on a \ref Shape_detection_RegionGrowingPoints "2D point set";
+- Plane detection on a \ref Shape_detection_RegionGrowingPoints "3D point set";
+- Plane detection on a \ref Shape_detection_RegionGrowingMesh "polygon mesh".
 
-Other instances can be easily added by the user. 
-To do that, the user needs to implement its own version of the \ref Shape_detection_RegionGrowingConnectivity and \ref Shape_detection_RegionGrowingConditions classes, 
-which are used to parameterize the `Shape_detection::Region_growing` main class (see \ref Shape_detection_RegionGrowingExample_with_custom_classes).
+Other instances can be easily added by the user as explained below. 
+
+
+\subsection Shape_detection_RegionGrowingFramework Framework
+
+The main class `Shape_detection::Region_growing` is parameterized by 
+
+- `InputRange` with user-defined items, which can be any objects;
+- \ref Shape_detection_RegionGrowingFramework_connectivity "Connectivity" that provides the means for getting connectivity among the items;
+- \ref Shape_detection_RegionGrowingFramework_conditions "Conditions" that provides conditions for validating regions.
+
+Using this generic framework, users can detect shapes or simply grow regions on any set of items with 
+their own propagation condtions (see \ref Shape_detection_RegionGrowingFramework_examples "an example").
+
+
+\subsubsection Shape_detection_RegionGrowingFramework_connectivity Connectivity
+
+The concept `RegionGrowingConnectivity` provides the means for getting connectivity among given items. 
+To create a model that respects this concept, the only requirement on the user-defined class is to implement the function:
+
+- `RegionGrowingConnectivity::get_neighbors()` that should return all items, 
+which are defined to be neighbors of the query item. This function is called whenever a new item is queried.
+
+
+\subsubsection Shape_detection_RegionGrowingFramework_conditions Conditions
+
+The concept `RegionGrowingConditions` provides conditions for validating regions. 
+To create a model that respect this concept, three functions in the user-defined class must be implemented:
+
+- `RegionGrowingPropagationConditions::belongs_to_region()` This function checks if a query item 
+should belong to the region that is currently getting developed. It is called whenever 
+the algorithm tries to add an item to the region.
+
+- `RegionGrowingPropagationConditions::is_valid_region()` This function checks if a region 
+satisfies all necessary user-defined conditions. It is called whenever propagation is no 
+longer possible for the given seed item. If it is `true`, the region is accepted, otherwise rejected 
+and all its items become again available for the algorithm.
+
+- `RegionGrowingPropagationConditions::update()` This function updates all necessary 
+information that goes along with the region propagation. It is called each time 
+when a new seed item is chosen and each time when we expand current region with several new items.
+In the first case, the number of items in the region is one.
+
+
+\subsubsection Shape_detection_RegionGrowingFramework_examples Examples
+
+This toy example shows how to implement one's own \ref Shape_detection_RegionGrowingFramework_connectivity "Connectivity" and 
+\ref Shape_detection_RegionGrowingFramework_conditions "Conditions" classes, which are used to parameterize the main 
+`Shape_detection::Region_growing` class.
+
+We choose a simple custom sphere item. We define three such spheres with the fixed radius and different center points. For each sphere, 
+we also manually store indices of its direct neighbors. The function `RegionGrowingConnectivity::get_neighbors()` in the `Connectivity` class that must be 
+provided by the user does nothing but accessing these neighbors. The `Conditions` class implements the following necessary functions:
+
+- `RegionGrowingPropagationConditions::belongs_to_region()` - `true` if the first and second spheres are neighbors,
+- `RegionGrowingPropagationConditions::is_valid_region()` - always `true` after the first call to the function `update()`:
+- `RegionGrowingPropagationConditions::update()` - updates the internal flag from the default `false` to `true`.
+
+The result of using these classes with the Region Growing main class on the spheres above is that the first two spheres form the first region,
+while the third sphere forms the second region.
+
+\cgalExample{Shape_detection/Region_growing/example_region_growing_with_custom_classes.cpp}
 
 
 \subsection Shape_detection_RegionGrowingPoints Points
 
-If the item type is a 2D or 3D point, the component provides two different ways to search for neighbors around this point:
-
-- Fuzzy sphere search via `Shape_detection::Points_fuzzy_sphere_connectivity`: 
-The class creates a circle (if the point is 2D) or a sphere (if the point is 3D) centered at the query point with a user-specified search radius. 
-All points that lie within this spherical search space will be treated as neighbors of the query point;
-
-- Nearest neighbor search via `Shape_detection::Points_k_nearest_neighbors_connectivity`: 
-The class returns k (given by the user) nearest neighbors of the query point either 2D or 3D.
-
-To check if a query point belongs to a given region, the program associates this region to a best-fit hyperplane (2D line or 3D plane), 
-using the least squares method via `Shape_detection::Points_2_least_squares_line_fit_conditions` for 2D points or `Shape_detection::Points_3_least_squares_plane_fit_conditions` for 3D points. 
-If the distance from the query point to the hyperplane is within a user-defined value, and the dot product between the normal of the query point and the normal of the hyperplane is large enough, 
-this query point is assigned to the region.
-
-The two condition classes above also verify if the size of a region is larger than a user-defined value, where the size of the region is the number of items it contains.
-
-A picture below gives an example of the Region Growing algorithm for detecting 2D lines on a 2D point set.
+If one wants to detect lines (see \ref Shape_detection_RegionGrowingPoints_examples "2D Example")
 
 \cgalFigureBegin{Region_growing_on_points_2, Region_growing/region_growing_on_points_2.png}
-A 2D point set depicted with one color per detected linear shape.
+A 2D point set depicted with one color per detected line.
 \cgalFigureEnd
 
-A similar example but for detecting 3D planes on a 3D point set is given below.
+or planes (see \ref Shape_detection_RegionGrowingPoints_examples "3D Example") 
 
 \cgalFigureBegin{Region_growing_on_points_3, Region_growing/region_growing_on_points_3.png}
-A 3D point set depicted with one color per detected planar shape.
+A 3D point set depicted with one color per detected plane.
 \cgalFigureEnd
 
+on 2D or respectively 3D points, this \cgal component provides the corresponding models of the concepts \ref Shape_detection_RegionGrowingFramework_connectivity "Connectivity" 
+and \ref Shape_detection_RegionGrowingFramework_conditions "Conditions". In particular, it provides two different ways to define neighbors:
 
-\subsection Shape_detection_RegionGrowingMesh Polygon Mesh
+- Fuzzy sphere search via `Shape_detection::Points_fuzzy_sphere_connectivity`
+This class creates a circle (if the point is 2D) or a sphere (if the point is 3D) centered at the query point with a user-specified search radius. 
+All points, which belong to this spherical search space, will be treated as neighbors of the query point;
 
-If the item type is a model of `FaceGraph`, the neighbors of a face can be retrieved by selecting all faces that share an edge with the query face by using the class `Shape_detection::Polygon_mesh_adjacent_faces_connectivity`. 
-To grow the region, we need to check conditions, which are very similar to the 3D point case and given by the class `Shape_detection::Polygon_mesh_least_squares_plane_fit_conditions`.
-The faces are broken down to their vertices and a plane is fitted to them, 
-however, the distance from a face to the fitted plane is simplified down to the distance from the centroid of the face to the plane. 
-The normals of the faces are used and compared to the fitted plane's normal.
+- Nearest neighbors search via `Shape_detection::Points_k_nearest_neighbors_connectivity`
+This class returns K (given by the user) nearest neighbors of the query point either 2D or 3D.
 
-The same as before, the condition class above also verifies if the size of a region is larger than a user-defined value.
+The component also provides least squares line fit conditions for the 2D case and
+least squares plane fit conditions for the 3D case. That is, to check if a query point 
+belongs to a given region, the program associates this region to the best-fit hyperplane (2D line or 3D plane) and controls the quality of this fit, 
+using the corresponding method:
 
-A picture below gives an example of the Region Growing algorithm for detecting 3D planes on a surface mesh.
-
-\cgalFigureBegin{Region_growing_on_surface_mesh, Region_growing/region_growing_on_polygon_mesh.png}
-A surface mesh depicted with one color per detected planar shape.
-\cgalFigureEnd
+- `Shape_detection::Points_2_least_squares_line_fit_conditions` - line fit for 2D points;
+- `Shape_detection::Points_3_least_squares_plane_fit_conditions` - plane fit for 3D points.
 
 
-\subsection Shape_detection_RegionGrowingConnectivity Connectivity
+\subsubsection Shape_detection_RegionGrowingPoints_parameters Parameters
 
-The concept `RegionGrowingConnectivity` provides the means for getting connectivity among given items. 
-For points, we provide two different types of connectivity as mentioned in Section \ref Shape_detection_RegionGrowingPoints,
+The classes in Section \ref Shape_detection_RegionGrowingPoints "Region Growing On Points" depend on a few parameters 
+that should be defined by the user. They also have default values, but these values are not guaranteed 
+to work for each case.
 
-- `Shape_detection::Points_fuzzy_sphere_connectivity`: The user must provide the `search_radius` of the hypersphere that defines the neighborhood search space;
+- `search_radius` This parameter is used by the class `Shape_detection::Points_fuzzy_sphere_connectivity` 
+and defines a radius of a search circe in 2D case and sphere in 3D case;
 
-- `Shape_detection::Points_k_nearest_neighbors_connectivity`: The user must provide the `number_of_neighbors` returned in each search query.
+- `number_of_neighbors` This parameter defines the number K of nearest neighbors in the class `Shape_detection::Points_k_nearest_neighbors_connectivity`.
 
 The right choice for the `search_radius` or `number_of_neighbors` parameters plays an important role in producing a good result. 
 For example, if we consider the fuzzy sphere connectivity, when `search_radius` is too large, we have fewer regions, and the details are not clearly separated. 
@@ -310,31 +356,23 @@ Each region is painted with a unique color. As `search_radius` increases, the de
 
 \cgalFigureBegin{Region_growing_parameter_search_radius_variation, Region_growing/search_radius_parameter_2D.png}
 (a) Input 2D point set;
-(b) 17 regions are found when `radius` = 0.1; 
-(c) 8 regions are found when `radius` = 0.3; 
-(d) 4 regions are found when `radius` = 1.2.
+(b) 17 regions are found when `search_radius` = 0.1; 
+(c) 8 regions are found when `search_radius` = 0.3; 
+(d) 4 regions are found when `search_radius` = 1.2.
 \cgalFigureEnd
 
-For a face graph, the connectivity method is discussed in Section \ref Shape_detection_RegionGrowingMesh,
+The \ref Shape_detection_RegionGrowingPoints "Conditions" related classes depend on the following parameters:
 
-- `Shape_detection::Polygon_mesh_adjacent_faces_connectivity`: The user must provide the face graph that defines the connectivity between its faces.
+- `distance_threshold` - the maximum distance from a point to a line/plane;
+- `normal_threshold` - the minimum dot product between the normal associated with a point and the normal of a line/plane;
+- `min_region_size` - the minimum number of points a region must have.
 
+The first two parameters are used in the functions `belongs_to_region()` and `update()`, while the third parameter is used in the function `is_valid_region()`
+explained in Section \ref Shape_detection_RegionGrowingFramework_conditions "Framework Conditions".
 
-\subsection Shape_detection_RegionGrowingConditions Conditions
-
-The concept `RegionGrowingPropagationConditions` provides the means for verifying conditions that should be satisfied in order for an item to be included in a region. 
-For points, we provide two different types of conditions (2D lines and 3D planes) as mentioned in Section \ref Shape_detection_RegionGrowingPoints. 
-For face graphs, the conditions are planar and discussed in Section \ref Shape_detection_RegionGrowingMesh.
-
-Since the above implemented conditions are for either linear or planar shapes, they can be controlled by a few parameters:
-
-- `distance_threshold` - the maximum distance from an item to a shape;
-- `normal_threshold` - the minimum dot product between the normal associated with an item and the normal of a shape;
-- `min_region_size` - the minimum number of items a region representing a shape must have.
-
-The same as for the parameters `search_radius` and `number_of_neighbors` in the \ref Shape_detection_RegionGrowingConnectivity classes, the right choice of the `distance_threshold` and `normal_threshold` is also very important. 
-Figure \cgalFigureRef{Region_growing_parameter_normal_threshold_variation} shows that the roof top of the house can be distinguished as two planes (painted in blue and dark red) 
-when the normal threshold is strict enough (c), or it can be recognized as only one plane (painted in pale yellow) in the other setting (b).
+The right choice of the `distance_threshold` and `normal_threshold` parameters is also very important. 
+For example, Figure \cgalFigureRef{Region_growing_parameter_normal_threshold_variation} shows that the roof top of the house can be distinguished as two planes (painted in blue and dark red) 
+when the `normal_threshold` is strict enough (c), or it can be recognized as only one plane (painted in pale yellow) in the other case (b).
 
 \cgalFigureBegin{Region_growing_parameter_normal_threshold_variation, Region_growing/normal_threshold_parameter_3D.png}
 (a) Input 3D point cloud; 
@@ -343,55 +381,36 @@ when the normal threshold is strict enough (c), or it can be recognized as only 
 \cgalFigureEnd
 
 
-\subsection Shape_detection_RegionGrowingExamples Examples
+\subsubsection Shape_detection_RegionGrowingPoints_examples Examples
 
 Typical usage of the Region Growing component consists of five steps:
 
--# Define an input range with items;
--# Create instances of the classes `Conditions` and `Connectivity` with proper parameters or default ones;
+-# Define an input range with points;
+-# Create instances of the classes `Conditions` and `Connectivity` with the proper parameters or default ones;
 -# Create an instance of the `Region_growing` class using the input range and the instances from the previous step;
 -# Detect;
 -# Postprocess.
 
-
-\subsubsection Shape_detection_RegionGrowingExample_points_2 Detecting Lines On 2D Points
-
-Given a 2D point set, we detect 2D lines on this set using fuzzy sphere neighbors search, color these regions, and save them in a file.
+Given a 2D point set, in the example below, we detect 2D lines on this set using fuzzy sphere neighbors search. We then color these regions and save them in a file. 
+The points with assigned to them normal vectors are stored in `std::vector` and the used `Kernel` is `CGAL::Simple_cartesian`, where the number type is `double`.
 
 \cgalExample{Shape_detection/Region_growing/example_region_growing_on_points_2.cpp}
 
-
-\subsubsection Shape_detection_RegionGrowingExample_points_3 Detecting Planes On 3D Points
-
-Given a 3D point set, we detect 3D planes on this set using k nearest neighbors search, color these regions, and save them in a file. In addition, we retrieve all unclassified points.
+If we are given a 3D point set, then the example below shows how to detect 3D planes on this set using the K nearest neighbors search. We color found regions 
+and save them in a file. The point set with associated normals is stored in `CGAL::Point_set_3` and the used `Kernel` is `CGAL::Exact_predicates_inexact_constructions_kernel`.
 
 \cgalExample{Shape_detection/Region_growing/example_region_growing_on_points_3.cpp}
 
 
-\subsubsection Shape_detection_RegionGrowingExample_face_graph Detecting Planes On Polygon Mesh
+\subsubsection Shape_detection_RegionGrowingPoints_performance Performance
 
-We use Region Growing algorithm for detecting planes on a general face graph that, in this example, can be either `CGAL::Surface_mesh` or `CGAL::Polyhedron_3`.
+The main parameter that affects the Region Growing algorithm is the neighborhood size at each retrieval (`search_radius` or `number_of_neighbors`). 
+Larger neighbor lists are often followed by a smaller number of regions, larger coverage (the ratio between the number of points assigned to regions and the total number of points given as input), 
+and longer running time. For example, on a test of about 70k 2D points, the following table is produced:
 
-\cgalExample{Shape_detection/Region_growing/example_region_growing_on_polygon_mesh.cpp}
-
-
-\subsubsection Shape_detection_RegionGrowingExample_with_custom_classes Custom Classes
-
-In this particular example, we show how to use custom user-defined classes in Region Growing.
-
-\cgalExample{Shape_detection/Region_growing/example_region_growing_with_custom_classes.cpp}
-
-
-\subsection Shape_detection_RegionGrowingPerformance Performance On Points
-
-The main parameter that affects the Region Growing algorithm is the neighborhood size (`search_radius` or `number_of_neighbors`) at each retrieval. 
-Larger neighbor lists are often followed by smaller number of regions, 
-larger coverage (the ratio between the number of points assigned to some region and the total number of points given in the input), 
-and longer running time. On a test of 67768 points, the following table is produced:
-
-<table class="markdownTable">
+<table class="markdownTable" align="center">
 <tr class="markdownTableHead">
-<th class="markdownTableHeadCenter"><code>radius</code>  </th><th class="markdownTableHeadCenter">Time (in seconds)  </th><th class="markdownTableHeadCenter">Number of regions  </th><th class="markdownTableHeadCenter">Number of assigned points   </th></tr>
+<th class="markdownTableHeadCenter"><code>search_radius</code>  </th><th class="markdownTableHeadCenter">Time (in seconds)  </th><th class="markdownTableHeadCenter">Number of regions  </th><th class="markdownTableHeadCenter">Number of assigned points   </th></tr>
 <tr class="markdownTableBody">
 <td class="markdownTableBodyCenter">1  </td><td class="markdownTableBodyCenter">0.164965  </td><td class="markdownTableBodyCenter">796  </td><td class="markdownTableBodyCenter">4491   </td></tr>
 <tr class="markdownTableBody">
@@ -402,17 +421,57 @@ and longer running time. On a test of 67768 points, the following table is produ
 <td class="markdownTableBodyCenter">9  </td><td class="markdownTableBodyCenter">0.168458 </td><td class="markdownTableBodyCenter">2282  </td><td class="markdownTableBodyCenter">65353   </td></tr>
 </table>
 
-If the neighborhood size is set too low, some points may be isolated and the region size is not large enough, hence will be discarded. 
-This not only causes latency in the program, but also reduces the coverage value, as can be seen when the `search_radius` is 1.
-
-We also plot the detection performance against the `distance_threshold` parameter for detecting planes on a 3D point set, 
-this time is in a scene of 500k points, see Figure \cgalFigureRef{Region_growing_performance_distance_threshold}.
+If the neighborhood size is set too low, some points might be isolated, the region size would not reach a critical mass and so will be discarded. 
+This does not only cause the latency in the program, but also reduces the coverage value, as can be seen when the `search_radius = 1`. The detection performance against another important parameter, 
+that is `distance_threshold`, for detecting planes on a 3D point set with about 500k points is shown in Figure \cgalFigureRef{Region_growing_performance_distance_threshold}.
 
 \cgalFigureBegin{Region_growing_performance_distance_threshold, Efficient_RANSAC/epsilon_graph_2.png}
 The graph depicts the number of detected shapes (purple) and the coverage (green), i.e., the ratio assignedPoints / totalPoints, 
 against the `distance_threshold` parameter (for simplicity, we use the same value for `distance_threshold` and `search_radius`). 
-A higher value for `search_radius`, i.e., larger neighborhood spheres, leads to longer computation time and to larger shapes.
+A higher value for `search_radius`, i.e., larger neighborhood spheres, leads to longer running time and to larger shapes.
 \cgalFigureEnd
+
+
+\subsection Shape_detection_RegionGrowingMesh Polygon Mesh
+
+If one wants to detect planes on a polygon mesh, this \cgal component provides the corresponding models of the cocepts 
+\ref Shape_detection_RegionGrowingFramework_connectivity "Connectivity" and \ref Shape_detection_RegionGrowingFramework_conditions "Conditions".
+In particular, it has
+
+- `Shape_detection::Polygon_mesh_adjacent_faces_connectivity` class that retrieves all adjacent faces for a given face, and
+- `Shape_detection::Polygon_mesh_least_squares_plane_fit_conditions` class that fits a 3D plane to the vertices of 
+all mesh faces, which have been added to the region so far, and controls the quality of this fit.
+
+This component accepts any model of the concept `FaceListGraph` as a polygon mesh. A picture below gives an \ref Shape_detection_RegionGrowingMesh_examples "example" 
+of the Region Growing algorithm for detecting 3D planes on `CGAL::Surface_mesh`.
+
+\cgalFigureBegin{Region_growing_on_surface_mesh, Region_growing/region_growing_on_polygon_mesh.png}
+A surface mesh depicted with one color per detected plane.
+\cgalFigureEnd
+
+
+\subsubsection Shape_detection_RegionGrowingMesh_parameters Parameters
+
+The \ref Shape_detection_RegionGrowingMesh "Connectivity" class does not require any parameters, because adjacent faces are found using the internal face graph connectivity, while
+the \ref Shape_detection_RegionGrowingMesh "Conditions" class depends on three parameters:
+
+- `distance_threshold` - the maximum distance from the furthest face vertex to a plane;
+- `normal_threshold` - the minimum dot product between the face normal and the normal of a plane;
+- `min_region_size` - the minimum number of mesh faces a region must have.
+
+The first two parameters are used in the functions `belongs_to_region()` and `update()`, while the third parameter is used in the function `is_valid_region()`
+explained in Section \ref Shape_detection_RegionGrowingFramework_conditions "Framework Conditions". The right choice of these parameters is as important as the one explained 
+in Section \ref Shape_detection_RegionGrowingPoints_parameters "Parameters For Region Growing On Points".
+
+
+\subsubsection Shape_detection_RegionGrowingMesh_examples Examples
+
+In the example below, we show how to use Region Growing to detect planes on a polygon mesh that can be either stored as `CGAL::Surface_mesh` or `CGAL::Polyhedron_3`.
+If it is a surface mesh, this example also provides a way to save the result in a file. The used `Kernel` here is `CGAL::Exact_predicates_exact_constructions_kernel`.
+Though this exact kernel provides better quality results, please note that it may significantly slow down the execution of the program, so if you need 
+a faster version of Region Growing, use a floating type based kernel.
+
+\cgalExample{Shape_detection/Region_growing/example_region_growing_on_polygon_mesh.cpp}
 
 
 \section Shape_detection_Comparison Comparison

@@ -182,9 +182,9 @@ namespace Shape_detection {
     /// @{ 
 
     /*!
-      \brief Controls if a point belongs to a region.
+      \brief Checks if a point belongs to a region.
 
-      Controls if the point with the index `query_index` belongs to the region
+      Checks if the point with the index `query_index` belongs to the region
       that is currently getting developed using the `distance_threshold` and
       `normal_threshold` values.
 

@@ -180,9 +180,9 @@ namespace Shape_detection {
     /// @{ 
 
     /*!
-      \brief Controls if a face belongs to a region.
+      \brief Checks if a face belongs to a region.
 
-      Controls if the face with the index `query_index` belongs to the region
+      Checks if the face with the index `query_index` belongs to the region
       that is currently getting developed using the `distance_threshold` and
       `normal_threshold` values.
 

@@ -62,10 +62,9 @@ namespace custom {
   public:
     Conditions() { }
 
-    template<typename ItemRange>
     bool belongs_to_region(
       const std::size_t query_index,
-      const ItemRange& region) const {
+      const std::vector<std::size_t>& region) const {
 
       if (region.size() == 0) 
         return false;
@@ -74,13 +73,11 @@ namespace custom {
       return (index == 0 && query_index == 1);
     }
 
-    template<typename ItemRange>
-    inline bool is_valid_region(const ItemRange&) const {
+    inline bool is_valid_region(const std::vector<std::size_t>&) const {
       return m_is_valid;
     }
 
-    template<typename ItemRange>
-    void update(const ItemRange&) {
+    void update(const std::vector<std::size_t>&) {
       m_is_valid = true;
     }
   };
