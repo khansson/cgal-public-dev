@@ -13,16 +13,18 @@ namespace CGAL {
 
 This \cgal component implements two algorithms for shape detection:
 
-- the __efficient RANSAC (RANdom SAmple Consensus)__ method, contributed by Schnabel et al. \cgalCite{schnabel2007efficient};
-- the __region growing__ method, contributed by Lafarge and Mallet \cgalCite{cgal:lm-clscm-12}.
+- the __Efficient RANSAC (RANdom SAmple Consensus)__ method, contributed by Schnabel et al. \cgalCite{schnabel2007efficient};
+- the __Region Growing__ method, contributed by Lafarge and Mallet \cgalCite{cgal:lm-clscm-12}.
 
 
 \section Shape_detection_RANSAC Efficient RANSAC
 
 From an unstructured point set with unoriented normals, this algorithm detects a set of shapes (see \cgalFigureRef{Efficient_RANSAC_overview}). 
-Five types of primitive shapes are provided by this package: plane, sphere, cylinder, cone, and torus. Other primitive shapes can be easily added by the user.
+Five types of primitive shapes are provided by this package: plane, sphere, cylinder, cone, and torus. Other primitive shapes can be easily added 
+by the user (see \ref Shape_detection_RANSACExample_with_custom_shapes).
+
 \cgalFigureBegin{Efficient_RANSAC_overview, Efficient_RANSAC/overview2.png}
-Input and output of the efficient RANSAC method.
+Input and output of the Efficient RANSAC method.
 (a) Input point set. 
 (b) Point set depicted with one color per detected shape.
 \cgalFigureEnd
@@ -43,7 +45,7 @@ In our context, the error between a point and a shape is defined by its distance
 A random subset corresponds to the minimal number of points (with normals) required to uniquely define a primitive.
 
 For very large point sets, the basic RANSAC method is not practical when testing all possible shape candidates against the input data in order to find the largest shape. 
-The main idea behind the efficient RANSAC method is testing shape candidates against subsets of the input data. 
+The main idea behind the Efficient RANSAC method is testing shape candidates against subsets of the input data. 
 Shape candidates are constructed until the probability to miss the largest candidate is lower than a user-specified threshold. 
 The largest shape is repeatedly extracted until no more shapes, restricted to cover a minimum number of points, can be extracted. 
 An additional gain in efficiency is achieved through exploiting the normal attributes during initial shape construction and enumeration of inliers.
@@ -76,7 +78,7 @@ Impact of the epsilon parameter over levels of detail of the detection.
 \cgalFigureEnd
 
 - `cluster_epsilon`:
-The efficient RANSAC uses this parameter to cluster the points into connected components covered by a detected shape. 
+The Efficient RANSAC uses this parameter to cluster the points into connected components covered by a detected shape. 
 For developable shapes that admit a trivial planar parameterization (plane, cylinder, cone), 
 the points covered by a shape are mapped to a 2D parameter space chosen to minimize distortion and best preserve arc-length distances. 
 This 2D parameter space is discretized using a regular grid, and a connected component search is performed to identify the largest cluster. 
@@ -107,7 +109,7 @@ The main class `Shape_detection::Efficient_RANSAC` takes a template parameter `S
 Property maps provide a means to interface with user-specific data structures. 
 The first parameter of the `Shape_detection::Efficient_RANSAC_traits` class is the common `Kernel`. 
 In order to match the constraints of property maps, an iterator type and two maps that map an iterator to a point and a normal are specified in the `Shape_detection::Efficient_RANSAC_traits` class. 
-The concept behind property maps is detailed in Manual \ref chapterProperty_map "CGAL and Propery Maps".
+The concept behind property maps is detailed in Manual \ref chapterProperty_map "CGAL and Property Maps".
 
 Typical usage consists of five steps:
 
@@ -155,9 +157,9 @@ A timer measures the running performance.
 \cgalExample{Shape_detection/Efficient_RANSAC/example_efficient_RANSAC_with_point_access.cpp}
 
 
-\subsubsection Shape_detection_RANSACCustom_shapes Custom Shapes
+\subsubsection Shape_detection_RANSACExample_with_custom_shapes Custom Shapes
 
-Other shape types can be detected by implementing a shape class derived from the class `Shape_detection::Shape_base` and registering it to the shape detection factory of the efficient RANSAC object. 
+Other shape types can be detected by implementing a shape class derived from the class `Shape_detection::Shape_base` and registering it to the shape detection factory of the Efficient RANSAC object. 
 This class must provide the following functions: 
 construct a shape from a small set of given points, 
 compute the squared distance from a query point to the shape and 
@@ -167,8 +169,8 @@ The used shape parameters are added as members to the derived class.
 Note that the RANSAC approach is efficient for shapes that are uniquely defined by a small number of points, denoted by the number of required samples. 
 The algorithm aims at detecting the largest shape via many random samples, and the combinatorial complexity of possible samples increases rapidly with the number of required samples.
 
-More specifically, the functions to be implemented are defined in the base class
- `Shape_detection::Shape_base`:
+More specifically, the functions to be implemented are defined in the base class `Shape_detection::Shape_base`:
+
 - `Shape_detection::Shape_base::minimum_sample_size()` const: Returns the minimal number of required samples.
 - `Shape_detection::Shape_base::create_shape(const std::vector<size_t> &indices)`: The randomly generated samples are provided via a vector of indices. `Shape_detection::Shape_base::point``(std::size_t index)` 
 and `Shape_detection::Shape_base::normal``(std::size_t index)` are used to retrieve the actual points and normals (see the example below). 
@@ -176,10 +178,12 @@ The provided number of samples might actually be larger than the set minimal num
 If the provided samples are not sufficient to define a unique shape, e.g., in a degenerated case, the shape is considered invalid.
 - `Shape_detection::Shape_base::squared_distance``(const Point &point)` const: This function computes the squared distance from a query point to the shape. 
 It is used for traversing the hierarchical spatial data structure.
-- `Shape_detection::Shape_base::squared_distance(std::vector<FT> &distances, const std::vector<size_t> &indices)` 
-and `Shape_detection::Shape_base::cos_to_normal``(const std::vector<size_t> &indices, sstd::vector<FT> &angles)` const: 
-These functions are used to determine the number of inlier points to the shape. 
-They compute respectively the squared distance from a set of points to the shape, and the dot product between the point normals and the normals at the shape for the closest points on the shape. 
+- `Shape_detection::Shape_base::squared_distance(std::vector<FT> &distances, const std::vector<size_t> &indices)` and
+- `Shape_detection::Shape_base::cos_to_normal``(const std::vector<size_t> &indices, std::vector<FT> &angles)` const.
+
+The last two functions are used to determine the number of inlier points to the shape. They compute respectively the squared distance from a set of points to the shape, 
+and the dot product between the point normals and the normals at the shape for the closest points on the shape. 
+
 The access to the actual point and normal data is carried out via `Shape_detection::Shape_base::point``(std::size_t index)` and `Shape_detection::Shape_base::normal``(std::size_t index)` (see the example below). 
 The resulting squared distance/dot product is stored in the vector provided as the first argument.
 
@@ -198,30 +202,9 @@ which is used by the example \ref Shape_detection/Efficient_RANSAC/example_effic
 \cgalExample{Shape_detection/Efficient_RANSAC/example_efficient_RANSAC_with_custom_shape.h}
 
 
-\subsection Shape_detection_RANSACPlane_regularization Plane Regularization
-
-Shape detection applies to man-made scenes or objects such as urban scenes or scans of mechanical parts. 
-Such scenes often contain a wide range of geometric regularities such as parallelism, orthogonality, or symmetry. 
-This package offers a function to reinforce four types of regularities for planar shapes: `CGAL::regularize_planes()`:
-
-- Planes that are near __parallel__ are made parallel: normal vectors of planes that form angles smaller than a user-defined threshold are made equal;
-
-- Parallel planes that are near __coplanar__ are made coplanar;
-
-- Planes that are near __orthogonal__ are made exactly orthogonal;
-
-- Planes that are near __symmetrical__ with respect to a user-defined axis are made symmetrical.
-
-The user can choose to only regularize one or several of these 4 properties (see \link CGAL::regularize_planes() Reference Manual\endlink). 
-The process is greedy and based on a hierarchical decomposition (coplanar clusters are subgroups of parallel clusters, 
-which are subgroups of axis-symmetric and orthogonal clusters) as described by Verdie et al. \cgalCite{cgal:vla-lod-15}
-
-\cgalExample{Shape_detection/Efficient_RANSAC/example_efficient_RANSAC_and_plane_regularization.cpp}
-
-
 \subsection Shape_detection_RANSACPerformance Performance
  
-The running time and detection performance of the efficient RANSAC depend on the chosen parameters. 
+The running time and detection performance of the Efficient RANSAC depend on the chosen parameters. 
 A selective error tolerance parameter leads to higher running time and fewer shapes, as many shape candidates are generated to find the largest shape. 
 We plot the detection performance against the `epsilon` error tolerance parameter for detecting planes in a complex scene with 5M points, see \cgalFigureRef{Efficient_RANSAC_performance_epsilon}. 
 The `probability` parameter controls the endurance when searching for the largest candidate at each iteration. 
@@ -242,13 +225,13 @@ The running time increases significantly as many more candidates are generated d
 
 \section Shape_detection_RegionGrowing Region Growing
 
-This shape detection component is based on the region growing algorithm on an arbitrary set of items. 
-Shapes are detected by growing regions from estimated seeds as
+This shape detection component is based on the Region Growing algorithm applied to a set of user-specified items.
+Shapes are detected by growing regions from estimated seeds as follows:
 
 -# Pick the next available seed item;
--# Find its direct neighbours in the data set; 
--# Check if these neighbours satisfy all necessary conditions to be included in the region; 
--# Add all items that satisfy these conditions and repeat the procedure for these items as seed items; 
+-# Find its direct neighbors in the data set; 
+-# Check if these neighbors satisfy all necessary conditions to be included in the region; 
+-# Add all items that satisfy these conditions and repeat the procedure using these items as seed items;
 -# If no further neighbor satisfies the conditions, start a new region.
 
 Together with the generic algorithm's implementation `Shape_detection::Region_growing`, three particular instances of this algorithm are provided:
@@ -262,12 +245,12 @@ To do that, the user needs to implement its own version of the \ref Shape_detect
 which are used to parameterize the `Shape_detection::Region_growing` main class (see \ref Shape_detection_RegionGrowingExample_with_custom_classes).
 
 
-\subsection Shape_detection_RegionGrowingPoints Region Growing On Points
+\subsection Shape_detection_RegionGrowingPoints Points
 
 If the item type is a 2D or 3D point, the component provides two different ways to search for neighbors around this point:
 
 - Fuzzy sphere search via `Shape_detection::Points_fuzzy_sphere_connectivity`: 
-The class creates a circle (if the point is 2D) or a sphere (if the point is 3D) with the query point being its center and the user-given search radius. 
+The class creates a circle (if the point is 2D) or a sphere (if the point is 3D) centered at the query point with a user-specified search radius. 
 All points that lie within this spherical search space will be treated as neighbors of the query point;
 
 - Nearest neighbor search via `Shape_detection::Points_k_nearest_neighbors_connectivity`: 
@@ -280,7 +263,7 @@ this query point is assigned to the region.
 
 The two condition classes above also verify if the size of a region is larger than a user-defined value, where the size of the region is the number of items it contains.
 
-A picture below gives an example of the region growing algorithm for detecting 2D lines on a 2D point set.
+A picture below gives an example of the Region Growing algorithm for detecting 2D lines on a 2D point set.
 
 \cgalFigureBegin{Region_growing_on_points_2, Region_growing/region_growing_on_points_2.png}
 A 2D point set depicted with one color per detected linear shape.
@@ -293,17 +276,17 @@ A 3D point set depicted with one color per detected planar shape.
 \cgalFigureEnd
 
 
-\subsection Shape_detection_RegionGrowingFaceGraph Region Growing On Polygon Mesh
+\subsection Shape_detection_RegionGrowingMesh Polygon Mesh
 
-If the item type is a graph face, the neighbors of a face can be retrieved by selecting all faces that share an edge with the query face by using the class `Shape_detection::Polygon_mesh_adjacent_faces_connectivity`. 
+If the item type is a model of `FaceGraph`, the neighbors of a face can be retrieved by selecting all faces that share an edge with the query face by using the class `Shape_detection::Polygon_mesh_adjacent_faces_connectivity`. 
 To grow the region, we need to check conditions, which are very similar to the 3D point case and given by the class `Shape_detection::Polygon_mesh_least_squares_plane_fit_conditions`.
 The faces are broken down to their vertices and a plane is fitted to them, 
-however, the distance from a face to the fitted plane is simplifed down to the distance from the centroid of the face to the plane. 
-Vertices do not need normals linked with them, instead, the normal of a face is calculated from the face vertices and the dot product between the face's normal and the fitted plane's normal is computed as usual.
+however, the distance from a face to the fitted plane is simplified down to the distance from the centroid of the face to the plane. 
+The normals of the faces are used and compared to the fitted plane's normal.
 
 The same as before, the condition class above also verifies if the size of a region is larger than a user-defined value.
 
-A picture below gives an example of the region growing algorithm for detecting 3D planes on a surface mesh.
+A picture below gives an example of the Region Growing algorithm for detecting 3D planes on a surface mesh.
 
 \cgalFigureBegin{Region_growing_on_surface_mesh, Region_growing/region_growing_on_polygon_mesh.png}
 A surface mesh depicted with one color per detected planar shape.
@@ -321,7 +304,7 @@ For points, we provide two different types of connectivity as mentioned in Secti
 
 The right choice for the `search_radius` or `number_of_neighbors` parameters plays an important role in producing a good result. 
 For example, if we consider the fuzzy sphere connectivity, when `search_radius` is too large, we have fewer regions, and the details are not clearly separated. 
-Meanwhile, if `search_radius` is too small, we produce more regions, and the point set may be oversegmented.
+Meanwhile, if `search_radius` is too small, we produce more regions, and the point set may be over-segmented.
 Consider a 2D map of an intersection of streets in a city as in \cgalFigureRef{Region_growing_parameter_search_radius_variation}. 
 Each region is painted with a unique color. As `search_radius` increases, the details become less clear. When `search_radius` = 0.3 (c), the best visualization is produced.
 
@@ -332,7 +315,7 @@ Each region is painted with a unique color. As `search_radius` increases, the de
 (d) 4 regions are found when `radius` = 1.2.
 \cgalFigureEnd
 
-For a face graph, the connectivity method is discussed in Section \ref Shape_detection_RegionGrowingFaceGraph,
+For a face graph, the connectivity method is discussed in Section \ref Shape_detection_RegionGrowingMesh,
 
 - `Shape_detection::Polygon_mesh_adjacent_faces_connectivity`: The user must provide the face graph that defines the connectivity between its faces.
 
@@ -340,8 +323,8 @@ For a face graph, the connectivity method is discussed in Section \ref Shape_det
 \subsection Shape_detection_RegionGrowingConditions Conditions
 
 The concept `RegionGrowingPropagationConditions` provides the means for verifying conditions that should be satisfied in order for an item to be included in a region. 
-For points, we provide two different types of condtions (2D lines and 3D planes) as mentioned in Section \ref Shape_detection_RegionGrowingPoints. 
-For face graphs, the conditions are planar and discussed in Section \ref Shape_detection_RegionGrowingFaceGraph.
+For points, we provide two different types of conditions (2D lines and 3D planes) as mentioned in Section \ref Shape_detection_RegionGrowingPoints. 
+For face graphs, the conditions are planar and discussed in Section \ref Shape_detection_RegionGrowingMesh.
 
 Since the above implemented conditions are for either linear or planar shapes, they can be controlled by a few parameters:
 
@@ -362,7 +345,7 @@ when the normal threshold is strict enough (c), or it can be recognized as only 
 
 \subsection Shape_detection_RegionGrowingExamples Examples
 
-Typical usage of the region growing component consists of five steps:
+Typical usage of the Region Growing component consists of five steps:
 
 -# Define an input range with items;
 -# Create instances of the classes `Conditions` and `Connectivity` with proper parameters or default ones;
@@ -371,37 +354,37 @@ Typical usage of the region growing component consists of five steps:
 -# Postprocess.
 
 
-\subsubsection Shape_detection_RegionGrowingExample_points_2 Region Growing On 2D Points With Fuzzy Sphere Search
+\subsubsection Shape_detection_RegionGrowingExample_points_2 Detecting Lines On 2D Points
 
-Given a 2D point set, we detect 2D lines on this set using fuzzy sphere neighbours search, color these regions, and save them in a file.
+Given a 2D point set, we detect 2D lines on this set using fuzzy sphere neighbors search, color these regions, and save them in a file.
 
 \cgalExample{Shape_detection/Region_growing/example_region_growing_on_points_2.cpp}
 
 
-\subsubsection Shape_detection_RegionGrowingExample_points_3 Region Growing On 3D Points With Nearest Neighbor Search
+\subsubsection Shape_detection_RegionGrowingExample_points_3 Detecting Planes On 3D Points
 
-Given a 3D point set, we detect 3D planes on this set using k nearest neighbours search, color these regions, and save them in a file. In addition, we retreive all unclassified points.
+Given a 3D point set, we detect 3D planes on this set using k nearest neighbors search, color these regions, and save them in a file. In addition, we retrieve all unclassified points.
 
 \cgalExample{Shape_detection/Region_growing/example_region_growing_on_points_3.cpp}
 
 
-\subsubsection Shape_detection_RegionGrowingExample_face_graph Region Growing On Polygon Mesh
+\subsubsection Shape_detection_RegionGrowingExample_face_graph Detecting Planes On Polygon Mesh
 
-We perform a region growing for detecting planes on a general face graph that, in this example, can be either `CGAL::Surface_mesh` or `CGAL::Polyhedron_3`.
+We use Region Growing algorithm for detecting planes on a general face graph that, in this example, can be either `CGAL::Surface_mesh` or `CGAL::Polyhedron_3`.
 
 \cgalExample{Shape_detection/Region_growing/example_region_growing_on_polygon_mesh.cpp}
 
 
-\subsubsection Shape_detection_RegionGrowingExample_with_custom_classes Region Growing With Custom Classes
+\subsubsection Shape_detection_RegionGrowingExample_with_custom_classes Custom Classes
 
-In this particular example, we show how to use custom user-defined classes in region growing.
+In this particular example, we show how to use custom user-defined classes in Region Growing.
 
 \cgalExample{Shape_detection/Region_growing/example_region_growing_with_custom_classes.cpp}
 
 
 \subsection Shape_detection_RegionGrowingPerformance Performance On Points
 
-The main parameter that affects the region growing algorithm is the neighborhood size (`search_radius` or `number_of_neighbors`) at each retrieval. 
+The main parameter that affects the Region Growing algorithm is the neighborhood size (`search_radius` or `number_of_neighbors`) at each retrieval. 
 Larger neighbor lists are often followed by smaller number of regions, 
 larger coverage (the ratio between the number of points assigned to some region and the total number of points given in the input), 
 and longer running time. On a test of 67768 points, the following table is produced:
@@ -434,30 +417,49 @@ A higher value for `search_radius`, i.e., larger neighborhood spheres, leads to 
 
 \section Shape_detection_Comparison Comparison
 
-The efficient RANSAC algorithm is very quick, however, since it is not deterministic, some small shapes might be missed in the detection process.
+The Efficient RANSAC algorithm is very quick, however, since it is not deterministic, some small shapes might be missed in the detection process.
 
-Instead, the region growing algorithm usually takes longer to complete than the efficient RANSAC, but it may provide better quality output in the presence of large scenes 
+Instead, the Region Growing algorithm usually takes longer to complete than the Efficient RANSAC, but it may provide better quality output in the presence of large scenes 
 with numerous small details: as it iterates throughout all items of the scene, there are fewer chances to miss a shape. 
 In addition, it is deterministic (for a given input and a given set of parameters, it always returns the same output, 
-whereas as the efficient RANSAC algorithm is randomized and so the output may vary at each run). See figure \cgalFigureRef{Shape_detection_comparison_figure}.
+whereas as the Efficient RANSAC algorithm is randomized and so the output may vary at each run). See figure \cgalFigureRef{Shape_detection_comparison_figure}.
 
 \cgalFigureBegin{Shape_detection_comparison_figure, Efficient_RANSAC/comparison.png}
-Comparison of the efficient RANSAC and region growing algorithms. 
+Comparison of the Efficient RANSAC and Region Growing algorithms. 
 Top: the input point set. 
-Bottom left: the output of the efficient RANSAC, \f$78\%\f$ of the shapes are correctly detected in 8 seconds. 
-Bottom right: the output of the region growing, \f$100\%\f$ of the shapes detected in 15 seconds. 
+Bottom left: the output of the Efficient RANSAC, \f$78\%\f$ of the shapes are correctly detected in 8 seconds. 
+Bottom right: the output of the Region Growing, \f$100\%\f$ of the shapes detected in 15 seconds. 
 Unassigned points are in black in both output images.
 \cgalFigureEnd
 
 
+\section Shape_detection_PlaneRegularization Plane Regularization
+
+Shape detection applies to man-made scenes or objects such as urban scenes or scans of mechanical parts. 
+Such scenes often contain a wide range of geometric regularities such as parallelism, orthogonality, or symmetry. 
+This package offers a function to reinforce four types of regularities for planar shapes: `CGAL::regularize_planes()`:
+
+- Planes that are near __parallel__ are made parallel: normal vectors of planes that form angles smaller than a user-defined threshold are made equal;
+- Parallel planes that are near __coplanar__ are made coplanar;
+- Planes that are near __orthogonal__ are made exactly orthogonal;
+- Planes that are near __symmetrical__ with respect to a user-defined axis are made symmetrical.
+
+The user can choose to only regularize one or several of these 4 properties (see \link CGAL::regularize_planes() Reference Manual\endlink). 
+The process is greedy and based on a hierarchical decomposition (coplanar clusters are subgroups of parallel clusters, 
+which are subgroups of axis-symmetric and orthogonal clusters) as described by Verdie et al. \cgalCite{cgal:vla-lod-15}
+
+\cgalExample{Shape_detection/Efficient_RANSAC/example_efficient_RANSAC_and_plane_regularization.cpp}
+
+
 \section Shape_detection_History History
 
-The efficient RANSAC implementation was developed by Sven Oesau based on a prototype version created by Yannick Verdie, 
-with the help of Clément Jamin and under the supervision of Pierre Alliez. 
-Plane regularization was added by Simon Giraudot based on the prototype version developed by Florent Lafarge.
+The Efficient RANSAC implementation was developed by Sven Oesau based on a prototype version created by Yannick Verdie, 
+with the help of Clément Jamin and under the supervision of Pierre Alliez. Plane regularization was added by Simon Giraudot 
+based on the prototype version developed by Florent Lafarge.
 
-The region growing algorithm on 3D points was first developed by Simon Giraudot based on the prototype version developed by Florent Lafarge 
-and then generalized to arbitrary items including versions for 2D points, 3D points, and a face graph by Thien Hoang during the Google Summer of Code 2018 under the supervision of Dmitry Anisimov.
+The Region Growing algorithm on 3D points was first developed by Simon Giraudot based on the prototype version developed by Florent Lafarge 
+and then generalized to arbitrary items including versions for 2D points, 3D points, and a polygon mesh by Thien Hoang during the 
+Google Summer of Code 2018 under the supervision of Dmitry Anisimov.
 
 */ 
 } /* namespace CGAL */

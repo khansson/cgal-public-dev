@@ -88,7 +88,7 @@ namespace Shape_detection {
    \ingroup PkgShapeDetectionRANSACPropertyMaps
 
    Property map that associates a detected plane object
-   (`CGAL::Shape_detection::Plane`) to a `CGAL::Plane_3` object.
+   `CGAL::Shape_detection::Plane` to a `CGAL::Plane_3` object.
  */
   template <typename Traits>
   class Plane_map
