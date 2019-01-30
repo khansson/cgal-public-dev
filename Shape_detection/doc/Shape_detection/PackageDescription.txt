@@ -4,28 +4,46 @@
 \defgroup PkgShapeDetectionRG Region Growing
 \ingroup PkgShapeDetectionRef
 
+Reference Manual for the \cgal Region Growing shape detection component.
+
 \defgroup PkgShapeDetectionRGConcepts Concepts
 \ingroup PkgShapeDetectionRG
+
+Concepts used to parameterize the `CGAL::Shape_detection::Region_growing` approach.
 
 \defgroup PkgShapeDetectionRGOnPoints Points
 \ingroup PkgShapeDetectionRG
 
+Classes that can be used in the `CGAL::Shape_detection::Region_growing` approach 
+for shape detection on points.
+
 \defgroup PkgShapeDetectionRGOnMesh Polygon Mesh
 \ingroup PkgShapeDetectionRG
+
+Classes that can be used in the `CGAL::Shape_detection::Region_growing` approach 
+for shape detection on a polygon mesh.
 
 \addtogroup PkgShapeDetectionRG
 
 \defgroup PkgShapeDetectionRANSAC Efficient RANSAC
 \ingroup PkgShapeDetectionRef
 
+Reference Manual for the \cgal Efficient RANSAC shape detection component.
+
 \defgroup PkgShapeDetectionRANSACConcepts Concepts
 \ingroup PkgShapeDetectionRANSAC
+
+Concepts used to parameterize the `CGAL::Shape_detection::Efficient_RANSAC` approach.
 
 \defgroup PkgShapeDetectionRANSACShapes Shapes
 \ingroup PkgShapeDetectionRANSAC
 
+Shape classes that can be used with the `CGAL::Shape_detection::Efficient_RANSAC` approach.
+
 \defgroup PkgShapeDetectionRANSACPropertyMaps Property Maps
 \ingroup PkgShapeDetectionRANSAC
+
+Property maps that can be used with the `CGAL::Shape_detection::Efficient_RANSAC` approach.
 
 \addtogroup PkgShapeDetectionRANSAC
 
@@ -91,10 +109,13 @@ on a polygon mesh.}
 - `CGAL::Shape_detection::Points_k_nearest_neighbors_connectivity<GeomTraits, InputRange, PointMap>`
 - `CGAL::Shape_detection::Points_2_least_squares_line_fit_conditions<GeomTraits, InputRange, PointMap, NormalMap>`
 - `CGAL::Shape_detection::Points_3_least_squares_plane_fit_conditions<GeomTraits, InputRange, PointMap, NormalMap>`
+- `CGAL::Shape_detection::Points_2_least_squares_line_fit_sorting<GeomTraits, InputRange, PointMap>`
+- `CGAL::Shape_detection::Points_3_least_squares_plane_fit_sorting<GeomTraits, InputRange, PointMap>`
 
 ## Region Growing On Polygon Mesh ##
 - `CGAL::Shape_detection::Polygon_mesh_adjacent_faces_connectivity<FaceGraph, FaceRange>`
 - `CGAL::Shape_detection::Polygon_mesh_least_squares_plane_fit_conditions<GeomTraits, FaceGraph, FaceRange, VertexToPointMap>`
+- `CGAL::Shape_detection::Polygon_mesh_least_squares_plane_fit_sorting<GeomTraits, FaceGraph, FaceRange, VertexToPointMap>`
 
 ## Functions ##
 - `CGAL::regularize_planes()`

@@ -89,8 +89,10 @@ namespace Shape_detection {
       const FaceListGraph& polygon_mesh) :
     m_face_graph(polygon_mesh),
     m_face_range(CGAL::faces(m_face_graph)),
-    m_face_to_index_map(m_face_range)
-    { }
+    m_face_to_index_map(m_face_range) { 
+
+      CGAL_precondition(m_face_range.size() > 0);
+    }
 
     /// @}
 
@@ -101,27 +103,23 @@ namespace Shape_detection {
       \brief Returns adjacent faces to a given face.
 
       This function returns indices of all faces, 
-      which are adjacent to the face with the index `query_index`, 
-      via an output iterator `neighbors`.
-
-      \tparam OutputIterator 
-      is an output iterator that accepts `std::size_t` values.
+      which are adjacent to the face with the index `query_index`. 
+      These indices are returned in `neighbors`.
 
       \param query_index
       Index of the query face.
 
       \param neighbors
-      An output iterator with the indices of faces, which are adjacent to the
-      face with the index `query_index`.
+      An `std::vector<std::size_t>` with the indices of faces, which are 
+      adjacent to the face with the index `query_index`.
 
-      Implements the function `RegionGrowingConnectivity::get_neighbors()`.
+      Implements the function `RegionGrowingConnectivity::neighbors()`.
 
       \pre `query_index >= 0 && query_index < total_number_of_faces`
     */
-    template<typename OutputIterator>
-    void get_neighbors(
+    void neighbors(
       const std::size_t query_index, 
-      OutputIterator neighbors) const {
+      std::vector<std::size_t>& neighbors) const {
                     
       CGAL_precondition(query_index >= 0);
       CGAL_precondition(query_index < m_face_range.size());
@@ -135,7 +133,7 @@ namespace Shape_detection {
         const std::size_t face_index = get(m_face_to_index_map, *face);
         
         if (face_index != std::size_t(-1)) // not a null face
-          *(neighbors++) = face_index;
+          neighbors.push_back(face_index);
       }
     }
 

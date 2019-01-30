@@ -169,9 +169,11 @@ namespace Shape_detection {
     m_scalar_product_3(traits.compute_scalar_product_3_object()),
     m_sqrt(Get_sqrt::sqrt_object(traits)) {
 
-      CGAL_precondition(distance_threshold >= FT(0));
-      CGAL_precondition(normal_threshold >= FT(0) && normal_threshold <= FT(1));
-      CGAL_precondition(min_region_size > 0);
+      CGAL_precondition(m_face_range.size() > 0);
+
+      CGAL_precondition(m_distance_threshold >= FT(0));
+      CGAL_precondition(m_normal_threshold >= FT(0) && m_normal_threshold <= FT(1));
+      CGAL_precondition(m_min_region_size > 0);
     }
 
     /// @}

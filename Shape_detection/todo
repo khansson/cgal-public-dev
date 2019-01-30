@@ -1,3 +1,1 @@
-1. Add the callback mechanism to region growing. See the RANSAC code.
-2. Add a sorting class by line/plane quality.
-3. Add all necessary property maps to be able to use plane regularization with region growing on points 3.
+1. Add a sorting class by line/plane quality.

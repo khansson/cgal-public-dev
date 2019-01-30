@@ -150,8 +150,10 @@ namespace Shape_detection {
       Splitter(),
       Search_traits(m_index_to_point_map)) { 
 
+      CGAL_precondition(m_input_range.size() > 0);
+
       m_tree.build();
-      CGAL_precondition(number_of_neighbors >= 0);
+      CGAL_precondition(m_number_of_neighbors >= 0);
     }
 
     /// @}
@@ -164,26 +166,22 @@ namespace Shape_detection {
 
       This function returns indices of the `number_of_neighbors` closest 
       points to the point with the index `query_index`. These neighbors are
-      returned via an output iterator `neighbors`.
-
-      \tparam OutputIterator 
-      is an output iterator that accepts `std::size_t` values.
+      returned in `neighbors`.
 
       \param query_index
       Index of the query point.
 
       \param neighbors
-      An output iterator with the indices of points, which are neighbors of 
-      the point with the index `query_index`.
+      An `std::vector<std::size_t>` with the indices of points, which are 
+      neighbors of the point with the index `query_index`.
 
-      Implements the function `RegionGrowingConnectivity::get_neighbors()`.
+      Implements the function `RegionGrowingConnectivity::neighbors()`.
 
       \pre `query_index >= 0 && query_index < total_number_of_points`
     */
-    template<typename OutputIterator>
-    void get_neighbors(
+    void neighbors(
       const std::size_t query_index, 
-      OutputIterator neighbors) const {
+      std::vector<std::size_t>& neighbors) const {
       
       CGAL_precondition(query_index >= 0);
       CGAL_precondition(query_index < m_input_range.size());
@@ -195,9 +193,9 @@ namespace Shape_detection {
         0, 
         true, 
         m_distance);
-                
+
       for (auto it = neighbor_search.begin(); it != neighbor_search.end(); ++it)
-        *(neighbors++) = it->first;
+        neighbors.push_back(it->first);
     }
 
     /// @}

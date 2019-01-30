@@ -82,7 +82,6 @@ namespace internal {
   class Item_to_index_property_map {
                         
   public:
-
     using Item_range = ItemRange;
             
     using Iterator = typename Item_range::const_iterator;
@@ -118,7 +117,7 @@ namespace internal {
 
     friend inline value_type get(
       const Item_to_index_property_map& item_to_index_map, 
-      const key_type &key) { 
+      const key_type& key) { 
       
       return item_to_index_map[key];
     }
@@ -128,7 +127,27 @@ namespace internal {
     Item_map m_item_map;
   };
 
-} // internal
+  struct Identity_seed_map {
+                        
+    using key_type = std::size_t;
+    using value_type = std::size_t;
+    using category = boost::lvalue_property_map_tag;
+
+    Identity_seed_map() { }
+
+    value_type operator[](const key_type key) const { 
+      return key;
+    }
+
+    friend value_type get(
+      const Identity_seed_map& seed_map, 
+      const key_type key) { 
+      
+      return seed_map[key];
+    }
+  };
+
+} // namespace internal
 } // namespace Shape_detection
 } // namespace CGAL
 

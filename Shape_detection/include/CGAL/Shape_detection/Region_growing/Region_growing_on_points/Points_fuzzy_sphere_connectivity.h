@@ -146,8 +146,10 @@ namespace Shape_detection {
       Splitter(),
       Search_traits(m_index_to_point_map)) { 
 
+      CGAL_precondition(m_input_range.size() > 0);
+
       m_tree.build();
-      CGAL_precondition(search_radius >= FT(0));
+      CGAL_precondition(m_search_radius >= FT(0));
     }
 
     /// @}
@@ -161,26 +163,22 @@ namespace Shape_detection {
       This function returns indices of all points, which belong to a sphere
       of the fixed radius `search_radius` centered at the query point with
       the index `query_index`, and thus being its direct neighbors. These
-      neighbors are returned via an output iterator `neighbors`.
-
-      \tparam OutputIterator 
-      is an output iterator that accepts `std::size_t` values.
+      neighbors are returned in `neighbors`.
 
       \param query_index
       Index of the query point.
 
       \param neighbors
-      An output iterator with the indices of points, which are neighbors of 
-      the point with the index `query_index`.
+      An `std::vector<std::size_t>` with the indices of points, which are 
+      neighbors of the point with the index `query_index`.
 
-      Implements the function `RegionGrowingConnectivity::get_neighbors()`.
+      Implements the function `RegionGrowingConnectivity::neighbors()`.
 
       \pre `query_index >= 0 && query_index < total_number_of_points`
     */
-    template<typename OutputIterator>
-    void get_neighbors(
+    void neighbors(
       const std::size_t query_index, 
-      OutputIterator neighbors) const {
+      std::vector<std::size_t>& neighbors) const {
                 
       CGAL_precondition(query_index >= 0);
       CGAL_precondition(query_index < m_input_range.size());
@@ -191,7 +189,7 @@ namespace Shape_detection {
         FT(0), 
         m_tree.traits());
 
-      m_tree.search(neighbors, sphere);
+      m_tree.search(std::back_inserter(neighbors), sphere);
     }
 
     /// @}

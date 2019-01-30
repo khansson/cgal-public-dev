@@ -81,7 +81,7 @@ namespace internal {
     }
   };
 
-} // internal
+} // namespace internal
 } // namespace Shape_detection
 } // namespace CGAL
 

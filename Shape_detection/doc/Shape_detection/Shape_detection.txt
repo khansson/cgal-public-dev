@@ -249,10 +249,11 @@ The main class `Shape_detection::Region_growing` is parameterized by
 
 - `InputRange` with user-defined items, which can be any objects;
 - \ref Shape_detection_RegionGrowingFramework_connectivity "Connectivity" that provides the means for getting connectivity among the items;
-- \ref Shape_detection_RegionGrowingFramework_conditions "Conditions" that provides conditions for validating regions.
+- \ref Shape_detection_RegionGrowingFramework_conditions "Conditions" that provides conditions for validating regions;
+- \ref Shape_detection_RegionGrowingFramework_seeding "SeedMap" that defines the seeding order of items.
 
 Using this generic framework, users can detect shapes or simply grow regions on any set of items with 
-their own propagation condtions (see \ref Shape_detection_RegionGrowingFramework_examples "an example").
+their own propagation and seeding conditions (see \ref Shape_detection_RegionGrowingFramework_examples "an example").
 
 
 \subsubsection Shape_detection_RegionGrowingFramework_connectivity Connectivity
@@ -260,13 +261,13 @@ their own propagation condtions (see \ref Shape_detection_RegionGrowingFramework
 The concept `RegionGrowingConnectivity` provides the means for getting connectivity among given items. 
 To create a model that respects this concept, the only requirement on the user-defined class is to implement the function:
 
-- `RegionGrowingConnectivity::get_neighbors()` that should return all items, 
+- `RegionGrowingConnectivity::neighbors()` that should return all items, 
 which are defined to be neighbors of the query item. This function is called whenever a new item is queried.
 
 
 \subsubsection Shape_detection_RegionGrowingFramework_conditions Conditions
 
-The concept `RegionGrowingConditions` provides conditions for validating regions. 
+The concept `RegionGrowingPropagationConditions` provides conditions for validating regions. 
 To create a model that respect this concept, three functions in the user-defined class must be implemented:
 
 - `RegionGrowingPropagationConditions::belongs_to_region()` This function checks if a query item 
@@ -280,26 +281,39 @@ and all its items become again available for the algorithm.
 
 - `RegionGrowingPropagationConditions::update()` This function updates all necessary 
 information that goes along with the region propagation. It is called each time 
-when a new seed item is chosen and each time when we expand current region with several new items.
+when a new seed item is chosen and each time when we expand the current region with several new items.
 In the first case, the number of items in the region is one.
+
+
+\subsubsection Shape_detection_RegionGrowingFramework_seeding Seeding
+
+The `SeedMap` property map provided as an optional parameter to the main class allows
+to define the seeding order of items that is which items are used first to grow regions from.
+Such items are called seed items. The `SeedMap` maps the index of an item to its 
+number in the overall region growing processing queue. The default map is the identity one 
+that is the seed index of an item equals to the item's index in the `input_range`. 
+If it maps to `std::size_t(-1)`, then the corresponding item is skipped.
 
 
 \subsubsection Shape_detection_RegionGrowingFramework_examples Examples
 
 This toy example shows how to implement one's own \ref Shape_detection_RegionGrowingFramework_connectivity "Connectivity" and 
 \ref Shape_detection_RegionGrowingFramework_conditions "Conditions" classes, which are used to parameterize the main 
-`Shape_detection::Region_growing` class.
+`Shape_detection::Region_growing` class. It also shows how to skip unnecessary items and change their default seeding order.
 
-We choose a simple custom sphere item. We define three such spheres with the fixed radius and different center points. For each sphere, 
-we also manually store indices of its direct neighbors. The function `RegionGrowingConnectivity::get_neighbors()` in the `Connectivity` class that must be 
+We choose a simple custom object item. We define four such objects, where for each object, we manually 
+store indices of its direct neighbors. The function `RegionGrowingConnectivity::neighbors()` in the `Connectivity` class that must be 
 provided by the user does nothing but accessing these neighbors. The `Conditions` class implements the following necessary functions:
 
-- `RegionGrowingPropagationConditions::belongs_to_region()` - `true` if the first and second spheres are neighbors,
+- `RegionGrowingPropagationConditions::belongs_to_region()` - `true` if the first and second objects are neighbors,
 - `RegionGrowingPropagationConditions::is_valid_region()` - always `true` after the first call to the function `update()`:
 - `RegionGrowingPropagationConditions::update()` - updates the internal flag from the default `false` to `true`.
 
-The result of using these classes with the Region Growing main class on the spheres above is that the first two spheres form the first region,
-while the third sphere forms the second region.
+We also define a `SeedMap`, such that the second object is handled first, while the first object follows.
+Moreover, the last object is always skipped.
+
+The result of using these classes with the Region Growing main class on the objects above is that the first two objects form the first region, 
+the third object forms the second region, and the last object is skipped.
 
 \cgalExample{Shape_detection/Region_growing/example_region_growing_with_custom_classes.cpp}
 
@@ -336,6 +350,18 @@ using the corresponding method:
 - `Shape_detection::Points_2_least_squares_line_fit_conditions` - line fit for 2D points;
 - `Shape_detection::Points_3_least_squares_plane_fit_conditions` - plane fit for 3D points.
 
+The quality of Region Growing on points can be improved by sacrificing the running time. To achieve 
+this, one can sort indices of input points with respect to some quality criteria. These quality criteria
+can be included through the \ref Shape_detection_RegionGrowingFramework_seeding "Seed Map" input parameter. 
+We provide a quality sorting both for 2D (see the third 
+\ref Shape_detection_RegionGrowingPoints_examples "example") and 3D points:
+
+- `Shape_detection::Points_2_least_squares_line_fit_sorting` - indices of 2D input points are sorted with respect 
+to the quality of the least squares line fit applied to the user-defined neighbors of each point;
+
+- `Shape_detection::Points_3_least_squares_plane_fit_sorting` - indices of 3D input points are sorted with respect 
+to the quality of the least squares plane fit applied to the user-defined neighbors of each point.
+
 
 \subsubsection Shape_detection_RegionGrowingPoints_parameters Parameters
 
@@ -344,7 +370,7 @@ that should be defined by the user. They also have default values, but these val
 to work for each case.
 
 - `search_radius` This parameter is used by the class `Shape_detection::Points_fuzzy_sphere_connectivity` 
-and defines a radius of a search circe in 2D case and sphere in 3D case;
+and defines a radius of a search circle in 2D case and sphere in 3D case;
 
 - `number_of_neighbors` This parameter defines the number K of nearest neighbors in the class `Shape_detection::Points_k_nearest_neighbors_connectivity`.
 
@@ -401,6 +427,11 @@ and save them in a file. The point set with associated normals is stored in `CGA
 
 \cgalExample{Shape_detection/Region_growing/example_region_growing_on_points_3.cpp}
 
+We can improve the quality of Region Growing by providing a different seeding order. In the example below, we 
+first sort indices of 2D input points by the best local least squares line fit quality and only then detect regions.
+
+\cgalExample{Shape_detection/Region_growing/example_region_growing_with_sorting.cpp}
+
 
 \subsubsection Shape_detection_RegionGrowingPoints_performance Performance
 
@@ -434,7 +465,7 @@ A higher value for `search_radius`, i.e., larger neighborhood spheres, leads to 
 
 \subsection Shape_detection_RegionGrowingMesh Polygon Mesh
 
-If one wants to detect planes on a polygon mesh, this \cgal component provides the corresponding models of the cocepts 
+If one wants to detect planes on a polygon mesh, this \cgal component provides the corresponding models of the concepts 
 \ref Shape_detection_RegionGrowingFramework_connectivity "Connectivity" and \ref Shape_detection_RegionGrowingFramework_conditions "Conditions".
 In particular, it has
 
@@ -448,6 +479,14 @@ of the Region Growing algorithm for detecting 3D planes on `CGAL::Surface_mesh`.
 \cgalFigureBegin{Region_growing_on_surface_mesh, Region_growing/region_growing_on_polygon_mesh.png}
 A surface mesh depicted with one color per detected plane.
 \cgalFigureEnd
+
+The quality of Region Growing on a polygon mesh can be improved by sacrificing the running time. To achieve 
+this, one can sort indices of input faces with respect to some quality criteria. These quality criteria
+can be included in Region Growing through the \ref Shape_detection_RegionGrowingFramework_seeding "Seed Map" 
+input parameter. We provide such a quality sorting:
+
+- `Shape_detection::Polygon_mesh_least_squares_plane_fit_sorting` - indices of input faces are sorted with respect 
+to the quality of the least squares plane fit applied to the user-defined neighbors of each face.
 
 
 \subsubsection Shape_detection_RegionGrowingMesh_parameters Parameters
@@ -503,7 +542,7 @@ This package offers a function to reinforce four types of regularities for plana
 - Planes that are near __orthogonal__ are made exactly orthogonal;
 - Planes that are near __symmetrical__ with respect to a user-defined axis are made symmetrical.
 
-The user can choose to only regularize one or several of these 4 properties (see \link CGAL::regularize_planes() Reference Manual\endlink). 
+The user can choose to only regularize one or several of these four properties (see \link CGAL::regularize_planes() Reference Manual\endlink). 
 The process is greedy and based on a hierarchical decomposition (coplanar clusters are subgroups of parallel clusters, 
 which are subgroups of axis-symmetric and orthogonal clusters) as described by Verdie et al. \cgalCite{cgal:vla-lod-15}
 

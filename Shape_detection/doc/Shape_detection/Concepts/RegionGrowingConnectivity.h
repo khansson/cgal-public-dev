@@ -17,15 +17,13 @@ public:
 
   /*!  
     Returns indices of all items, which are connected to an item with the index `query_index`.
-    The indices are returned via an output iterator.
+    The indices are returned in `neighbors`.
 
     This function is called each time when a new query item is chosen.
-
-    \tparam OutputIterator An output iterator that accepts `std::size_t` values.
   */
-  void get_neighbors(
-    std::size_t query_index, 
-    OutputIterator& neighbors) {
+  void neighbors(
+    const std::size_t query_index, 
+    std::vector<std::size_t>& neighbors) {
         
   }
 };
