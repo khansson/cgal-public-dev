@@ -31,4 +31,6 @@
 #include <CGAL/Shape_detection/Region_growing/Region_growing_on_points/Points_2_least_squares_line_fit_conditions.h>
 #include <CGAL/Shape_detection/Region_growing/Region_growing_on_points/Points_3_least_squares_plane_fit_conditions.h>
 
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_points/Points_2_least_squares_line_fit_sorting.h>
+
 #endif // CGAL_SHAPE_DETECTION_REGION_GROWING_ON_POINTS_H
