@@ -68,7 +68,7 @@ namespace CGAL {
 int main(int argc, char *argv[]) {
     
   std::cout << std::endl << 
-    "region_growing_with_sorting example started" 
+    "region_growing_on_points_2_with_sorting example started" 
   << std::endl << std::endl;
     
   std::cout << 
@@ -108,7 +108,9 @@ int main(int argc, char *argv[]) {
     input_range, 
     max_distance_to_line, normal_threshold, min_region_size);
 
-  Sorting sorting(input_range, connectivity);
+  Sorting sorting(
+    input_range,
+    connectivity);
   sorting.sort();
     
   // Create an instance of the region growing class.
@@ -172,7 +174,7 @@ int main(int argc, char *argv[]) {
   }
 
   std::cout << std::endl << 
-    "region_growing_on_points_2 example finished" 
+    "region_growing_on_points_2_with_sorting example finished" 
   << std::endl << std::endl;
   
   return EXIT_SUCCESS;

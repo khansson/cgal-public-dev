@@ -27,5 +27,6 @@
 
 #include <CGAL/Shape_detection/Region_growing/Region_growing_on_polygon_mesh/Polygon_mesh_adjacent_faces_connectivity.h>
 #include <CGAL/Shape_detection/Region_growing/Region_growing_on_polygon_mesh/Polygon_mesh_least_squares_plane_fit_conditions.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_polygon_mesh/Polygon_mesh_least_squares_plane_fit_sorting.h>
 
 #endif // CGAL_SHAPE_DETECTION_REGION_GROWING_ON_POLYGON_MESH_H
