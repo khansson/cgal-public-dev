@@ -267,7 +267,7 @@ namespace Shape_detection {
 
       } else {
 
-        std::vector<Local_point_3> points(region.size());
+        std::vector<Local_point_3> points;
         for (std::size_t i = 0; i < region.size(); ++i) {
 
           CGAL_precondition(region[i] >= 0);
@@ -280,7 +280,7 @@ namespace Shape_detection {
           for (auto vertex = vertices.begin(); vertex != vertices.end(); ++vertex) {
                             
             const Point_3& tmp_point = get(m_vertex_to_point_map, *vertex);
-            points[i] = m_to_local_converter(tmp_point);
+            points.push_back(m_to_local_converter(tmp_point));
           }
         }
         CGAL_precondition(points.size() > 0);
