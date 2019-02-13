@@ -24,6 +24,7 @@
 
 // STL includes.
 #include <map>
+#include <vector>
 
 // CGAL includes.
 #include <CGAL/assertions.h>
@@ -127,20 +128,47 @@ namespace internal {
     Item_map m_item_map;
   };
 
-  struct Identity_seed_map {
+  class Seed_property_map {
+                        
+  public:
+    using key_type = std::size_t;
+    using value_type = std::size_t;
+    using category = boost::lvalue_property_map_tag;
+
+    Seed_property_map(
+      const std::vector<std::size_t>& seeds) : 
+    m_seeds(seeds) 
+    { }
+
+    value_type operator[](const key_type key) const { 
+      return m_seeds[key];
+    }
+
+    friend value_type get(
+      const Seed_property_map& seed_map, 
+      const key_type key) { 
+        
+      return seed_map[key];
+    }
+
+  private:
+    const std::vector<std::size_t>& m_seeds;
+  };
+
+  struct Identity_seed_property_map {
                         
     using key_type = std::size_t;
     using value_type = std::size_t;
     using category = boost::lvalue_property_map_tag;
 
-    Identity_seed_map() { }
+    Identity_seed_property_map() { }
 
     value_type operator[](const key_type key) const { 
       return key;
     }
 
     friend value_type get(
-      const Identity_seed_map& seed_map, 
+      const Identity_seed_property_map& seed_map, 
       const key_type key) { 
       
       return seed_map[key];

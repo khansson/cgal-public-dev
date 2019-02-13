@@ -67,10 +67,10 @@ bool test_region_growing_on_polygon_mesh(int argc, char *argv[]) {
   const auto& regions = region_growing.regions();
 
   CGAL_assertion(
-    regions.size() == 334 && 
+    regions.size() == 325 && 
     regions.size() == region_growing.number_of_regions());
 
-  if (regions.size() != 334) 
+  if (regions.size() != 325) 
     return false;
 
   for (auto region = regions.begin(); region != regions.end(); ++region)
@@ -80,10 +80,10 @@ bool test_region_growing_on_polygon_mesh(int argc, char *argv[]) {
   const auto& unassigned_faces = region_growing.unassigned_items();
 
   CGAL_assertion(
-    unassigned_faces.size() == 858 && 
+    unassigned_faces.size() == 836 && 
     unassigned_faces.size() == region_growing.number_of_unassigned_items());
 
-  if (unassigned_faces.size() != 858) 
+  if (unassigned_faces.size() != 836) 
     return false;
 
   return true;

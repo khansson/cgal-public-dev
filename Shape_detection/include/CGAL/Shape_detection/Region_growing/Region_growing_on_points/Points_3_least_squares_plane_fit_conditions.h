@@ -148,6 +148,7 @@ namespace Shape_detection {
       \param traits
       An instance of the `GeomTraits` class.
 
+      \pre `input_range.size() > 0`
       \pre `distance_threshold >= 0`
       \pre `normal_threshold >= 0 && normal_threshold <= 1`
       \pre `min_region_size > 0`
@@ -240,7 +241,7 @@ namespace Shape_detection {
     }
 
     /*!
-      \brief Recomputes a least squares plane.
+      \brief Recomputes the least squares plane.
 
       Recomputes the internal least squares plane that represents the `region`
       currently being developed. The plane is fitted to all points, 
@@ -261,7 +262,8 @@ namespace Shape_detection {
         CGAL_precondition(region[0] >= 0);
         CGAL_precondition(region[0] < m_input_range.size());
 
-        // The best fit plane will be a plane through this point with its normal being the point's normal.
+        // The best fit plane will be a plane through this point with 
+        // its normal being the point's normal.
         const auto& key = *(m_input_range.begin() + region[0]);
 
         const Point_3& point = get(m_point_map, key);
@@ -275,21 +277,24 @@ namespace Shape_detection {
 
       } else { // update reference plane and normal
 
-        std::vector<Local_point_3> points(region.size());
+        std::vector<Local_point_3> points;
+        points.reserve(region.size());
+
         for (std::size_t i = 0; i < region.size(); ++i) {
 
           CGAL_precondition(region[i] >= 0);
           CGAL_precondition(region[i] < m_input_range.size());
 
           const auto& key = *(m_input_range.begin() + region[i]);
-          points[i] = m_to_local_converter(get(m_point_map, key));
+          points.push_back(m_to_local_converter(get(m_point_map, key)));
         }
-        CGAL_precondition(points.size() > 0);
+        CGAL_postcondition(points.size() == region.size());
 
         Local_plane_3 fitted_plane;
         Local_point_3 fitted_centroid;
 
-        // The best fit plane will be a plane fitted to all region points with its normal being perpendicular to the plane.
+        // The best fit plane will be a plane fitted to all region points with 
+        // its normal being perpendicular to the plane.
         #ifndef CGAL_EIGEN3_ENABLED
           linear_least_squares_fitting_3(
             points.begin(), points.end(), 

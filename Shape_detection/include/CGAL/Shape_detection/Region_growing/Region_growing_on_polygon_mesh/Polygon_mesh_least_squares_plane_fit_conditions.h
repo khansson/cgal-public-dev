@@ -126,8 +126,7 @@ namespace Shape_detection {
       \brief Initializes all internal data structures.
 
       \param polygon_mesh 
-      An instance of a `FaceListGraph` that represents
-      a polygon mesh.
+      An instance of a `FaceListGraph` that represents a polygon mesh.
 
       \param distance_threshold 
       Maximum distance from a face to the region represented by a plane of 
@@ -147,6 +146,7 @@ namespace Shape_detection {
       \param traits
       An instance of the `GeomTraits` class.
 
+      \pre `total_number_of_faces > 0`
       \pre `distance_threshold >= 0`
       \pre `normal_threshold >= 0 && normal_threshold <= 1`
       \pre `min_region_size > 0`
@@ -235,7 +235,7 @@ namespace Shape_detection {
     }
 
     /*!
-      \brief Recomputes a least squares plane.
+      \brief Recomputes the least squares plane.
 
       Recomputes the internal least squares plane that represents the `region`
       currently being developed. The plane is fitted to the polygon mesh
@@ -256,6 +256,8 @@ namespace Shape_detection {
         CGAL_precondition(region[0] >= 0);
         CGAL_precondition(region[0] < m_face_range.size());
 
+        // The best fit plane will be a plane through this face centroid with 
+        // its normal being the face's normal.
         const auto& face = *(m_face_range.begin() + region[0]);
         Point_3 face_centroid;
 
@@ -265,7 +267,7 @@ namespace Shape_detection {
         m_plane_of_best_fit = 
         Plane_3(face_centroid, m_normal_of_best_fit);
 
-      } else {
+      } else { // update reference plane and normal
 
         std::vector<Local_point_3> points;
         for (std::size_t i = 0; i < region.size(); ++i) {
@@ -283,11 +285,13 @@ namespace Shape_detection {
             points.push_back(m_to_local_converter(tmp_point));
           }
         }
-        CGAL_precondition(points.size() > 0);
+        CGAL_postcondition(points.size() > 0);
 
         Local_plane_3 fitted_plane;
         Local_point_3 fitted_centroid;
 
+        // The best fit plane will be a plane fitted to all vertices of all
+        // region faces with its normal being perpendicular to the plane.
         #ifndef CGAL_EIGEN3_ENABLED
           linear_least_squares_fitting_3(
             points.begin(), points.end(), 
@@ -344,8 +348,8 @@ namespace Shape_detection {
         y += point.y();
         z += point.z();
       }
+      
       CGAL_precondition(sum > FT(0));
-
       x /= sum;
       y /= sum;
       z /= sum;
@@ -358,6 +362,7 @@ namespace Shape_detection {
       const Face& face, 
       Vector_3& face_normal) const {
 
+      // Compute normal of the face.
       const auto& halfedge = CGAL::halfedge(face, m_face_graph);
       const auto& vertices = CGAL::vertices_around_face(halfedge, m_face_graph);
 
@@ -373,6 +378,7 @@ namespace Shape_detection {
       face_normal = tmp_normal / tmp_normal_length;
     }
 
+    // The maximum distance from the vertices of the face to the best fit plane.
     template<typename Face>
     FT get_max_face_distance(const Face& face) const {
 

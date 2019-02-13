@@ -157,6 +157,10 @@ int main(int argc, char *argv[]) {
     " regions have been found among " << objects.size() <<  " objects" 
   << std::endl;
   
+  // Release all internal memory that is used to store regions and
+  // other related data.
+  region_growing.release_memory();
+
   std::cout << std::endl << 
     "region_growing_with_custom_classes example finished" 
   << std::endl << std::endl;

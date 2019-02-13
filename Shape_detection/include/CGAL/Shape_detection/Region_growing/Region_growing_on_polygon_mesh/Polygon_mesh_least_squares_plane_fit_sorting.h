@@ -39,134 +39,159 @@
 
 // CGAL includes.
 #include <CGAL/assertions.h>
-#include <CGAL/number_utils.h>
 #include <CGAL/Cartesian_converter.h>
 #include <CGAL/linear_least_squares_fitting_3.h>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 
 // Internal includes.
 #include <CGAL/Shape_detection/Region_growing/internal/utilities.h>
+#include <CGAL/Shape_detection/Region_growing/internal/property_maps.h>
 
 namespace CGAL {
 namespace Shape_detection {
 
+  /*!
+    \ingroup PkgShapeDetectionRGOnMesh
+
+    \brief Best least squares plane fit sorting of faces in a polygon mesh.
+
+    This class allows to sort indices of faces in a polygon mesh, where 
+    the sorting is based on the quality of the local best least squares plane fit. 
+    The plane is fitted to the face vertices and vertices of its neighbors 
+    found via the `Connectivity` class. The faces are sorted in the decreasing 
+    quality order, that is the first index - the best quality.
+
+    \tparam GeomTraits 
+    is a model of `Kernel`.
+
+    \tparam FaceListGraph 
+    is a model of `FaceListGraph`.
+
+    \tparam Connectivity 
+    is a model of `RegionGrowingConnectivity`.
+
+    \tparam FaceRange 
+    is a model of `ConstRange`, whose iterator type is `RandomAccessIterator` 
+    and value type is a face type used in `FaceListGraph`.
+
+    \tparam VertexToPointMap 
+    is an `LvaluePropertyMap` that maps a polygon mesh vertex to `CGAL::Point_3`.
+  */
   template<
   typename GeomTraits, 
   typename FaceListGraph,
-  typename Connectivity_,
+  typename Connectivity,
   typename FaceRange = typename FaceListGraph::Face_range,
   typename VertexToPointMap = typename boost::property_map<FaceListGraph, CGAL::vertex_point_t>::type>
   class Polygon_mesh_least_squares_plane_fit_sorting {
 
   public:
 
-    /// \cond SKIP_IN_MANUAL
-    using Traits = GeomTraits;
-    using Face_graph = FaceListGraph;
-    using Face_range = FaceRange;
-    using Vertex_to_point_map = VertexToPointMap;
-    using Input_connectivity = Connectivity_;
-
-    /// \endcond
-
     /// \name Types
     /// @{
 
-    /// Number type.
-    using FT = typename GeomTraits::FT;
+    /// \cond SKIP_IN_MANUAL
+    using Traits = GeomTraits;
+    using Face_graph = FaceListGraph;
+    using Input_connectivity = Connectivity;
+    using Face_range = FaceRange;
+    using Vertex_to_point_map = VertexToPointMap;
+    /// \endcond
 
-    /// Point type.
-    using Point_3 = typename GeomTraits::Point_3; 
-
-    /// Type of the plane.
-    using Plane_3 = typename GeomTraits::Plane_3;
+    /// Property map that returns the quality ordered seed indices of the faces.
+    using Seed_map = internal::Seed_property_map;
 
     /// @}
 
-    class Seed_map {
-                        
-    public:
-      using key_type = std::size_t;
-      using value_type = std::size_t;
-      using category = boost::lvalue_property_map_tag;
+    /// \name Initialization
+    /// @{
 
-      Seed_map(const std::vector<std::size_t>& objects_map) : m_objects_map(objects_map) { }
+    /*!
+      \brief Initializes all internal data structures.
 
-      value_type operator[](const key_type key) const { 
-        return m_objects_map[key];
-      }
+      \param polygon_mesh 
+      An instance of a `FaceListGraph` that represents a polygon mesh.
 
-      friend value_type get(
-        const Seed_map& seed_map, 
-        const key_type key) { 
-        
-        return seed_map[key];
-      }
+      \param connectivity 
+      An instance of the `Connectivity` class that is used
+      internally to access face neighbors.
 
-    private:
-      const std::vector<std::size_t>& m_objects_map;
-    };
+      \param vertex_to_point_map 
+      An instance of an `LvaluePropertyMap` that maps a polygon mesh 
+      vertex to `CGAL::Point_3`.
 
+      \pre `total_number_of_faces > 0`
+    */
     Polygon_mesh_least_squares_plane_fit_sorting(
       const FaceListGraph& polygon_mesh,
-      Input_connectivity& connectivity,
-      const VertexToPointMap vertex_to_point_map = VertexToPointMap(), 
-      const GeomTraits traits = GeomTraits()) :
+      Connectivity& connectivity,
+      const VertexToPointMap vertex_to_point_map = VertexToPointMap()) :
     m_face_graph(polygon_mesh),
     m_connectivity(connectivity),
     m_face_range(CGAL::faces(m_face_graph)),
     m_vertex_to_point_map(vertex_to_point_map) {
 
       CGAL_precondition(m_face_range.size() > 0);
-      std::size_t input_size = m_face_range.end() - m_face_range.begin();
-      m_order.resize(input_size);
-      m_scores.resize(input_size);
-      for (std::size_t i = 0; i < input_size; ++i) m_order[i] = i;
 
+      m_order.resize(m_face_range.size());
+      for (std::size_t i = 0; i < m_face_range.size(); ++i)
+        m_order[i] = i;
+      m_scores.resize(m_face_range.size());
     }
 
+    /// @}
+
+    /// \name Sorting
+    /// @{
+
+    /*!
+      \brief Sorts face indices.
+    */
     void sort() {
-      calculate_scores();
-      Compare cmp(m_scores);
+      
+      compute_scores();
+      CGAL_postcondition(m_scores.size() > 0);
+
+      Compare_scores cmp(m_scores);
       std::sort(m_order.begin(), m_order.end(), cmp);
     }
 
+    /// @}
+
+    /// \name Access
+    /// @{
+
+    /*!
+      \brief Returns the `Seed_map` that allows to access 
+      the ordered face indices.
+    */
     Seed_map seed_map() {
       return Seed_map(m_order);
     }
 
+    /// @}
+
   private:
 
+    // Types.
     using Local_traits = Exact_predicates_inexact_constructions_kernel;
     using Local_FT = typename Local_traits::FT;
     using Local_point_3 = typename Local_traits::Point_3;
     using Local_plane_3 = typename Local_traits::Plane_3;
     using To_local_converter = Cartesian_converter<Traits, Local_traits>;
+    using Compare_scores = internal::Compare_scores<Local_FT>;
 
-    struct Compare {
+    // Functions.
+    void compute_scores() {
 
-      Compare(const std::vector<Local_FT>& scores) : m_scores(scores) { }
-
-      bool operator()(const std::size_t x, const std::size_t y) const {
-        // x stands before y in m_order iff m_scores[x] > m_scores[y]
-        return m_scores[x] > m_scores[y];
-      }
-
-      private:
-        const std::vector<Local_FT>& m_scores;
-
-    };
-
-    void calculate_scores() {
-
+      std::vector<std::size_t> neighbors;
       for (std::size_t i = 0; i < m_face_range.size(); ++i) {
         
-        std::vector<std::size_t> neighbors;
+        neighbors.clear();
         m_connectivity.neighbors(i, neighbors);
         neighbors.push_back(i);
 
         std::vector<Local_point_3> points;
-
         for (std::size_t j = 0; j < neighbors.size(); ++j) {
 
           CGAL_precondition(neighbors[j] >= 0);
@@ -178,13 +203,11 @@ namespace Shape_detection {
           const auto& vertices = CGAL::vertices_around_face(halfedge, m_face_graph);
           for (auto vertex = vertices.begin(); vertex != vertices.end(); ++vertex) {
                             
-            const Point_3& tmp_point = get(m_vertex_to_point_map, *vertex);
+            const auto& tmp_point = get(m_vertex_to_point_map, *vertex);
             points.push_back(m_to_local_converter(tmp_point));
-
           }
         }
-
-        CGAL_precondition(points.size() > 0);
+        CGAL_postcondition(points.size() > 0);
 
         Local_plane_3 fitted_plane;
         Local_point_3 fitted_centroid;
@@ -200,23 +223,19 @@ namespace Shape_detection {
             fitted_plane, fitted_centroid, CGAL::Dimension_tag<0>(), 
             Local_traits(), CGAL::Eigen_diagonalize_traits<Local_FT, 3>());
         #endif
-        
       }
-
     }
 
     // Fields.
     const Face_graph& m_face_graph;
+    Input_connectivity& m_connectivity;
     const Face_range m_face_range;
-            
     const Vertex_to_point_map m_vertex_to_point_map;
 
-    const To_local_converter m_to_local_converter;
-
-    Input_connectivity& m_connectivity;
     std::vector<std::size_t> m_order;
     std::vector<Local_FT> m_scores;
-    
+
+    const To_local_converter m_to_local_converter;
   };
 
 } // namespace Shape_detection

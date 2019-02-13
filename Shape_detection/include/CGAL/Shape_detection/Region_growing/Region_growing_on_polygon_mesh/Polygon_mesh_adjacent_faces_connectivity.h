@@ -84,6 +84,8 @@ namespace Shape_detection {
 
       \param polygon_mesh An instance of a `FaceListGraph` that represents
       a polygon mesh.
+
+      \pre `total_number_of_faces > 0`
     */
     Polygon_mesh_adjacent_faces_connectivity(
       const FaceListGraph& polygon_mesh) :

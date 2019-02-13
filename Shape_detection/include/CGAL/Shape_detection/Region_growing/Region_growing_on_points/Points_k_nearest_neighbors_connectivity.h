@@ -50,7 +50,8 @@ namespace Shape_detection {
   /*!
     \ingroup PkgShapeDetectionRGOnPoints
 
-    \brief Kd tree based K nearest neighbors search on a set of `Point_2` or `Point_3`.
+    \brief Kd tree based K nearest neighbors search on a set 
+    of `Point_2` or `Point_3`.
 
     This class uses a Kd tree to search for K points with the smallest distance
     from the query point, and thus being its direct neighbors.
@@ -134,6 +135,9 @@ namespace Shape_detection {
       \param point_map
       An instance of an `LvaluePropertyMap` that maps an item from `input_range` 
       to `CGAL::Point_2` or to `CGAL::Point_3`.
+
+      \pre `input_range.size() > 0`
+      \pre `number_of_neighbors >= 0`
     */
     Points_k_nearest_neighbors_connectivity(
       const InputRange& input_range, 
@@ -182,7 +186,7 @@ namespace Shape_detection {
     void neighbors(
       const std::size_t query_index, 
       std::vector<std::size_t>& neighbors) const {
-      
+
       CGAL_precondition(query_index >= 0);
       CGAL_precondition(query_index < m_input_range.size());
 
@@ -196,18 +200,6 @@ namespace Shape_detection {
 
       for (auto it = neighbor_search.begin(); it != neighbor_search.end(); ++it)
         neighbors.push_back(it->first);
-    }
-
-    /// @}
-
-    /// \name Memory Management
-    /// @{
-
-    /*!
-      Clears all internal data structures.
-    */
-    void clear() {
-      m_tree.clear();
     }
 
     /// @}

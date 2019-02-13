@@ -20,134 +20,181 @@
 // Author(s)     : Florent Lafarge, Simon Giraudot, Thien Hoang, Dmitry Anisimov
 //
 
+#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_2_LEAST_SQUARES_LINE_FIT_SORTING_H
+#define CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_2_LEAST_SQUARES_LINE_FIT_SORTING_H
+
 // #include <CGAL/license/Shape_detection.h>
 
 // STL includes.
-#include <map>
 #include <vector>
 #include <algorithm>
 
 // CGAL includes.
 #include <CGAL/assertions.h>
-#include <CGAL/property_map.h>
+#include <CGAL/Cartesian_converter.h>
+#include <CGAL/linear_least_squares_fitting_2.h>
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 
-#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_2_LEAST_SQUARES_LINE_FIT_SORTING_H
-#define CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_2_LEAST_SQUARES_LINE_FIT_SORTING_H
+// Internal includes.
+#include <CGAL/Shape_detection/Region_growing/internal/utilities.h>
+#include <CGAL/Shape_detection/Region_growing/internal/property_maps.h>
 
 namespace CGAL {
 namespace Shape_detection {
 
+  /*! 
+    \ingroup PkgShapeDetectionRGOnPoints
+
+    \brief Least squares line fit sorting of 2D points.
+
+    This class allows to sort indices of 2D points, where the sorting is
+    based on the quality of the local best least squares line fit. 
+    The line is fitted to each point and its neighbors found via the 
+    `Connectivity` class. The points are sorted in the decreasing quality order,
+    that is the first index - the best quality.
+
+    \tparam GeomTraits 
+    is a model of `Kernel`.
+
+    \tparam InputRange 
+    is a model of `ConstRange`. Its iterator type is `RandomAccessIterator`. 
+    Its value type depends on the item type used in Region Growing, 
+    for example it can be `std::pair<CGAL::Point_2, CGAL::Vector_2>` 
+    or any user-defined type.
+
+    \tparam Connectivity 
+    is a model of `RegionGrowingConnectivity`.
+
+    \tparam PointMap 
+    is an `LvaluePropertyMap` that maps to `CGAL::Point_2`.
+  */
   template<
-    class GeomTraits,
-    class InputRange,
-    class PointMap,
-    class Connectivity_>
+  typename GeomTraits,
+  typename InputRange,
+  typename Connectivity,
+  typename PointMap>
   class Points_2_least_squares_line_fit_sorting {
 
   public:
+
+    /// \name Types
+    /// @{
+
+    /// \cond SKIP_IN_MANUAL
     using Traits = GeomTraits;
     using Input_range = InputRange;
+    using Input_connectivity = Connectivity;
     using Point_map = PointMap;
-    using Input_connectivity = Connectivity_;
+    /// \endcond
 
-    class Seed_map {
-                        
-    public:
-      using key_type = std::size_t;
-      using value_type = std::size_t;
-      using category = boost::lvalue_property_map_tag;
+    /// Property map that returns the quality ordered seed indices of the points.
+    using Seed_map = internal::Seed_property_map;
 
-      Seed_map(const std::vector<std::size_t>& objects_map) : m_objects_map(objects_map) { }
+    /// @}
 
-      value_type operator[](const key_type key) const { 
-        return m_objects_map[key];
-      }
+    /// \name Initialization
+    /// @{
 
-      friend value_type get(
-        const Seed_map& seed_map, 
-        const key_type key) { 
-        
-        return seed_map[key];
-      }
+    /*!
+      \brief Initializes all internal data structures.
 
-    private:
-      const std::vector<std::size_t>& m_objects_map;
-    };
+      \param input_range 
+      An instance of an `InputRange` container with 2D points.
 
+      \param connectivity 
+      An instance of the `Connectivity` class that is used
+      internally to access point neighbors.
+
+      \param point_map
+      An instance of an `LvaluePropertyMap` that maps an item from `input_range` 
+      to `CGAL::Point_2`.
+
+      \pre `input_range.size() > 0`
+    */
     Points_2_least_squares_line_fit_sorting(
-      const Input_range& input_range,
-      Input_connectivity& connectivity,
-      const Point_map point_map = Point_map()) :
+      const InputRange& input_range,
+      Connectivity& connectivity,
+      const PointMap point_map = Point_map()) :
     m_input_range(input_range),
-    m_point_map(point_map),
-    m_connectivity(connectivity) { 
-      std::size_t input_size = m_input_range.end() - m_input_range.begin();
-      m_order.resize(input_size);
-      m_scores.resize(input_size);
-      for (std::size_t i = 0; i < input_size; ++i) m_order[i] = i;
+    m_connectivity(connectivity),
+    m_point_map(point_map) { 
+      
+      CGAL_precondition(m_input_range.size() > 0);
+      
+      m_order.resize(m_input_range.size());
+      for (std::size_t i = 0; i < m_input_range.size(); ++i) 
+        m_order[i] = i;
+      m_scores.resize(m_input_range.size());
     }
 
+    /// @}
+
+    /// \name Sorting
+    /// @{
+
+    /*!
+      \brief Sorts point indices.
+    */
     void sort() {
-      calculate_scores();
-      Compare cmp(m_scores);
-      // std::cerr << "* sorting\n";
+      
+      compute_scores();
+      CGAL_postcondition(m_scores.size() > 0);
+
+      Compare_scores cmp(m_scores);
       std::sort(m_order.begin(), m_order.end(), cmp);
-      // std::cerr << "* sorted\n";
-      // m_seed_map = Seed_map(m_order);
     }
 
+    /// @}
+
+    /// \name Access
+    /// @{
+
+    /*!
+      \brief Returns the `Seed_map` that allows to access 
+      the ordered point indices.
+    */
     Seed_map seed_map() {
       return Seed_map(m_order);
     }
 
+    /// @}
+
   private:
 
-    /// \cond SKIP_IN_MANUAL
+    // Types.
     using Local_traits = Exact_predicates_inexact_constructions_kernel;
     using Local_FT = typename Local_traits::FT;
     using Local_point_2 = typename Local_traits::Point_2;
     using Local_line_2 = typename Local_traits::Line_2;
     using To_local_converter = Cartesian_converter<Traits, Local_traits>;
-    /// \endcond
+    using Compare_scores = internal::Compare_scores<Local_FT>;
 
-    struct Compare {
+    // Functions.
+    void compute_scores() {
 
-      Compare(const std::vector<Local_FT>& scores) : m_scores(scores) { }
-
-      bool operator()(const std::size_t x, const std::size_t y) const {
-        // x stands before y in m_order iff m_scores[x] > m_scores[y]
-        return m_scores[x] > m_scores[y];
-      }
-
-      private:
-        const std::vector<Local_FT>& m_scores;
-
-    };
-
-    void calculate_scores() {
-      // std::cerr << "* calculating scores\n";
-      // std::cerr << m_scores.size() << std::endl;
-      std::size_t input_size = m_input_range.end() - m_input_range.begin();
-      for (int i = 0; i < input_size; ++i) {
-        std::vector<std::size_t> neighbors;
+      std::vector<std::size_t> neighbors;
+      for (std::size_t i = 0; i < m_input_range.size(); ++i) {
+        
+        neighbors.clear();
         m_connectivity.neighbors(i, neighbors);
         neighbors.push_back(i);
 
-        std::vector<Local_point_2> points(neighbors.size());
-        for (std::size_t i = 0; i < neighbors.size(); ++i) {
+        std::vector<Local_point_2> points;
+        points.reserve(neighbors.size());
 
-          CGAL_precondition(neighbors[i] >= 0);
-          CGAL_precondition(neighbors[i] < m_input_range.size());
+        for (std::size_t j = 0; j < neighbors.size(); ++j) {
 
-          const auto& key = *(m_input_range.begin() + neighbors[i]);
-          points[i] = m_to_local_converter(get(m_point_map, key));
+          CGAL_precondition(neighbors[j] >= 0);
+          CGAL_precondition(neighbors[j] < m_input_range.size());
+
+          const auto& key = *(m_input_range.begin() + neighbors[j]);
+          points.push_back(m_to_local_converter(get(m_point_map, key)));
         }
-        CGAL_precondition(points.size() > 0);
+        CGAL_postcondition(points.size() == neighbors.size());
 
         Local_line_2  fitted_line;
         Local_point_2 fitted_centroid;
 
-        // The best fit line will be a line fitted to all region points with its normal being perpendicular to the line.
         #ifndef CGAL_EIGEN2_ENABLED
           m_scores[i] = linear_least_squares_fitting_2(
             points.begin(), points.end(), 
@@ -160,20 +207,20 @@ namespace Shape_detection {
             Local_traits(), CGAL::Eigen_diagonalize_traits<Local_FT, 2>());
         #endif
       }
-      // std::cerr << "* done calculating scores\n";
     }
 
+    // Fields.
     const Input_range& m_input_range;
-    const Point_map m_point_map;
     Input_connectivity& m_connectivity;
+    const Point_map m_point_map;
+    
     std::vector<std::size_t> m_order;
     std::vector<Local_FT> m_scores;
+
     const To_local_converter m_to_local_converter;
-    // Seed_map m_seed_map(std::vector<std::size_t>());
   };
 
-} // namespace internal
 } // namespace Shape_detection
+} // namespace CGAL
 
-
-#endif
+#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_2_LEAST_SQUARES_LINE_FIT_SORTING_H

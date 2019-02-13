@@ -428,7 +428,9 @@ and save them in a file. The point set with associated normals is stored in `CGA
 \cgalExample{Shape_detection/Region_growing/example_region_growing_on_points_3.cpp}
 
 We can improve the quality of Region Growing by providing a different seeding order. In the example below, we 
-first sort indices of 2D input points by the best local least squares line fit quality and only then detect regions.
+first sort indices of 2D input points by the best local least squares line fit quality and only then detect regions. Moreover,
+in this example, we also show how to store the found regions outside the region growing object so that it could be destroyed
+without affecting these regions. 3D points sorting can be done analogously.
 
 \cgalExample{Shape_detection/Region_growing/example_region_growing_with_sorting.cpp}
 
@@ -443,13 +445,13 @@ and longer running time. For example, on a test of about 70k 2D points, the foll
 <tr class="markdownTableHead">
 <th class="markdownTableHeadCenter"><code>search_radius</code>  </th><th class="markdownTableHeadCenter">Time (in seconds)  </th><th class="markdownTableHeadCenter">Number of regions  </th><th class="markdownTableHeadCenter">Number of assigned points   </th></tr>
 <tr class="markdownTableBody">
-<td class="markdownTableBodyCenter">1  </td><td class="markdownTableBodyCenter">0.164965  </td><td class="markdownTableBodyCenter">796  </td><td class="markdownTableBodyCenter">4491   </td></tr>
+<td class="markdownTableBodyCenter">1  </td><td class="markdownTableBodyCenter">0.138201  </td><td class="markdownTableBodyCenter">796  </td><td class="markdownTableBodyCenter">4491   </td></tr>
 <tr class="markdownTableBody">
-<td class="markdownTableBodyCenter">3  </td><td class="markdownTableBodyCenter">0.115316  </td><td class="markdownTableBodyCenter">3054  </td><td class="markdownTableBodyCenter">63154   </td></tr>
+<td class="markdownTableBodyCenter">3  </td><td class="markdownTableBodyCenter">0.072401  </td><td class="markdownTableBodyCenter">3054  </td><td class="markdownTableBodyCenter">63154   </td></tr>
 <tr class="markdownTableBody">
-<td class="markdownTableBodyCenter">6  </td><td class="markdownTableBodyCenter">0.132817  </td><td class="markdownTableBodyCenter">2483  </td><td class="markdownTableBodyCenter">64977   </td></tr>
+<td class="markdownTableBodyCenter">6  </td><td class="markdownTableBodyCenter">0.080463  </td><td class="markdownTableBodyCenter">2483  </td><td class="markdownTableBodyCenter">64977   </td></tr>
 <tr class="markdownTableBody">
-<td class="markdownTableBodyCenter">9  </td><td class="markdownTableBodyCenter">0.168458 </td><td class="markdownTableBodyCenter">2282  </td><td class="markdownTableBodyCenter">65353   </td></tr>
+<td class="markdownTableBodyCenter">9  </td><td class="markdownTableBodyCenter">0.093556 </td><td class="markdownTableBodyCenter">2282  </td><td class="markdownTableBodyCenter">65353   </td></tr>
 </table>
 
 If the neighborhood size is set too low, some points might be isolated, the region size would not reach a critical mass and so will be discarded. 

@@ -31,7 +31,6 @@
 // CGAL includes.
 #include <CGAL/assertions.h>
 #include <CGAL/number_utils.h>
-#include <CGAL/property_map.h>
 #include <CGAL/Cartesian_converter.h>
 #include <CGAL/linear_least_squares_fitting_2.h>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
@@ -45,7 +44,7 @@ namespace Shape_detection {
   /*! 
     \ingroup PkgShapeDetectionRGOnPoints
 
-    \brief Least squares line fit conditions on 2D points.
+    \brief Best least squares line fit conditions on 2D points.
 
     This class implements propagation conditions for detecting lines 
     on 2D points via the `Shape_detection::Region_growing` approach, 
@@ -57,7 +56,7 @@ namespace Shape_detection {
     \tparam InputRange 
     is a model of `ConstRange`. Its iterator type is `RandomAccessIterator`. 
     Its value type depends on the item type used in Region Growing, 
-    for example it can be `std::pair<CGAL::Point_2, CGAL::Vector_2>` 
+    for example it can be `std::pair<CGAL::Point_2, int>` 
     or any user-defined type.
 
     \tparam PointMap 
@@ -149,6 +148,7 @@ namespace Shape_detection {
       \param traits
       An instance of the `GeomTraits` class.
 
+      \pre `input_range.size() > 0`
       \pre `distance_threshold >= 0`
       \pre `normal_threshold >= 0 && normal_threshold <= 1`
       \pre `min_region_size > 0`
@@ -172,7 +172,7 @@ namespace Shape_detection {
     m_scalar_product_2(traits.compute_scalar_product_2_object()),
     m_sqrt(Get_sqrt::sqrt_object(traits)) {
 
-      CGAL_precondition(m_input_range.size() > 0);      
+      CGAL_precondition(m_input_range.size() > 0); 
 
       CGAL_precondition(m_distance_threshold >= FT(0));
       CGAL_precondition(m_normal_threshold >= FT(0) && m_normal_threshold <= FT(1));
@@ -241,7 +241,7 @@ namespace Shape_detection {
     }
 
     /*!
-      \brief Recomputes a least squares line.
+      \brief Recomputes the least squares line.
 
       Recomputes the internal least squares line that represents the `region`
       currently being developed. The line is fitted to all points, 
@@ -262,7 +262,8 @@ namespace Shape_detection {
         CGAL_precondition(region[0] >= 0);
         CGAL_precondition(region[0] < m_input_range.size());
 
-        // The best fit line will be a line through this point with its normal being the point's normal.
+        // The best fit line will be a line through this point with 
+        // its normal being the point's normal.
         const auto& key = *(m_input_range.begin() + region[0]);
 
         const Point_2& point = get(m_point_map, key);
@@ -276,21 +277,24 @@ namespace Shape_detection {
 
       } else { // update reference line and normal
 
-        std::vector<Local_point_2> points(region.size());
+        std::vector<Local_point_2> points;
+        points.reserve(region.size());
+
         for (std::size_t i = 0; i < region.size(); ++i) {
 
           CGAL_precondition(region[i] >= 0);
           CGAL_precondition(region[i] < m_input_range.size());
 
           const auto& key = *(m_input_range.begin() + region[i]);
-          points[i] = m_to_local_converter(get(m_point_map, key));
+          points.push_back(m_to_local_converter(get(m_point_map, key)));
         }
-        CGAL_precondition(points.size() > 0);
+        CGAL_postcondition(points.size() == region.size());
 
-        Local_line_2  fitted_line;
+        Local_line_2 fitted_line;
         Local_point_2 fitted_centroid;
 
-        // The best fit line will be a line fitted to all region points with its normal being perpendicular to the line.
+        // The best fit line will be a line fitted to all region points with 
+        // its normal being perpendicular to the line.
         #ifndef CGAL_EIGEN2_ENABLED
           linear_least_squares_fitting_2(
             points.begin(), points.end(), 

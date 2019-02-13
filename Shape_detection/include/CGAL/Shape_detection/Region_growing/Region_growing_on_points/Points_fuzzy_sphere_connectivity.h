@@ -50,7 +50,8 @@ namespace Shape_detection {
   /*!
     \ingroup PkgShapeDetectionRGOnPoints
 
-    \brief Kd tree based fuzzy sphere search for neighbors on a set of `Point_2` or `Point_3`.
+    \brief Kd tree based fuzzy sphere search for neighbors on a set 
+    of `Point_2` or `Point_3`.
 
     This class uses a Kd tree to search for all points, which belong to a sphere
     of the fixed radius centered at the query point, and thus being its 
@@ -131,6 +132,9 @@ namespace Shape_detection {
       \param point_map
       An instance of an `LvaluePropertyMap` that maps an item from `input_range` 
       to `CGAL::Point_2` or to `CGAL::Point_3`.
+
+      \pre `input_range.size() > 0`
+      \pre `search_radius >= 0`
     */
     Points_fuzzy_sphere_connectivity(
       const InputRange& input_range, 
@@ -190,18 +194,6 @@ namespace Shape_detection {
         m_tree.traits());
 
       m_tree.search(std::back_inserter(neighbors), sphere);
-    }
-
-    /// @}
-
-    /// \name Memory Management
-    /// @{
-
-    /*!
-      Clears all internal data structures.
-    */
-    void clear() {
-      m_tree.clear();
     }
 
     /// @}

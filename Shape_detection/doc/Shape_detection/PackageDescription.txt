@@ -102,20 +102,20 @@ on a polygon mesh.}
 - `RegionGrowingPropagationConditions`
 
 ## Region Growing Main Class ##
-- `CGAL::Shape_detection::Region_growing<InputRange, Connectivity, Conditions>`
+- `CGAL::Shape_detection::Region_growing<InputRange, Connectivity, Conditions, SeedMap>`
 
 ## Region Growing On Points ##
 - `CGAL::Shape_detection::Points_fuzzy_sphere_connectivity<GeomTraits, InputRange, PointMap>`
 - `CGAL::Shape_detection::Points_k_nearest_neighbors_connectivity<GeomTraits, InputRange, PointMap>`
 - `CGAL::Shape_detection::Points_2_least_squares_line_fit_conditions<GeomTraits, InputRange, PointMap, NormalMap>`
 - `CGAL::Shape_detection::Points_3_least_squares_plane_fit_conditions<GeomTraits, InputRange, PointMap, NormalMap>`
-- `CGAL::Shape_detection::Points_2_least_squares_line_fit_sorting<GeomTraits, InputRange, PointMap>`
-- `CGAL::Shape_detection::Points_3_least_squares_plane_fit_sorting<GeomTraits, InputRange, PointMap>`
+- `CGAL::Shape_detection::Points_2_least_squares_line_fit_sorting<GeomTraits, InputRange, Connectivity, PointMap>`
+- `CGAL::Shape_detection::Points_3_least_squares_plane_fit_sorting<GeomTraits, InputRange, Connectivity, PointMap>`
 
 ## Region Growing On Polygon Mesh ##
 - `CGAL::Shape_detection::Polygon_mesh_adjacent_faces_connectivity<FaceGraph, FaceRange>`
 - `CGAL::Shape_detection::Polygon_mesh_least_squares_plane_fit_conditions<GeomTraits, FaceGraph, FaceRange, VertexToPointMap>`
-- `CGAL::Shape_detection::Polygon_mesh_least_squares_plane_fit_sorting<GeomTraits, FaceGraph, FaceRange, VertexToPointMap>`
+- `CGAL::Shape_detection::Polygon_mesh_least_squares_plane_fit_sorting<GeomTraits, FaceGraph, Connectivity, FaceRange, VertexToPointMap>`
 
 ## Functions ##
 - `CGAL::regularize_planes()`

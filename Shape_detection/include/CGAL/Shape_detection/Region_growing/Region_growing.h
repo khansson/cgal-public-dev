@@ -72,7 +72,7 @@ namespace Shape_detection {
   typename InputRange, 
   typename Connectivity, 
   typename Conditions,
-  typename SeedMap = internal::Identity_seed_map>
+  typename SeedMap = internal::Identity_seed_property_map>
   class Region_growing {
 
   public:
@@ -91,16 +91,16 @@ namespace Shape_detection {
     /// \endcond
 
     /// An `std::vector` with indices of all input items provided via `InputRange`.
-    using Items = std::vector<std::size_t>;
+    using Item_indices = std::vector<std::size_t>;
     
-    /// An `std::vector` that stores all found regions, where each region is of type `Region_growing::Items`.
-    using Regions = std::vector<Items>;
+    /// An `std::vector` that stores all found regions, where each region is of type `Region_growing::Item_indices`.
+    using Regions = std::vector<Item_indices>;
     
     /// An `Iterator_range` of the iterators in `Region_growing::Regions`.
     using Region_range = CGAL::Iterator_range<typename Regions::const_iterator>;
     
-    /// An `Iterator_range` of the iterators in `Region_growing::Items`.
-    using Item_range = CGAL::Iterator_range<typename Items::const_iterator>;
+    /// An `Iterator_range` of the iterators in `Region_growing::Item_indices`.
+    using Item_range = CGAL::Iterator_range<typename Item_indices::const_iterator>;
     
     /// @}
 
@@ -110,24 +110,29 @@ namespace Shape_detection {
     /*!
       \brief Initializes the Region Growing algorithm.
       
-      \param input_range Contains items, which are planned to be used to grow
-      regions upon.
+      \param input_range 
+      Contains items, which are planned to be used to grow regions upon.
 
-      \param connectivity An instance of the `Connectivity` class that is used
-      internally to access item neighbors.
+      \param connectivity 
+      An instance of the `Connectivity` class that is used internally to 
+      access item neighbors.
 
-      \param conditions An instance of the `Conditions` class that is used
-      internally to control if items should form a region.
+      \param conditions 
+      An instance of the `Conditions` class that is used internally to 
+      control if items should form a region.
 
-      \param seed_map An instance of the `SeedMap` property map that is used
-      internally to set the order of items to grow regions from. If it maps 
+      \param seed_map 
+      An instance of the `SeedMap` property map that is used internally to 
+      set the order of items to grow regions from. If it maps 
       to `std::size_t(-1)`, then this item is skipped.
+
+      \pre `input_range.size() > 0`
     */
     Region_growing(
       const InputRange& input_range, 
       Connectivity& connectivity, 
       Conditions& conditions,
-      SeedMap seed_map = SeedMap()) :
+      const SeedMap seed_map = SeedMap()) :
     m_input_range(input_range),
     m_connectivity(connectivity),
     m_conditions(conditions),
@@ -186,10 +191,10 @@ namespace Shape_detection {
       copying these data from internal to external storage.
 
       \tparam OutputIterator 
-      is an output iterator whose value type is `Items`.
+      is an output iterator whose value type is `Item_indices`.
 
       \param regions
-      An output iterator that stores regions represented as `Items`.
+      An output iterator that stores regions represented as `Item_indices`.
 
       \warning All functions from Access Section will return empty values.
     */
@@ -197,7 +202,7 @@ namespace Shape_detection {
     void detect(OutputIterator regions) {
 
       clear();
-      Items region;
+      Item_indices region;
 
       // Grow regions.
       for (std::size_t i = 0; i < m_input_range.size(); ++i) {
@@ -229,7 +234,7 @@ namespace Shape_detection {
       \brief Returns found regions.      
 
       Returns an `CGAL::Iterator_range` with a bidirectional iterator whose value type
-      is `Region_growing::Items`. It is empty if the function `Region_growing::detect()`
+      is `Region_growing::Item_indices`. It is empty if the function `Region_growing::detect()`
       has not been called.
     */
     const Region_range& regions() const {
@@ -283,11 +288,31 @@ namespace Shape_detection {
       Item_range(m_unassigned.begin(), m_unassigned.end());
     }
 
+    /*!
+      Releases all memory that is used internally.
+    */
+    void release_memory() {
+
+      m_visited.clear();
+      m_visited.shrink_to_fit();
+
+      m_regions.clear();
+      m_regions.shrink_to_fit();
+
+      m_unassigned.clear();
+      m_unassigned.shrink_to_fit();
+
+      m_output_regions = 
+      Region_range(m_regions.begin(), m_regions.end());
+      m_output_unassigned = 
+      Item_range(m_unassigned.begin(), m_unassigned.end());
+    }
+
     /// @}
 
   private:
 
-    void propagate(const std::size_t seed_index, Items& region) {
+    void propagate(const std::size_t seed_index, Item_indices& region) {
       region.clear();
 
       // Use two queues, while running on this queue, push to the other queue;
@@ -304,6 +329,7 @@ namespace Shape_detection {
       // Update internal properties of the propagating region.
       m_conditions.update(region);
 
+      Item_indices neighbors;
       while (
         !running_queue[depth_index].empty() || 
         !running_queue[!depth_index].empty()) {
@@ -313,7 +339,7 @@ namespace Shape_detection {
         running_queue[depth_index].pop();
 
         // Get neighbors of the current item.
-        Items neighbors;
+        neighbors.clear();
         m_connectivity.neighbors(item_index, neighbors);
 
         // Visit the neighbors.
@@ -343,7 +369,7 @@ namespace Shape_detection {
       }
     }
 
-    void revert(const Items& region) {
+    void revert(const Item_indices& region) {
       for (std::size_t i = 0; i < region.size(); ++i)
         m_visited[region[i]] = false;
     }
@@ -356,7 +382,7 @@ namespace Shape_detection {
 
     Visited_items m_visited;
     Regions m_regions;
-    Items m_unassigned;
+    Item_indices m_unassigned;
 
     Region_range m_output_regions = 
     Region_range(m_regions.begin(), m_regions.end());

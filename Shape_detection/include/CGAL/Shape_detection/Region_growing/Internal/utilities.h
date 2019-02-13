@@ -81,6 +81,23 @@ namespace internal {
     }
   };
 
+  template<typename FT>
+  struct Compare_scores {
+    const std::vector<FT>& m_scores;
+      
+    Compare_scores(const std::vector<FT>& scores) : 
+    m_scores(scores) 
+    { }
+
+    bool operator()(const std::size_t i, const std::size_t j) const {
+        
+      CGAL_precondition(i >= 0 && i < m_scores.size());
+      CGAL_precondition(j >= 0 && j < m_scores.size());
+
+      return m_scores[i] > m_scores[j];
+    }
+  };
+
 } // namespace internal
 } // namespace Shape_detection
 } // namespace CGAL
