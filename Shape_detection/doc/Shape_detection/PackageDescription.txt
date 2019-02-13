@@ -113,9 +113,9 @@ on a polygon mesh.}
 - `CGAL::Shape_detection::Points_3_least_squares_plane_fit_sorting<GeomTraits, InputRange, Connectivity, PointMap>`
 
 ## Region Growing On Polygon Mesh ##
-- `CGAL::Shape_detection::Polygon_mesh_adjacent_faces_connectivity<FaceGraph, FaceRange>`
-- `CGAL::Shape_detection::Polygon_mesh_least_squares_plane_fit_conditions<GeomTraits, FaceGraph, FaceRange, VertexToPointMap>`
-- `CGAL::Shape_detection::Polygon_mesh_least_squares_plane_fit_sorting<GeomTraits, FaceGraph, Connectivity, FaceRange, VertexToPointMap>`
+- `CGAL::Shape_detection::Polygon_mesh_adjacent_faces_connectivity<FaceListGraph, FaceRange>`
+- `CGAL::Shape_detection::Polygon_mesh_least_squares_plane_fit_conditions<GeomTraits, FaceListGraph, FaceRange, VertexToPointMap>`
+- `CGAL::Shape_detection::Polygon_mesh_least_squares_plane_fit_sorting<GeomTraits, FaceListGraph, Connectivity, FaceRange, VertexToPointMap>`
 
 ## Functions ##
 - `CGAL::regularize_planes()`
