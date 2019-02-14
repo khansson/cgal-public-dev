@@ -57,7 +57,7 @@ int main (int argc, char** argv) {
   ransac.set_input(points);
 
   // Registers planar shapes via template method.
-  ransac.template add_shape_factory<Plane>();
+  ransac.add_shape_factory<Plane>();
 
   // Detects registered shapes with default parameters.
   ransac.detect();

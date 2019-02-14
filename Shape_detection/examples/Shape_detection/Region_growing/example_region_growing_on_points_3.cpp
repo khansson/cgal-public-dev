@@ -16,8 +16,6 @@
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
 #include <CGAL/Shape_detection/Region_growing/Region_growing_on_points.h>
 
-namespace SD = CGAL::Shape_detection;
-
 // Type declarations.
 using Kernel = CGAL::Exact_predicates_inexact_constructions_kernel;
 
@@ -29,9 +27,9 @@ using Input_range = CGAL::Point_set_3<Point_3>;
 using Point_map   = typename Input_range::Point_map;
 using Normal_map  = typename Input_range::Vector_map;
 
-using Connectivity   = SD::Points_k_nearest_neighbors_connectivity<Kernel, Input_range, Point_map>;
-using Conditions     = SD::Points_3_least_squares_plane_fit_conditions<Kernel, Input_range, Point_map, Normal_map>;
-using Region_growing = SD::Region_growing<Input_range, Connectivity, Conditions>;
+using Connectivity   = CGAL::Shape_detection::Points_k_nearest_neighbors_connectivity<Kernel, Input_range, Point_map>;
+using Conditions     = CGAL::Shape_detection::Points_3_least_squares_plane_fit_conditions<Kernel, Input_range, Point_map, Normal_map>;
+using Region_growing = CGAL::Shape_detection::Region_growing<Input_range, Connectivity, Conditions>;
 
 using Color            = CGAL::cpp11::array<unsigned char, 3>;
 using Point_with_color = std::pair<Point_3, Color>;

@@ -129,7 +129,7 @@ namespace Shape_detection {
       An instance of an `InputRange` container with 2D or 3D points.
 
       \param number_of_neighbors 
-      The fixed number that defines how many clossest points to the query 
+      The fixed number that defines how many closest points to the query 
       point should be identified.
 
       \param point_map

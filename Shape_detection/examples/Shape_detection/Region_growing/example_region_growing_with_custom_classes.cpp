@@ -7,8 +7,6 @@
 // CGAL includes.
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
 
-namespace SD = CGAL::Shape_detection;
-
 // Custom Connectivity, Conditions, and Seed_map classes for region growing.
 namespace custom {
 
@@ -111,7 +109,7 @@ using Conditions   = custom::Conditions;
 using Seed_map     = custom::Seed_map;
 
 using Region_growing = 
-SD::Region_growing<Objects, Connectivity, Conditions, Seed_map>;
+CGAL::Shape_detection::Region_growing<Objects, Connectivity, Conditions, Seed_map>;
 
 int main(int argc, char *argv[]) { 
   

@@ -13,8 +13,8 @@ namespace CGAL {
 
 This \cgal component implements two algorithms for shape detection:
 
-- the __Efficient RANSAC (RANdom SAmple Consensus)__ method, contributed by Schnabel et al. \cgalCite{schnabel2007efficient};
-- the __Region Growing__ method, contributed by Lafarge and Mallet \cgalCite{cgal:lm-clscm-12}.
+- the *Efficient RANSAC (RANdom SAmple Consensus)* method, contributed by Schnabel et al. \cgalCite{schnabel2007efficient};
+- the *Region Growing* method, contributed by Lafarge and Mallet \cgalCite{cgal:lm-clscm-12}.
 
 
 \section Shape_detection_RANSAC Efficient RANSAC
@@ -50,8 +50,8 @@ Shape candidates are constructed until the probability to miss the largest candi
 The largest shape is repeatedly extracted until no more shapes, restricted to cover a minimum number of points, can be extracted. 
 An additional gain in efficiency is achieved through exploiting the normal attributes during initial shape construction and enumeration of inliers.
 
-The \a support of a shape refers to the footprint of the points covered by the primitive. 
-To avoid generating shapes with fragmented support, we enforce a connectivity constraint by considering only one connected component, referred to as \a cluster, 
+The *support* of a shape refers to the footprint of the points covered by the primitive. 
+To avoid generating shapes with fragmented support, we enforce a connectivity constraint by considering only one connected component, referred to as *cluster*, 
 selected as the one covering the largest number of inliers. See Section \ref Shape_detection_RANSACParameters for more details.
 
 
@@ -539,10 +539,10 @@ Shape detection applies to man-made scenes or objects such as urban scenes or sc
 Such scenes often contain a wide range of geometric regularities such as parallelism, orthogonality, or symmetry. 
 This package offers a function to reinforce four types of regularities for planar shapes: `CGAL::regularize_planes()`:
 
-- Planes that are near __parallel__ are made parallel: normal vectors of planes that form angles smaller than a user-defined threshold are made equal;
-- Parallel planes that are near __coplanar__ are made coplanar;
-- Planes that are near __orthogonal__ are made exactly orthogonal;
-- Planes that are near __symmetrical__ with respect to a user-defined axis are made symmetrical.
+- Planes that are near *parallel* are made parallel: normal vectors of planes that form angles smaller than a user-defined threshold are made equal;
+- Parallel planes that are near *coplanar* are made coplanar;
+- Planes that are near *orthogonal* are made exactly orthogonal;
+- Planes that are near *symmetrical* with respect to a user-defined axis are made symmetrical.
 
 The user can choose to only regularize one or several of these four properties (see \link CGAL::regularize_planes() Reference Manual\endlink). 
 The process is greedy and based on a hierarchical decomposition (coplanar clusters are subgroups of parallel clusters, 

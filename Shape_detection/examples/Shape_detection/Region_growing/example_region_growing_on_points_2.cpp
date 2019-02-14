@@ -15,8 +15,6 @@
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
 #include <CGAL/Shape_detection/Region_growing/Region_growing_on_points.h>
 
-namespace SD = CGAL::Shape_detection;
-
 // Type declarations.
 using Kernel = CGAL::Simple_cartesian<double>;
 
@@ -30,9 +28,9 @@ using Input_range       = std::vector<Point_with_normal>;
 using Point_map         = CGAL::First_of_pair_property_map<Point_with_normal>;
 using Normal_map        = CGAL::Second_of_pair_property_map<Point_with_normal>;
 
-using Connectivity   = SD::Points_fuzzy_sphere_connectivity<Kernel, Input_range, Point_map>;
-using Conditions     = SD::Points_2_least_squares_line_fit_conditions<Kernel, Input_range, Point_map, Normal_map>;
-using Region_growing = SD::Region_growing<Input_range, Connectivity, Conditions>;
+using Connectivity   = CGAL::Shape_detection::Points_fuzzy_sphere_connectivity<Kernel, Input_range, Point_map>;
+using Conditions     = CGAL::Shape_detection::Points_2_least_squares_line_fit_conditions<Kernel, Input_range, Point_map, Normal_map>;
+using Region_growing = CGAL::Shape_detection::Region_growing<Input_range, Connectivity, Conditions>;
 
 using Color            = CGAL::cpp11::array<unsigned char, 3>;
 using Point_with_color = std::pair<Point_3, Color>;

@@ -95,7 +95,7 @@ public:
   /*!
    * Function object type that provides
    * `Point_3 operator()(Line_3 l, int i)`
-   * returning an arbitrary point on `l`. `i` is not used and can vbe of 
+   * returning an arbitrary point on `l`. `i` is not used and can be of 
    * any value.
    * Only required if you want to detect cylinders.
    */

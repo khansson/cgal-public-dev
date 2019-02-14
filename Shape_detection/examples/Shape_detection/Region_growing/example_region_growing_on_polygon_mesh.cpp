@@ -17,8 +17,6 @@
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
 #include <CGAL/Shape_detection/Region_growing/Region_growing_on_polygon_mesh.h>
 
-namespace SD = CGAL::Shape_detection;
-
 // Type declarations.
 using Kernel = CGAL::Exact_predicates_exact_constructions_kernel;
 
@@ -35,20 +33,20 @@ using Color = CGAL::Color;
     using Polygon_mesh = CGAL::Surface_mesh<Point_3>;
     using Face_range   = typename Polygon_mesh::Face_range;
 
-    using Connectivity = SD::Polygon_mesh_adjacent_faces_connectivity<Polygon_mesh>;
-    using Conditions   = SD::Polygon_mesh_least_squares_plane_fit_conditions<Kernel, Polygon_mesh>;
+    using Connectivity = CGAL::Shape_detection::Polygon_mesh_adjacent_faces_connectivity<Polygon_mesh>;
+    using Conditions   = CGAL::Shape_detection::Polygon_mesh_least_squares_plane_fit_conditions<Kernel, Polygon_mesh>;
 
 #else
 
     using Polygon_mesh = CGAL::Polyhedron_3<Kernel, CGAL::Polyhedron_items_3, CGAL::HalfedgeDS_vector>;
     using Face_range   = typename CGAL::Iterator_range<typename boost::graph_traits<Polygon_mesh>::face_iterator>;
     
-    using Connectivity = SD::Polygon_mesh_adjacent_faces_connectivity<Polygon_mesh, Face_range>;
-    using Conditions   = SD::Polygon_mesh_least_squares_plane_fit_conditions<Kernel, Polygon_mesh, Face_range>;
+    using Connectivity = CGAL::Shape_detection::Polygon_mesh_adjacent_faces_connectivity<Polygon_mesh, Face_range>;
+    using Conditions   = CGAL::Shape_detection::Polygon_mesh_least_squares_plane_fit_conditions<Kernel, Polygon_mesh, Face_range>;
 
 #endif
 
-using Region_growing = SD::Region_growing<Face_range, Connectivity, Conditions>;
+using Region_growing = CGAL::Shape_detection::Region_growing<Face_range, Connectivity, Conditions>;
 
 int main(int argc, char *argv[]) {
 
