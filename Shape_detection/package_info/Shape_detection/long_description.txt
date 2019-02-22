@@ -11,4 +11,4 @@ In addition to the RANSAC approach, the generic Region Growing algorithm is impl
 This algorithm can detect shapes in a set of arbitrary items. In particular, 
 CGAL provides three instances of the algorithm: detecting lines on 2D points, 
 detecting planes on 3D points, and detecting planes on a polygon mesh. 
-Other custom instances can be easily added by users.
+Other custom instances can be easily added by the user.

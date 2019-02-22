@@ -39,7 +39,7 @@ Periodic_3_triangulation_3 3D Periodic Triangulations
 Point_set_2 2D Range and Neighbor Search
 Point_set_3 3D Point Set
 Point_set_processing_3 Point Set Processing
-Point_set_shape_detection_3 Point Set Shape Detection
+Shape_detection Shape Detection
 Poisson_surface_reconstruction_3 Poisson Surface Reconstruction
 Polygon_mesh_processing Polygon Mesh Processing
 Polygon_mesh_processing/Compute_normal Polygon Mesh Processing - Normal Computation

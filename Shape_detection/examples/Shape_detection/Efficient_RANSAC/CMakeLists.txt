@@ -1,12 +1,12 @@
-# Created by the script cgal_create_cmake_script
-# This is the CMake script for compiling a CGAL application.
+# Created by the script cgal_create_cmake_script This is the CMake script for
+# compiling a CGAL application.
 
-
-project( Efficient_RANSAC_Examples )
+project(Efficient_RANSAC_Examples)
 
 cmake_minimum_required(VERSION 3.1)
 if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
-  if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}" VERSION_GREATER 2.8.3)
+  if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}"
+     VERSION_GREATER 2.8.3)
     cmake_policy(VERSION 2.8.4)
   else()
     cmake_policy(VERSION 2.6)
@@ -15,28 +15,31 @@ endif()
 
 find_package(CGAL QUIET)
 
-if ( CGAL_FOUND )
+if(CGAL_FOUND)
 
   include(${CGAL_USE_FILE})
-
   include(CGAL_CreateSingleSourceCGALProgram)
 
-  # Use Eigen
-  find_package(Eigen3 3.1.0 QUIET) #(3.1.0 or greater)
-  if (EIGEN3_FOUND)
-    include( ${EIGEN3_USE_FILE} )
-    create_single_source_cgal_program( "example_efficient_RANSAC_basic.cpp" )
-    create_single_source_cgal_program( "example_efficient_RANSAC_with_callback.cpp" )
-    create_single_source_cgal_program( "example_efficient_RANSAC_and_plane_regularization.cpp" )
+  # Use Eigen.
+  find_package(Eigen3 3.1.0 QUIET) # (3.1.0 or greater)
+  if(EIGEN3_FOUND)
+    include(${EIGEN3_USE_FILE})
+    create_single_source_cgal_program(
+      "example_efficient_RANSAC_basic.cpp")
+    create_single_source_cgal_program(
+      "example_efficient_RANSAC_with_callback.cpp")
+    create_single_source_cgal_program(
+      "example_efficient_RANSAC_and_plane_regularization.cpp")
   endif()
 
-  create_single_source_cgal_program( "example_efficient_RANSAC_with_custom_shape.cpp" )
-  create_single_source_cgal_program( "example_efficient_RANSAC_with_parameters.cpp" )
-  create_single_source_cgal_program( "example_efficient_RANSAC_with_point_access.cpp" )
+  create_single_source_cgal_program(
+    "example_efficient_RANSAC_with_custom_shape.cpp")
+  create_single_source_cgal_program(
+    "example_efficient_RANSAC_with_parameters.cpp")
+  create_single_source_cgal_program(
+    "example_efficient_RANSAC_with_point_access.cpp")
 
 else()
-  
-    message(STATUS "This program requires the CGAL library, and will not be compiled.")
-  
+  message(
+    STATUS "This program requires the CGAL library, and will not be compiled.")
 endif()
-

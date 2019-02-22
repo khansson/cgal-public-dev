@@ -1,5 +1,27 @@
-#ifndef GENERATORS_H
-#define GENERATORS_H
+// Copyright (c) 2015 INRIA Sophia-Antipolis (France).
+// All rights reserved.
+//
+// This file is part of CGAL (www.cgal.org).
+// You can redistribute it and/or modify it under the terms of the GNU
+// General Public License as published by the Free Software Foundation,
+// either version 3 of the License, or (at your option) any later version.
+//
+// Licensees holding a valid commercial license may use this file in
+// accordance with the commercial license agreement provided with the software.
+//
+// This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+// WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+//
+// $URL$
+// $Id$
+// SPDX-License-Identifier: GPL-3.0+
+//
+//
+// Author(s)     : Sven Oesau, Yannick Verdie, Clément Jamin, Pierre Alliez
+//
+
+#ifndef CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_GENERATORS_H
+#define CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_GENERATORS_H
 
 #include <CGAL/Random.h>
 #include <CGAL/Point_with_normal_3.h>
@@ -7,7 +29,6 @@
 #include <CGAL/squared_distance_3.h>
 #include <string>
 #include <fstream>
-
 
 template <typename fl_t>
 fl_t random_float(fl_t min, fl_t max) {
@@ -78,7 +99,7 @@ void sample_random_sphere_in_box(const std::size_t num_points,
   const CGAL::Bbox_3 &bbox, CGAL::Point_3<K> &center,
   typename K::FT &radius, OutputIterator points) {
     typedef typename K::FT FT;
-    // Generate random parameters
+    // Generate random parameters.
     if (radius < 0.00001)
       radius = random_float<FT>((FT) 0.01, (FT) 5);
     else radius = random_float<FT>(radius / (FT) 10.0, (FT) radius);
@@ -93,7 +114,7 @@ void sample_cylinder(const std::size_t num_points,
   const CGAL::Vector_3<K> &axis, typename K::FT radius,
   typename K::FT length, OutputIterator points) {
     typedef typename K::FT FT;
-     // Sample shape
+    // Sample shape.
     for (size_t i = 0 ; i < num_points ; ++i) {
       CGAL::Vector_3<K> normal(
         random_float((FT) -1, (FT) 1), 
@@ -120,7 +141,7 @@ void sample_random_cylinder(const std::size_t num_points,
   CGAL::Vector_3<K> &axis, typename K::FT &radius,
   OutputIterator points) {
     typedef typename K::FT FT;
-    // Generate random parameters
+    // Generate random parameters.
     axis = random_normal<K>();
     radius = random_float((FT) 0.5, (FT) 5);
     FT length = random_float((FT) 0.2, (FT) 10);
@@ -165,9 +186,9 @@ void sample_cone(const std::size_t num_points,
 
     CGAL::Point_3<K> p = apex + axis * l + (l * radiusGrow) * normal;
 
-    // axis is pointing down from apex
+    // Axis is pointing down from apex.
     normal = normal * (FT) 1.0 / (CGAL::sqrt(normal.squared_length()));
-    // normal is pointing from axis to surface point
+    // Normal is pointing from axis to surface point.
     normal = normal * cosAng - axis * sinAng;
     l = CGAL::sqrt(normal.squared_length());
     if ((FT) 0.95 > l || l > (FT) 1.05)
@@ -183,7 +204,7 @@ void sample_random_cone(const std::size_t num_points,
   CGAL::Point_3<K> &apex,  CGAL::Vector_3<K> &axis,
   typename K::FT &angle, typename K::FT &mid, OutputIterator points) {
     typedef typename K::FT FT;
-    // Generate random parameters
+    // Generate random parameters.
     apex = random_point_in<K>(CGAL::Bbox_3(-5, -5, -5, 5, 5, 5));
     axis = random_normal<K>();
     angle = random_float((FT) 0.2, (FT) 1.4);
@@ -220,13 +241,13 @@ void sample_random_parallelogram_in_box(const std::size_t num_points,
     b = b * 1.0 / CGAL::sqrt(b.squared_length());
 
     normal = CGAL::cross_product(a, b);
-    // repeat if angle between a and b is small
+    // Repeat if angle between a and b is small.
   } while (normal.squared_length() < (FT) 0.2);
 
   normal = normal * (FT) 1.0 / CGAL::sqrt(normal.squared_length());
   dist = -((p[0] - CGAL::ORIGIN) * normal);
 
-  // sample
+  // Sample.
   u = p[1] - p[0];
   v = p[2] - p[0];
   
@@ -248,7 +269,7 @@ void sample_torus(const std::size_t num_points,
   OutputIterator points) {
   typedef typename K::FT FT;
 
-  // calculate basis  
+  // Calculate basis.  
   CGAL::Vector_3<K> b1, b2;
   b1 = CGAL::cross_product(axis, CGAL::Vector_3<K>((FT) 0, (FT) 0, (FT) 1));
   if (b1.squared_length() < (FT) 0.1)
@@ -279,7 +300,7 @@ void sample_random_torus(const std::size_t num_points, CGAL::Point_3<K> &center,
   CGAL::Vector_3<K> &axis, typename K::FT &major_radius,
   typename K::FT &minor_radius, OutputIterator points) {
     typedef typename K::FT FT;  
-    // Generate random parameters
+    // Generate random parameters.
     center = random_point_in<K>(CGAL::Bbox_3(-5, -5, -5, 5, 5, 5));
     axis = random_normal<K>();
     major_radius = random_float((FT) 1.0, (FT) 5.0);
@@ -329,4 +350,4 @@ void save_scene(const std::string &fn, const std::vector<CGAL::Point_with_normal
   plyFile.close();
 }
 
-#endif
+#endif // CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_GENERATORS_H

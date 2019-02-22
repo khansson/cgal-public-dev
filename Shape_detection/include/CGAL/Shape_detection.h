@@ -23,7 +23,7 @@
 #ifndef CGAL_SHAPE_DETECTION_H
 #define CGAL_SHAPE_DETECTION_H
 
-// #include <CGAL/license/Shape_detection.h>
+#include <CGAL/license/Shape_detection.h>
 
 #include <CGAL/Shape_detection/Region_growing.h>
 #include <CGAL/Shape_detection/Efficient_RANSAC.h>

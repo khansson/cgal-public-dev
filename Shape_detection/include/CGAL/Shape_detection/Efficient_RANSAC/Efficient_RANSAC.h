@@ -23,16 +23,16 @@
 #ifndef CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_H
 #define CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_H
 
-// #include <CGAL/license/Shape_detection.h>
+#include <CGAL/license/Shape_detection.h>
 
+#include <CGAL/Random.h>
+#include <CGAL/function.h>
 
 #include <CGAL/Shape_detection/Efficient_RANSAC/Octree.h>
 #include <CGAL/Shape_detection/Efficient_RANSAC/Shape_base.h>
 #include <CGAL/Shape_detection/Efficient_RANSAC/Plane.h>
-#include <CGAL/Random.h>
-#include <CGAL/function.h>
 
-//for octree ------------------------------
+// for octree ------------------------------
 #include <boost/iterator/filter_iterator.hpp>
 #include <CGAL/bounding_box.h>
 #include <CGAL/Iterator_range.h>
@@ -44,7 +44,7 @@
 #include <fstream>
 #include <sstream>
 
-//boost --------------
+// boost --------------
 #include <CGAL/boost/iterator/counting_iterator.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -54,16 +54,16 @@ namespace CGAL {
   namespace Shape_detection {
 
 /*!
-\ingroup PkgShapeDetectionRANSAC
-\brief A shape detection algorithm using a RANSAC method.
+  \ingroup PkgShapeDetectionRANSAC
+  
+  \brief Shape detection algorithm based on the RANSAC method.
 
-Given a point set in 3D space with unoriented normals, sampled on surfaces,
-this class enables to detect subsets of connected points lying on the surface of primitive shapes.
-Each input point is assigned to either none or at most one detected primitive
-shape. The implementation follows \cgalCite{schnabel2007efficient}.
+  Given a point set in 3D space with unoriented normals, sampled on surfaces,
+  this class enables to detect subsets of connected points lying on the surface of primitive shapes.
+  Each input point is assigned to either none or at most one detected primitive
+  shape. The implementation follows \cgalCite{schnabel2007efficient}.
 
-\tparam Traits a model of `EfficientRANSACTraits`
-
+  \tparam Traits is a model of `EfficientRANSACTraits`.
 */
   template <class Traits>
   class Efficient_RANSAC {
@@ -103,17 +103,17 @@ shape. The implementation follows \cgalCite{schnabel2007efficient}.
     /// through the following two property maps.
 
     typedef typename Traits::Point_map Point_map;
-    ///< property map to access the location of an input point.
+    ///< Property map to access the location of an input point.
     typedef typename Traits::Normal_map Normal_map;
-    ///< property map to access the unoriented normal of an input point
-    typedef Shape_base<Traits> Shape; ///< shape type.
-    typedef Plane<Traits> Plane_shape; ///< plane shape type.
+    ///< Property map to access the unoriented normal of an input point.
+    typedef Shape_base<Traits> Shape; ///< Shape type.
+    typedef Plane<Traits> Plane_shape; ///< %Plane shape type.
 
 #ifdef DOXYGEN_RUNNING
     typedef unspecified_type Shape_range;
-    ///< An `Iterator_range` with a bidirectional constant iterator type with value type `boost::shared_ptr<Shape>`.
+    ///< `Iterator_range` with a bidirectional constant iterator type with value type `boost::shared_ptr<Shape>`.
     typedef unspecified_type Plane_range;
-    ///< An `Iterator_range` with a bidirectional constant iterator type with value type `boost::shared_ptr<Plane_shape>`.
+    ///< `Iterator_range` with a bidirectional constant iterator type with value type `boost::shared_ptr<Plane_shape>`.
 #else
     struct Shape_range : public Iterator_range<
       typename std::vector<boost::shared_ptr<Shape> >::const_iterator> {
@@ -142,11 +142,9 @@ shape. The implementation follows \cgalCite{schnabel2007efficient}.
     };
 #endif
 
-
-
 #ifdef DOXYGEN_RUNNING
     typedef unspecified_type Point_index_range;
-    ///< An `Iterator_range` with a bidirectional iterator with value type `std::size_t`
+    ///< `Iterator_range` with a bidirectional iterator with value type `std::size_t`
     ///  as indices into the input data that has not been assigned to a shape.
     ///  As this range class has no `size()` method, the method 
     ///  `Efficient_RANSAC::number_of_unassigned_points()` is provided.
@@ -160,7 +158,7 @@ shape. The implementation follows \cgalCite{schnabel2007efficient}.
     /// \name Parameters 
     /// @{
       /*!
-       %Parameters for the shape detection algorithm. They are explained in detail 
+       Parameters for the shape detection algorithm. They are explained in detail 
        in Section \ref Shape_detection_RANSACParameters  of the User Manual.
        */
     struct Parameters {
@@ -174,8 +172,8 @@ shape. The implementation follows \cgalCite{schnabel2007efficient}.
 
       FT probability;         ///< Probability to control search endurance. %Default value: 5%.
       std::size_t min_points; ///< Minimum number of points of a shape. %Default value: 1% of total number of input points.
-      FT epsilon;             ///< Maximum tolerance Euclidian distance from a point and a shape. %Default value: 1% of bounding box diagonal.
-      FT normal_threshold;	  ///< Maximum tolerance normal deviation from a point's normal to the normal on shape at projected point. %Default value: 0.9 (around 25 degrees).
+      FT epsilon;             ///< Maximum tolerance Euclidean distance from a point and a shape. %Default value: 1% of bounding box diagonal.
+      FT normal_threshold;	  ///< Maximum tolerance normal deviation from a point's normal to the normal on a shape at the projected point. %Default value: 0.9 (around 25 degrees).
       FT cluster_epsilon;	    ///< Maximum distance between points to be considered connected. %Default value: 1% of bounding box diagonal.
     };
     /// @}
@@ -213,7 +211,7 @@ shape. The implementation follows \cgalCite{schnabel2007efficient}.
     {}
 
     /*! 
-      Releases all memory allocated by this instances including shapes.
+      Releases all memory allocated by this instance including shapes.
     */ 
     ~Efficient_RANSAC() {
       clear();
@@ -238,7 +236,6 @@ shape. The implementation follows \cgalCite{schnabel2007efficient}.
     */
     const Normal_map& normal() const { return m_normal_pmap; }
 
-
     Input_iterator input_iterator_first() const
     {
       return m_input_iterator_first;
@@ -256,11 +253,11 @@ shape. The implementation follows \cgalCite{schnabel2007efficient}.
     */
     void set_input(
       Input_range& input_range,
-      ///< range of input data.
+      ///< Range of input data.
       Point_map point_map = Point_map(),
-      ///< property map to access the position of an input point.
+      ///< Property map to access the position of an input point.
       Normal_map normal_map = Normal_map()
-      ///< property map to access the normal of an input point.
+      ///< Property map to access the normal of an input point.
       ) {
         m_point_pmap = point_map;
         m_normal_pmap = normal_map;
@@ -279,8 +276,8 @@ shape. The implementation follows \cgalCite{schnabel2007efficient}.
         m_valid_iterators = true;
     }
     /*!
-      Registers in the detection engine the shape type `ShapeType` that must inherit from `Shape_base`.
-      For example, for registering a plane as detectable shape you should call
+      Registers the shape type `ShapeType` in the detection engine that must inherit from `Shape_base`.
+      For example, for registering a plane as detectable shape, you should call
       `ransac.add_shape_factory< Shape_detection::Plane<Traits> >();`. Note
       that if your call is within a template, you should add the `template`
       keyword just before `add_shape_factory`: 
@@ -427,11 +424,11 @@ shape. The implementation follows \cgalCite{schnabel2007efficient}.
       Performs the shape detection. Shape types considered during the detection
       are those registered using `add_shape_factory()`.
 
-      \param options %Parameters for shape detection.
+      \param options Parameters for shape detection.
 
-      \param callback can be omitted if the algorithm should be run
+      \param callback Can be omitted if the algorithm should be run
       without any callback. It is called regularly when the algorithm
-      is running: the current advancement (between 0. and 1.) is
+      is running: the current advancement (between 0.0 and 1.0) is
       passed as parameter. If it returns `true`, then the algorithm
       continues its execution normally; if it returns `false`, the
       algorithm is stopped. Note that this interruption may leave the
@@ -916,7 +913,7 @@ shape. The implementation follows \cgalCite{schnabel2007efficient}.
 
           if (candidates.at(position_stop)->max_bound()
               <= m_options.min_points)
-            break;  //the following candidate doesnt have enough points!
+            break;  //the following candidate doesn't have enough points!
 
           //if we reach this point, there is an overlap
           //  between best one and position_stop
@@ -1026,6 +1023,7 @@ shape. The implementation follows \cgalCite{schnabel2007efficient}.
     Normal_map m_normal_pmap;
   };
 }
+
 }
 
 #endif // CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_H

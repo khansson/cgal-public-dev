@@ -8,7 +8,6 @@
 #include <CGAL/property_map.h>
 #include <CGAL/number_utils.h>
 
-
 template <class K>
 bool test_sphere_parameters() {
   const int NB_ROUNDS = 10;
@@ -21,8 +20,7 @@ bool test_sphere_parameters() {
   typedef CGAL::Identity_property_map<Pwn>                    Point_map;
   typedef CGAL::Normal_of_point_with_normal_map<K>            Normal_map;
 
-  typedef CGAL::Shape_detection::Efficient_RANSAC_traits<
-    K, Pwn_vector, Point_map, Normal_map>                     Traits;
+  typedef CGAL::Shape_detection::Efficient_RANSAC_traits<K, Pwn_vector, Point_map, Normal_map> Traits;
 
   typedef CGAL::Shape_detection::Efficient_RANSAC<Traits>   Efficient_ransac;
   typedef CGAL::Shape_detection::Sphere<Traits>             Sphere;
@@ -32,7 +30,7 @@ bool test_sphere_parameters() {
   for (int i = 0;i<NB_ROUNDS;i++) {
     Pwn_vector points;
 
-    // generate random points on random sphere
+    // Generate random points on random sphere.
     FT radius = 0;
     Point center;
     CGAL::Bbox_3 bbox(-10, -10, -10, 10, 10, 10);
@@ -40,7 +38,7 @@ bool test_sphere_parameters() {
     sample_random_sphere_in_box(NB_POINTS, bbox, center,
       radius, std::back_inserter(points));
 
-    // add outliers in second half of rounds
+    // Add outliers in second half of rounds.
     if (i >= NB_ROUNDS / 2)
       for (std::size_t j = 0; j < NB_POINTS / 2; j++) 
         points.push_back(random_pwn_in<K>(bbox));
@@ -68,13 +66,13 @@ bool test_sphere_parameters() {
 
     typename Efficient_ransac::Shape_range shapes = ransac.shapes();
 
-    // check: unique shape detected
+    // Check: unique shape detected.
     if (shapes.size() != 1)
       continue;
 
     boost::shared_ptr<Sphere> sphere = boost::dynamic_pointer_cast<Sphere>((*shapes.first));
 
-    // check: shape detected is a cylinder
+    // Check: shape detected is a cylinder.
     if (!sphere)
       continue;
 
@@ -103,7 +101,6 @@ bool test_sphere_parameters() {
     return false;
   }
 }
-
 
 int main() {
   bool success = true;

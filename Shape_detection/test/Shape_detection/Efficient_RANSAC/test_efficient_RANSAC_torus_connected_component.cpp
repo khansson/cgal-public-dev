@@ -7,7 +7,6 @@
 #include <CGAL/Point_with_normal_3.h>
 #include <CGAL/property_map.h>
 
-
 template <class K>
 bool test_torus_connected_component() {
   const int NB_ROUNDS = 10;
@@ -21,9 +20,7 @@ bool test_torus_connected_component() {
   typedef CGAL::Identity_property_map<Pwn>                    Point_map;
   typedef CGAL::Normal_of_point_with_normal_map<K>            Normal_map;
 
-  typedef CGAL::Shape_detection::Efficient_RANSAC_traits<
-    K, Pwn_vector, Point_map, Normal_map>                     Traits;
-
+  typedef CGAL::Shape_detection::Efficient_RANSAC_traits<K, Pwn_vector, Point_map, Normal_map> Traits;
   typedef CGAL::Shape_detection::Efficient_RANSAC<Traits>   Efficient_ransac;
   typedef CGAL::Shape_detection::Torus<Traits>              Torus;
 
@@ -32,7 +29,7 @@ bool test_torus_connected_component() {
   for (int i = 0;i<NB_ROUNDS;i++) {
     Pwn_vector points;
 
-    // generate random points on torus
+    // Generate random points on torus.
     CGAL::Bbox_3 bbox(-10, -10, -10, 10, 10, 10);
     FT minor_radius = (FT) 0.7;
     FT major_radius = (FT) 2.0;
@@ -52,7 +49,6 @@ bool test_torus_connected_component() {
     filter_by_distance(pl, spacing * FT(0.5), points);
     
     Efficient_ransac ransac;
-
 
     ransac.template add_shape_factory<Torus>();
 
@@ -99,7 +95,6 @@ bool test_torus_connected_component() {
     return false;
   }
 }
-
 
 int main() {
   bool success = true;

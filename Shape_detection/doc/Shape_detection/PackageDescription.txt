@@ -9,18 +9,18 @@ Reference Manual for the \cgal Region Growing shape detection component.
 \defgroup PkgShapeDetectionRGConcepts Concepts
 \ingroup PkgShapeDetectionRG
 
-Concepts used to parameterize the `CGAL::Shape_detection::Region_growing` approach.
+Concepts used for the parameters of the class `CGAL::Shape_detection::Region_growing`.
 
 \defgroup PkgShapeDetectionRGOnPoints Points
 \ingroup PkgShapeDetectionRG
 
-Classes that can be used in the `CGAL::Shape_detection::Region_growing` approach 
+Classes that can be used with the `CGAL::Shape_detection::Region_growing` algorithm 
 for shape detection on points.
 
 \defgroup PkgShapeDetectionRGOnMesh Polygon Mesh
 \ingroup PkgShapeDetectionRG
 
-Classes that can be used in the `CGAL::Shape_detection::Region_growing` approach 
+Classes that can be used with the `CGAL::Shape_detection::Region_growing` algorithm 
 for shape detection on a polygon mesh.
 
 \addtogroup PkgShapeDetectionRG
@@ -33,12 +33,12 @@ Reference Manual for the \cgal Efficient RANSAC shape detection component.
 \defgroup PkgShapeDetectionRANSACConcepts Concepts
 \ingroup PkgShapeDetectionRANSAC
 
-Concepts used to parameterize the `CGAL::Shape_detection::Efficient_RANSAC` approach.
+Concepts used for the parameters of the class `CGAL::Shape_detection::Efficient_RANSAC`.
 
 \defgroup PkgShapeDetectionRANSACShapes Shapes
 \ingroup PkgShapeDetectionRANSAC
 
-Shape classes that can be used with the `CGAL::Shape_detection::Efficient_RANSAC` approach.
+Shape classes that can be used with the `CGAL::Shape_detection::Efficient_RANSAC` algorithm.
 
 \defgroup PkgShapeDetectionRANSACPropertyMaps Property Maps
 \ingroup PkgShapeDetectionRANSAC

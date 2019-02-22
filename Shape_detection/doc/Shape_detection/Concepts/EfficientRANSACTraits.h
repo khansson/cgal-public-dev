@@ -2,7 +2,7 @@
 \ingroup PkgShapeDetectionRANSACConcepts
 \cgalConcept
 
-Concept describing the set of types required by the class `CGAL::Shape_detection::Efficient_RANSAC` and all RANSAC shape classes.
+Concept that describes the set of types required by the class `CGAL::Shape_detection::Efficient_RANSAC` and all RANSAC shape classes.
 
 To avoid copying potentially large input data, the shape detection class
 `CGAL::Shape_detection::Efficient_RANSAC` will work on the input
@@ -12,7 +12,6 @@ Point and normal property maps have to
 be provided to extract the points and the normals from the input.
 
 \cgalHasModel `CGAL::Shape_detection::Efficient_RANSAC_traits`
-
 */
 class EfficientRANSACTraits{
 public:
@@ -52,7 +51,7 @@ public:
   /// as key type and `Vector_3` as value type.
   typedef unspecified_type Normal_map;
 
-  /// a model of `SearchTraits`
+  /// A model of `SearchTraits`
   /// where `SearchTraits::point_d` is `Point_3`,
   /// `SearchTraits::Dimension` is ` CGAL::Dimension_tag<3>`,
   /// and `SearchTraits::FT` is ` FT`,

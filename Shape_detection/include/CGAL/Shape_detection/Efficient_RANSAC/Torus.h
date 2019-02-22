@@ -23,21 +23,21 @@
 #ifndef CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_TORUS_H
 #define CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_TORUS_H
 
-// #include <CGAL/license/Shape_detection.h>
+#include <CGAL/license/Shape_detection.h>
 
-
-#include <CGAL/Shape_detection/Efficient_RANSAC/Shape_base.h>
+#include <cmath>
 #include <CGAL/Circle_2.h>
 #include <CGAL/number_utils.h>
-#include <cmath>
+#include <CGAL/Shape_detection/Efficient_RANSAC/Shape_base.h>
 
 namespace CGAL {
   namespace Shape_detection {
+
     /*!
       \ingroup PkgShapeDetectionRANSACShapes
       \brief Torus implements Shape_base. The torus is represented by the
       symmetry axis, its center on the axis, and the major and minor radii.
-     \tparam Traits a model of `EfficientRANSACTraits` with the additional 
+     \tparam Traits is a model of `EfficientRANSACTraits` with the additional 
              requirement for tori (see `EfficientRANSACTraits` documentation).
      */
   template <class Traits>
@@ -59,7 +59,7 @@ namespace CGAL {
     typedef typename Traits::Point_2 Point_2;
     ///< 2D point type used during construction.
     typedef typename Traits::Circle_2 Circle_2;
-     ///< cricle type used during construction.
+     ///< circle type used during construction.
     /// \endcond
 
     Torus() : Shape_base<Traits>() {}

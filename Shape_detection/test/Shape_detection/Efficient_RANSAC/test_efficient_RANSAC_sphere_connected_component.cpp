@@ -7,7 +7,6 @@
 #include <CGAL/Point_with_normal_3.h>
 #include <CGAL/property_map.h>
 
-
 template <class K>
 bool test_sphere_connected_component() {
   const int NB_ROUNDS = 10;
@@ -20,8 +19,7 @@ bool test_sphere_connected_component() {
   typedef CGAL::Identity_property_map<Pwn>           Point_map;
   typedef CGAL::Normal_of_point_with_normal_map<K>   Normal_map;
 
-  typedef CGAL::Shape_detection::Efficient_RANSAC_traits<
-    K, Pwn_vector, Point_map, Normal_map>                     Traits;
+  typedef CGAL::Shape_detection::Efficient_RANSAC_traits<K, Pwn_vector, Point_map, Normal_map> Traits;
 
   typedef CGAL::Shape_detection::Efficient_RANSAC<Traits>   Efficient_ransac;
   typedef CGAL::Shape_detection::Sphere<Traits>             Sphere;
@@ -31,7 +29,7 @@ bool test_sphere_connected_component() {
   for (int i = 0;i<NB_ROUNDS;i++) {
     Pwn_vector points;
 
-    // generate random points on random sphere
+    // Generate random points on random sphere.
     FT radius = 1.0;
     Point center;
     CGAL::Bbox_3 bbox(-10, -10, -10, 10, 10, 10);
@@ -93,7 +91,6 @@ bool test_sphere_connected_component() {
     return false;
   }
 }
-
 
 int main() {
   bool success = true;

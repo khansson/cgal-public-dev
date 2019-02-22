@@ -7,7 +7,6 @@
 #include <CGAL/Point_with_normal_3.h>
 #include <CGAL/property_map.h>
 
-
 template <class K>
 bool test_cone_connected_component() {
   const int NB_ROUNDS = 10;
@@ -21,8 +20,7 @@ bool test_cone_connected_component() {
   typedef CGAL::Identity_property_map<Pwn>                    Point_map;
   typedef CGAL::Normal_of_point_with_normal_map<K>            Normal_map;
 
-  typedef CGAL::Shape_detection::Efficient_RANSAC_traits<
-    K, Pwn_vector, Point_map, Normal_map>                     Traits;
+  typedef CGAL::Shape_detection::Efficient_RANSAC_traits<K, Pwn_vector, Point_map, Normal_map> Traits;
 
   typedef CGAL::Shape_detection::Efficient_RANSAC<Traits>   Efficient_ransac;
   typedef CGAL::Shape_detection::Cone<Traits>               Cone;
@@ -32,7 +30,7 @@ bool test_cone_connected_component() {
   for (int i = 0; i < NB_ROUNDS ; i++) {
     Pwn_vector points;
 
-    // generate random points on a cone
+    // Generate random points on a cone.
     FT spacing;
 
     do {
@@ -103,7 +101,6 @@ bool test_cone_connected_component() {
     return false;
   }
 }
-
 
 int main() {
   bool success = true;

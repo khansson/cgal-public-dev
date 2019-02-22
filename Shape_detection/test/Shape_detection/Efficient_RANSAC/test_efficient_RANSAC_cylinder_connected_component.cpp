@@ -7,7 +7,6 @@
 #include <CGAL/Point_with_normal_3.h>
 #include <CGAL/property_map.h>
 
-
 template <class K>
 bool test_cylinder_connected_component() {
   const int NB_ROUNDS = 10;
@@ -21,8 +20,7 @@ bool test_cylinder_connected_component() {
   typedef typename CGAL::Identity_property_map<Pwn>           Point_map;
   typedef typename CGAL::Normal_of_point_with_normal_map<K>   Normal_map;
 
-  typedef CGAL::Shape_detection::Efficient_RANSAC_traits<
-    K, Pwn_vector, Point_map, Normal_map>                     Traits;
+  typedef CGAL::Shape_detection::Efficient_RANSAC_traits<K, Pwn_vector, Point_map, Normal_map> Traits;
 
   typedef CGAL::Shape_detection::Efficient_RANSAC<Traits>   Efficient_ransac;
   typedef CGAL::Shape_detection::Cylinder<Traits>           Cylinder;
@@ -32,7 +30,7 @@ bool test_cylinder_connected_component() {
   for (int i = 0 ; i < NB_ROUNDS ; i++) {
     Pwn_vector points;
 
-    // generate random points on random cylinder
+    // Generate random points on random cylinder.
     CGAL::Bbox_3 bbox(-10, -10, -10, 10, 10, 10);
     FT radius = FT(1.0);
     Vector axis = random_normal<K>();
@@ -97,7 +95,6 @@ bool test_cylinder_connected_component() {
     return false;
   }
 }
-
 
 int main() {
   bool success = true;

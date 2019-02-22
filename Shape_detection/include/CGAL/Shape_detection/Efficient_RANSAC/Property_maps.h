@@ -20,7 +20,7 @@
 // Author(s)     : Simon Giraudot
 //
 
-// #include <CGAL/license/Shape_detection.h>
+#include <CGAL/license/Shape_detection.h>
 #include <CGAL/Shape_detection/Efficient_RANSAC/Shape_base.h>
 #include <CGAL/Shape_detection/Efficient_RANSAC.h>
 
@@ -28,14 +28,13 @@
 #define CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_PROPERTY_MAPS_H
 
 namespace CGAL {
-
 namespace Shape_detection {
 
 /*!
    \ingroup PkgShapeDetectionRANSACPropertyMaps
 
-   Property map that associate a point index to its assigned shape
-   found by `CGAL::Shape_detection::Efficient_RANSAC` algorithm.
+   Property map that associates a point index to its assigned shape
+   found by the `CGAL::Shape_detection::Efficient_RANSAC` algorithm.
  */
   template <typename Traits>
   class Point_to_shape_index_map
@@ -44,8 +43,8 @@ namespace Shape_detection {
     boost::shared_ptr<std::vector<int> > m_indices;
     
   public:
-    typedef std::size_t key_type; ///< Index of the point in the random access point range.
-    typedef int value_type; ///< Index of the shape (-1 if the point is not assigned to any shape).
+    typedef std::size_t key_type; ///< %Index of the point in the random access point range.
+    typedef int value_type; ///< %Index of the shape (-1 if the point is not assigned to any shape).
     typedef value_type reference;
     typedef boost::readable_property_map_tag category;
 
@@ -58,7 +57,7 @@ namespace Shape_detection {
 
       \note `shapes` must be a range of shapes detected using `points`.
 
-      \tparam ShapeRange an `Iterator_range` with a bidirectional
+      \tparam ShapeRange is an `Iterator_range` with a bidirectional
       constant iterator type with value type
       `boost::shared_ptr<CGAL::Shape_detection::Shape_base<Traits> >`.
      */
@@ -112,9 +111,7 @@ namespace Shape_detection {
 
   };
 
-
 } // namespace Shape_detection
-
 } // namespace CGAL
 
 #endif // CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_PROPERTY_MAPS_H

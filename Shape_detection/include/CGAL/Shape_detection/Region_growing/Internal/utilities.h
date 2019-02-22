@@ -23,7 +23,7 @@
 #ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_UTILITIES_H
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_UTILITIES_H
 
-// #include <CGAL/license/Shape_detection.h>
+#include <CGAL/license/Shape_detection.h>
 
 // Boost headers.
 #include <boost/mpl/has_xxx.hpp>

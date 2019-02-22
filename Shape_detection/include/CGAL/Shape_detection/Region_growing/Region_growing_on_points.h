@@ -23,7 +23,7 @@
 #ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_ON_POINTS_H
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_ON_POINTS_H
 
-// #include <CGAL/license/Shape_detection.h>
+#include <CGAL/license/Shape_detection.h>
 
 #include <CGAL/Shape_detection/Region_growing/Region_growing_on_points/Points_fuzzy_sphere_connectivity.h>
 #include <CGAL/Shape_detection/Region_growing/Region_growing_on_points/Points_k_nearest_neighbors_connectivity.h>

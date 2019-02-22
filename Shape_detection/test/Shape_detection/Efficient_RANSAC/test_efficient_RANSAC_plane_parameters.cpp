@@ -20,14 +20,12 @@ bool test_plane_parameters() {
   typedef typename CGAL::Identity_property_map<Pwn>           Point_map;
   typedef typename CGAL::Normal_of_point_with_normal_map<K>   Normal_map;
 
-  typedef CGAL::Shape_detection::Efficient_RANSAC_traits<K,
-    Pwn_vector, Point_map, Normal_map>                      Traits;
+  typedef CGAL::Shape_detection::Efficient_RANSAC_traits<K, Pwn_vector, Point_map, Normal_map> Traits;
 
   typedef CGAL::Shape_detection::Efficient_RANSAC<Traits> Efficient_ransac;
   typedef CGAL::Shape_detection::Plane<Traits>            Plane;
 
   std::size_t success = 0;
-
   for (int i = 0;i<NB_ROUNDS;i++) {
     Pwn_vector points;
 
@@ -97,7 +95,6 @@ bool test_plane_parameters() {
     return false;
   }
 }
-
 
 int main() {
   bool success = true;

@@ -23,8 +23,7 @@
 #ifndef CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_SHAPE_BASE_H
 #define CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_SHAPE_BASE_H
 
-// #include <CGAL/license/Shape_detection.h>
-
+#include <CGAL/license/Shape_detection.h>
 
 #include <vector>
 #include <set>
@@ -53,11 +52,11 @@ namespace CGAL {
     
     /*!
      \ingroup PkgShapeDetectionRANSACShapes
-     \brief Base class for shape types defining an interface to construct a
+     \brief Base class for shape types that defines an interface to construct a
             shape from a set of points and to compute the point distance and normal
             deviation from the surface normal. It is used during detection to
             identify the inliers from the input data and to extract the largest
-            connected component in inlier points.
+            connected component in the inlier points.
      */
   template <class Traits>
   class Shape_base {
@@ -82,9 +81,9 @@ namespace CGAL {
       ///< own type.
     /// \endcond
 
-    typedef typename Traits::FT FT; ///< number type.
-    typedef typename Traits::Point_3 Point_3; ///< point type.
-    typedef typename Traits::Vector_3 Vector_3; ///< vector type.
+    typedef typename Traits::FT FT; ///< Number type.
+    typedef typename Traits::Point_3 Point_3; ///< Point type.
+    typedef typename Traits::Vector_3 Vector_3; ///< Vector type.
 
     // \todo The property maps should be passed here instead of `compute`
     Shape_base() :
@@ -99,14 +98,14 @@ namespace CGAL {
     virtual ~Shape_base() {}
       
     /*!
-      returns the indices of the points in the input range assigned to this shape.
+      Returns the indices of the points in the input range assigned to this shape.
      */
     const std::vector<std::size_t> & indices_of_assigned_points() const {
       return m_indices;
     }
       
     /*!
-      returns a string containing the shape type
+      Returns a string containing the shape type
       and the numerical parameters.
      */
     virtual std::string info() const {
@@ -280,7 +279,7 @@ namespace CGAL {
     /*!
       Determines the largest cluster with a point-to-point
       distance not larger than `cluster_epsilon`. This general version performs
-      a region growing within the inliers using a kd-tree.
+      a region growing within the inliers using a Kd-tree.
      */
     std::size_t connected_component_kdTree(std::vector<std::size_t> &indices,
                                            FT cluster_epsilon) {
@@ -641,12 +640,10 @@ namespace CGAL {
       }
     }
 
-
     virtual bool supports_connected_component() const {
       return false;
     };
 
-    
     // ------------------------------------------------------------------------
     // Utilities
     // ------------------------------------------------------------------------

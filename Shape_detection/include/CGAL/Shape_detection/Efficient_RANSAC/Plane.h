@@ -23,20 +23,21 @@
 #ifndef CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_PLANE_H
 #define CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_PLANE_H
 
-// #include <CGAL/license/Shape_detection.h>
+#include <CGAL/license/Shape_detection.h>
 
-
-#include <CGAL/Shape_detection/Efficient_RANSAC/Shape_base.h>
 #include <CGAL/number_utils.h>
+#include <CGAL/Shape_detection/Efficient_RANSAC/Shape_base.h>
 
 namespace CGAL {
   namespace Shape_detection {
-    /*!
-     \ingroup PkgShapeDetectionRANSACShapes
-     \brief Plane implements Shape_base. The plane is represented by the normal vector and the distance to the origin.
-     \tparam Traits a model of `EfficientRANSACTraits` with the additional 
-             requirement for planes (see `EfficientRANSACTraits` documentation).
-     */
+  /*!
+    \ingroup PkgShapeDetectionRANSACShapes
+    
+    \brief Plane implements Shape_base. The plane is represented by the normal vector and the distance to the origin.
+    
+    \tparam Traits is a model of `EfficientRANSACTraits` with the additional 
+    requirement for planes (see `EfficientRANSACTraits` documentation).
+  */
   template <class Traits>
   class Plane : public Shape_base<Traits> {
   public:
@@ -51,7 +52,7 @@ namespace CGAL {
     typedef typename Traits::Vector_3 Vector_3;
     /// \endcond
 
-    typedef typename Traits::Plane_3 Plane_3;///< plane type for conversion operator.
+    typedef typename Traits::Plane_3 Plane_3;///< %Plane type for the conversion operator.
 
   public:
     Plane() : Shape_base<Traits>() {}

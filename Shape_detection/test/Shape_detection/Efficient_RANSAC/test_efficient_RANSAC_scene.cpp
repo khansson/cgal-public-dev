@@ -9,7 +9,6 @@
 #include <CGAL/Point_with_normal_3.h>
 #include <CGAL/property_map.h>
 
-
 template <class K>
 bool test_scene(int argc, char** argv) {
   typedef typename K::FT                                      FT;
@@ -18,13 +17,10 @@ bool test_scene(int argc, char** argv) {
   typedef CGAL::Identity_property_map<Pwn>                    Point_map;
   typedef CGAL::Normal_of_point_with_normal_map<K>            Normal_map;
 
-  typedef CGAL::Shape_detection::Efficient_RANSAC_traits<
-    K, Pwn_vector, Point_map, Normal_map>                     Traits;
+  typedef CGAL::Shape_detection::Efficient_RANSAC_traits<K, Pwn_vector, Point_map, Normal_map> Traits;
+  typedef CGAL::Shape_detection::Efficient_RANSAC<Traits> Efficient_ransac;
 
-  typedef CGAL::Shape_detection::Efficient_RANSAC<Traits>
-                                                              Efficient_ransac;
-
-  typedef typename Efficient_ransac::Point_index_range        Point_index_range;
+  typedef typename Efficient_ransac::Point_index_range Point_index_range;
 
   typedef CGAL::Shape_detection::Plane<Traits>              Plane;
   typedef CGAL::Shape_detection::Cone<Traits>               Cone;
@@ -34,7 +30,7 @@ bool test_scene(int argc, char** argv) {
 
   Pwn_vector points;
 
-  // Loads point set from a file. 
+  // Load point set from a file. 
   // read_xyz_points_and_normals takes an OutputIterator for storing the points
   // and a property map to store the normal vector with each point.
   std::ifstream stream((argc > 1) ? argv[1] : "../data/cube.pwn");
@@ -48,7 +44,6 @@ bool test_scene(int argc, char** argv) {
     std::cerr << "Error: cannot read file cube.pwn" << std::endl;
     return EXIT_FAILURE;
   }
-
 
   Efficient_ransac ransac;
 
@@ -83,40 +78,39 @@ bool test_scene(int argc, char** argv) {
   while (it != shapes.end()) {
     boost::shared_ptr<typename Efficient_ransac::Shape> shape = *it;
 
-    // Sums distances of points to detected shapes.
+    // Sum distances of points to detected shapes.
     FT sum_distances = 0;
 
-    // Iterates through point indices assigned to each detected shape.
+    // Iterate through point indices assigned to each detected shape.
     std::vector<std::size_t>::const_iterator
       index_it = (*it)->indices_of_assigned_points().begin();
 
     while (index_it != (*it)->indices_of_assigned_points().end()) {
 
-      // Retrieves point
+      // Retrieve point.
       const Pwn &p = *(points.begin() + (*index_it));
 
-      // Adds Euclidean distance between point and shape.
+      // Add Euclidean distance between point and shape.
       sum_distances += CGAL::sqrt((*it)->squared_distance(p));
 
-      // Proceeds with next point.
+      // Proceed with next point.
       index_it++;
     }
 
-    // Computes average distance.
+    // Compute average distance.
     average_distance += sum_distances / shape->indices_of_assigned_points().size();
     
-    // Proceeds with next detected shape.
+    // Proceed with next detected shape.
     it++;
   }
 
-  // Check coverage. For this scene it should not fall below 85%
+  // Check coverage. For this scene it should not fall below 85%.
   double coverage = double(points.size() - ransac.number_of_unassigned_points()) / double(points.size());
   if (coverage < 0.75) {
     std::cout << " failed (coverage = " << coverage << " < 0.75)" << std::endl;
 
     return false;
   }
-
 
   // Check average distance. It should not lie above 0.02.
   average_distance = average_distance / shapes.size();
@@ -143,7 +137,6 @@ bool test_scene(int argc, char** argv) {
 
   return true;
 }
-
 
 int main(int argc, char** argv) {
   bool success = true;

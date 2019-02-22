@@ -23,27 +23,26 @@
 #ifndef CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_TRAITS_H
 #define CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_TRAITS_H
 
-// #include <CGAL/license/Shape_detection.h>
-
+#include <CGAL/license/Shape_detection.h>
 #include <CGAL/Search_traits_3.h>
 
 namespace CGAL {
   namespace Shape_detection {
-    /*!
-      \ingroup PkgShapeDetectionRANSAC
-      \brief %Default traits class to use the shape detection class `Efficient_RANSAC`.
-      \cgalModels `EfficientRANSACTraits`
+  /*!
+    \ingroup PkgShapeDetectionRANSAC
+    \brief %Default traits class for the shape detection class `Efficient_RANSAC`.
+    
+    \cgalModels `EfficientRANSACTraits`
 
-      \tparam Gt a model of the concept `#Kernel` with `Gt::FT` being `float` or `double`.
+    \tparam Gt is a model of the concept `Kernel` with `Gt::FT` being `float` or `double`.
 
-      \tparam InputRange is a model of `Range` with random access iterators, 
-              providing input points and normals through the following two property maps.
+    \tparam InputRange is a model of `Range` with random access iterators, 
+    providing input points and normals through the following property maps.
 
-      \tparam InputPointMap is a model of `ReadablePropertyMap` with `std::iterator_traits<Input_range::iterator>::%value_type` as key type and `Geom_traits::Point_3` as value type.
+    \tparam InputPointMap is a model of `ReadablePropertyMap` with `std::iterator_traits<Input_range::iterator>::%value_type` as key type and `Geom_traits::Point_3` as value type.
 
-
-      \tparam InputNormalMap is a model of `ReadablePropertyMap` with `std::iterator_traits<Input_range::iterator>::%value_type` as key type and `Geom_traits::Vector_3` as value type.
-    */
+    \tparam InputNormalMap is a model of `ReadablePropertyMap` with `std::iterator_traits<Input_range::iterator>::%value_type` as key type and `Geom_traits::Vector_3` as value type.
+  */
   template <class Gt,
             class InputRange,
             class InputPointMap,

@@ -23,16 +23,14 @@
 #ifndef CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_OCTREE_H
 #define CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_OCTREE_H
 
-// #include <CGAL/license/Shape_detection.h>
+#include <CGAL/license/Shape_detection.h>
 
-
-#include <limits>
 #include <stack>
+#include <limits>
 
 #include <CGAL/Random.h>
 #include <CGAL/Bbox_3.h>
 #include <CGAL/Shape_detection/Efficient_RANSAC/Shape_base.h>
-
 
 extern int scoreTime;
 
@@ -368,7 +366,6 @@ namespace CGAL {
                                        get_x(cell->center));
             }
           }
-
 
           FT width = m_width / (1<<(cell->level + 1));
 
@@ -730,6 +727,7 @@ namespace CGAL {
     };
   }
   }
+  
 }
 
 #endif

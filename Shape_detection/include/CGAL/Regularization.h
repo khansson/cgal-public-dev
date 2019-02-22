@@ -23,8 +23,7 @@
 #ifndef CGAL_REGULARIZATION_H
 #define CGAL_REGULARIZATION_H
 
-// #include <CGAL/license/Shape_detection.h>
-
+#include <CGAL/license/Shape_detection.h>
 #include <CGAL/Regularization/regularize_planes.h>
 
 #endif // CGAL_REGULARIZATION_H

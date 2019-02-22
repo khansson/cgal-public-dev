@@ -7,7 +7,6 @@
 #include <CGAL/Point_with_normal_3.h>
 #include <CGAL/property_map.h>
 
-
 template <class K>
 bool test_plane_connected_component() {
   const int NB_ROUNDS = 10;
@@ -20,13 +19,10 @@ bool test_plane_connected_component() {
   typedef CGAL::Identity_property_map<Pwn>                    Point_map;
   typedef CGAL::Normal_of_point_with_normal_map<K>            Normal_map;
 
-  typedef typename CGAL::Shape_detection::Efficient_RANSAC_traits<K,
-    Pwn_vector, Point_map, Normal_map>                        Traits;
-
-  typedef typename CGAL::Shape_detection::Efficient_RANSAC<Traits>
-    Efficient_ransac;
-
-  typedef typename CGAL::Shape_detection::Plane<Traits>     Plane;
+  typedef typename CGAL::Shape_detection::Efficient_RANSAC_traits<K, Pwn_vector, Point_map, Normal_map> Traits;
+  
+  typedef typename CGAL::Shape_detection::Efficient_RANSAC<Traits> Efficient_ransac;
+  typedef typename CGAL::Shape_detection::Plane<Traits> Plane;
 
   std::size_t success = 0;
 
@@ -97,7 +93,6 @@ bool test_plane_connected_component() {
     return false;
   }
 }
-
 
 int main() {
   bool success = true;

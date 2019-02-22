@@ -23,15 +23,13 @@
 #ifndef CGAL_REGULARIZE_PLANES_H
 #define CGAL_REGULARIZE_PLANES_H
 
-// #include <CGAL/license/Shape_detection.h>
+#include <CGAL/license/Shape_detection.h>
 
-
-#include <CGAL/Shape_detection/Efficient_RANSAC.h>
 #include <CGAL/centroid.h>
 #include <CGAL/squared_distance_3.h>
+#include <CGAL/Shape_detection/Efficient_RANSAC.h>
 
 #include <boost/foreach.hpp>
-
 
 namespace CGAL {
   
@@ -451,10 +449,10 @@ void subgraph_mutually_orthogonal_clusters (std::vector<Plane_cluster<Traits> >&
       subgraph_clusters_prop.push_back(subgraph_clusters_prop_temp);
     }
 
-  //regularization of cluster normals : in eachsubgraph, we start
-  //from the largest area cluster and we propage over the subgraph
-  //by regularizing the normals of the clusters accorting to
-  //orthogonality and cosangle to symmetry direction
+  //regularization of cluster normals : in each subgraph, we start
+  //from the largest area cluster and we propagate over the subgraph
+  //by regularizing the normals of the clusters according to
+  //orthogonality and cos angle to symmetry direction
 
   for (std::size_t i = 0; i < clusters.size(); ++ i)
     clusters[i].is_free = true;
@@ -523,7 +521,6 @@ void subgraph_mutually_orthogonal_clusters (std::vector<Plane_cluster<Traits> >&
 }
                                     
 
-
 } // namespace PlaneRegularization
 } // namespace internal
 /// \endcond
@@ -537,7 +534,7 @@ void subgraph_mutually_orthogonal_clusters (std::vector<Plane_cluster<Traits> >&
   
   /*! 
 
-    Given a set of detected planes with their respective inlier sets,
+    Given a set of detected planes with their corresponding inlier sets,
     this function enables to regularize the planes: 
 
     - Planes near parallel can be made exactly parallel;
@@ -555,21 +552,26 @@ void subgraph_mutually_orthogonal_clusters (std::vector<Plane_cluster<Traits> >&
 
     The implementation follows \cgalCite{cgal:vla-lod-15}.
 
-    \tparam PointRange range of points, model of `ConstRange`.
+    \tparam PointRange is a range of points, model of `ConstRange`.
+
     \tparam PointPMap is a model of `ReadablePropertyMap` with value type `Kernel::Point_3`.
     It can be omitted if the value type of the iterator of `PointRange` is convertible to `Point_3<Kernel>`.
-    \tparam PlaneRange range of planes, model of `Range`.
+
+    \tparam PlaneRange is a range of planes, model of `Range`.
+
     \tparam PlaneMap is a model of `WritablePropertyMap` with value type `Kernel::Plane_3`.
     It can be omitted if the value type of the iterator of `PlaneRange` is convertible to `Plane_3<Kernel>`.
+
     \tparam IndexMap is a model of `ReadablePropertyMap` with value type `int`.
-    \tparam Kernel Geometric traits class.
+    
+    \tparam Kernel is a geometric traits class.
     It can be omitted and deduced automatically from the value type of `PointMap`.
 
-    \param points range of points.
-    \param point_map property map: value_type of `typename PointRange::const_iterator` -> `Point_3`.
-    \param planes range of planes.
-    \param plane_map property map: value_type of `typename PlaneRange::iterator` -> `Plane_3`.
-    \param index_map property map: index of point `std::size_t` -> index of plane `int` (-1 if the point is not assigned to a plane).
+    \param points ConstRange of points.
+    \param point_map Property map: value_type of `typename PointRange::const_iterator` -> `Point_3`.
+    \param planes Range of planes.
+    \param plane_map Property map: value_type of `typename PlaneRange::iterator` -> `Plane_3`.
+    \param index_map Property map: index of point `std::size_t` -> index of plane `int` (-1 if the point is not assigned to a plane).
 
     \param regularize_parallelism Select whether parallelism is
     regularized or not.
@@ -584,15 +586,15 @@ void subgraph_mutually_orthogonal_clusters (std::vector<Plane_cluster<Traits> >&
     regularized or not.
 
     \param tolerance_angle Tolerance of deviation between normal
-    vectors of planes (in degrees) used for parallelism, orthogonality
-    and axis symmetry. Default value is 25 degrees.
+    vectors of planes (in degrees) used for parallelism, orthogonality,
+    and axis symmetry. %Default value is 25 degrees.
 
     \param tolerance_coplanarity Maximal distance between two parallel
-    planes such that they are considered coplanar. Default value is
+    planes such that they are considered coplanar. %Default value is
     0.01.
 
     \param symmetry_direction Chosen axis for symmetry
-    regularization. Default value is the Z axis.
+    regularization. %Default value is the Z axis.
 */ 
 
 // This variant requires all parameters
@@ -602,7 +604,7 @@ template <typename PointRange,
           typename PlaneMap,
           typename IndexMap,
           typename Kernel>
-void regularize_planes (const PointRange& points,
+void regularize_planes(const PointRange& points,
                         PointMap point_map,
                         PlaneRange& planes,
                         PlaneMap plane_map,
@@ -615,7 +617,7 @@ void regularize_planes (const PointRange& points,
                         double tolerance_angle = 25.0,
                         double tolerance_coplanarity = 0.01,
                         typename Kernel::Vector_3 symmetry_direction
-                        = typename Kernel::Vector_3 (0., 0., 1.))
+                        = typename Kernel::Vector_3 (0.0, 0.0, 1.0))
 {
   typedef typename Kernel::FT FT;
   typedef typename Kernel::Point_3 Point;
@@ -664,7 +666,7 @@ void regularize_planes (const PointRange& points,
       
   if (regularize_axis_symmetry)
     {
-      //clustering the symmetry cosangle and store their centroids in
+      //clustering the symmetry cos angle and store their centroids in
       //cosangle_centroids and the centroid index of each cluster in
       //list_cluster_index
       internal::PlaneRegularization::cluster_symmetric_cosangles<Kernel>
@@ -739,7 +741,7 @@ void regularize_planes (const PointRange& points,
                   cop_index++; 
                 }
             }
-          //regularize primitive position by computing barycenter of cplanar planes
+          //regularize primitive position by computing barycenter of coplanar planes
           std::vector<Point> pt_bary (cop_index, Point ((FT)0., (FT)0., (FT)0.));
           std::vector<FT> area (cop_index, 0.);
       

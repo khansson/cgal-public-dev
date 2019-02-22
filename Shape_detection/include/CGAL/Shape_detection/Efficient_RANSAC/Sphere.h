@@ -23,19 +23,18 @@
 #ifndef CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_SPHERE_H
 #define CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_SPHERE_H
 
-// #include <CGAL/license/Shape_detection.h>
+#include <CGAL/license/Shape_detection.h>
 
-
-#include <CGAL/Shape_detection/Efficient_RANSAC/Shape_base.h>
-#include <CGAL/number_utils.h>
 #include <cmath>
+#include <CGAL/number_utils.h>
+#include <CGAL/Shape_detection/Efficient_RANSAC/Shape_base.h>
 
 namespace CGAL {
   namespace Shape_detection {
     /*!
      \ingroup PkgShapeDetectionRANSACShapes
      \brief Sphere implements Shape_base. The sphere is represented by its center and the radius.
-     \tparam Traits a model of `EfficientRANSACTraits` with the additional 
+     \tparam Traits is a model of `EfficientRANSACTraits` with the additional 
              requirement for spheres (see `EfficientRANSACTraits` documentation).
      */
   template <class Traits>

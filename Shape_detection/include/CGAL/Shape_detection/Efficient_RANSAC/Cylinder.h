@@ -23,23 +23,25 @@
 #ifndef CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_CYLINDER_H
 #define CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_CYLINDER_H
 
-// #include <CGAL/license/Shape_detection.h>
+#include <CGAL/license/Shape_detection.h>
 
-
-#include <CGAL/Shape_detection/Efficient_RANSAC/Shape_base.h>
-#include <CGAL/number_utils.h>
 #include <cmath>
+#include <CGAL/number_utils.h>
+#include <CGAL/Shape_detection/Efficient_RANSAC/Shape_base.h>
 
 namespace CGAL {
   namespace Shape_detection {
-    /*!
-     \brief Cylinder implements Shape_base. The cylinder is represented
-     by the axis, i.e. a point and direction, and the radius. The cylinder is
-     unbounded, thus caps are not modelled.
-     \tparam Traits a model of `EfficientRANSACTraits` with the additional 
-             requirement for cylinders (see `EfficientRANSACTraits` documentation).
-     \ingroup PkgShapeDetectionRANSACShapes
-     */
+    
+  /*!
+    \brief Cylinder implements Shape_base. The cylinder is represented
+    by the axis, that is a point and direction, and the radius. The cylinder is
+    unbounded, thus caps are not modeled.
+    
+    \tparam Traits is a model of `EfficientRANSACTraits` with the additional 
+    requirement for cylinders (see `EfficientRANSACTraits` documentation).
+    
+    \ingroup PkgShapeDetectionRANSACShapes
+  */
   template <class Traits>
   class Cylinder : public Shape_base<Traits> {
     using Shape_base<Traits>::update_label;
@@ -55,7 +57,7 @@ namespace CGAL {
     typedef typename Traits::FT FT; ///< number type.
     /// \endcond
 
-    typedef typename Traits::Line_3 Line_3; ///< line type.
+    typedef typename Traits::Line_3 Line_3; ///< Line type
 
   public:
     Cylinder() : Shape_base<Traits>() {}

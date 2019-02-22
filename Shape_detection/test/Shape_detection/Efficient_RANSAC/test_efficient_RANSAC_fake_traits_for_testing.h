@@ -40,7 +40,6 @@ namespace CGAL {
     Vector__3(double, double, double){}
   };
 
-
   namespace Shape_detection {
   template <class Gt,
             class InputRange,
@@ -48,31 +47,29 @@ namespace CGAL {
             class InputNormalMap>
   struct Efficient_RANSAC_traits {
 
-    typedef Efficient_RANSAC_traits<
-      Gt, InputRange, InputPointMap, InputNormalMap> Self;
-    ///
+    typedef Efficient_RANSAC_traits<Gt, InputRange, InputPointMap, InputNormalMap> Self;
+    
     typedef double FT;
     typedef Point__3 Point_3;
     typedef Vector__3 Vector_3;
-    ///
+    
     struct Sphere_3 {};
-    ///
+    
     struct Line_3 {};
-    ///
+    
     struct Circle_2 {};
-    ///
+    
     struct Vector_2 {};
-    ///
+    
     struct Plane_3 {};
-    ///
+    
     struct Point_2 {};
-    ///
+    
     typedef InputRange Input_range;
-    ///
+    
     typedef InputPointMap Point_map;
-    ///
+    
     typedef InputNormalMap Normal_map;
-    ///
     
     class Search_traits {
 
@@ -138,7 +135,6 @@ namespace CGAL {
     };
     Construct_point_3 construct_point_3_object() const
     { return Construct_point_3(); }
-    
 
     struct Construct_point_2
     {
@@ -301,10 +297,10 @@ namespace CGAL {
     Collinear_2 collinear_2_object() const
     { return Collinear_2(); }
     
-    /*struct Compute_squared_distance_3
+    /* struct Compute_squared_distance_3
     { FT operator()(Point_3 const&, Point_3 const&) const { return 0; } };
     Compute_squared_distance_3 compute_squared_distance_3_object() const
-    { return Compute_squared_distance_3(); }*/
+    { return Compute_squared_distance_3(); } */
     ///
     Efficient_RANSAC_traits(const Gt& gt =  Gt())
       : m_gt(gt) {}
@@ -312,7 +308,8 @@ namespace CGAL {
   private:
     Gt m_gt;
   };
+} 
 
-} } // end of namespace CGAL::Shape_detection
+}
 
 #endif // CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_TRAITS_COMPILATION_TEST_H

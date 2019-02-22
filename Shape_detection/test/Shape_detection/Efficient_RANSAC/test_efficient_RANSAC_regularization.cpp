@@ -19,11 +19,10 @@ typedef std::vector<Point_with_normal>                       Pwn_vector;
 typedef CGAL::First_of_pair_property_map<Point_with_normal>  Point_map;
 typedef CGAL::Second_of_pair_property_map<Point_with_normal> Normal_map;
 
-typedef CGAL::Shape_detection::Efficient_RANSAC_traits
-  <Kernel, Pwn_vector, Point_map, Normal_map>                Traits;
-typedef CGAL::Shape_detection::Efficient_RANSAC<Traits>    Efficient_ransac;
+typedef CGAL::Shape_detection::Efficient_RANSAC_traits<Kernel, Pwn_vector, Point_map, Normal_map> Traits;
+typedef CGAL::Shape_detection::Efficient_RANSAC<Traits> Efficient_ransac;
 
-typedef CGAL::Aff_transformation_3<Kernel>                   Transform;
+typedef CGAL::Aff_transformation_3<Kernel> Transform;
 
 
 template <typename OutputIterator>
@@ -32,14 +31,14 @@ void generate_random_points (const Point& origin, const Vector& base1, const Vec
 {
   Vector normal = CGAL::cross_product (base1, base2);
   normal = normal / std::sqrt (normal * normal);
-  //  Vector noise = 0.00001 * normal;
+  // Vector noise = 0.00001 * normal;
 
   for (std::size_t i = 0; i < nb_pts; ++ i)
     {
       Point point = origin
         + CGAL::get_default_random().get_double() * base1
         + CGAL::get_default_random().get_double() * base2;
-        //        + CGAL::get_default_random().get_double() * noise;
+        // + CGAL::get_default_random().get_double() * noise;
       *(output ++) = std::make_pair (point, normal);
     }
 }
@@ -120,7 +119,6 @@ void check_planes_changed (const std::vector<Plane>& before, const std::vector<P
   std::cerr << "Error: no plane has been altered by regularization while at least one should have." << std::endl;
 }
 
-
 int main() 
 {
   Vector vx (1., 0., 0.),
@@ -129,7 +127,6 @@ int main()
   
   Vector dvx = vx;
   rotate_vector (dvx, 1, to_rad(10.));
-
 
   Efficient_ransac ransac;
   
@@ -142,7 +139,7 @@ int main()
   op.cluster_epsilon = 0.2;
   op.normal_threshold = 0.8;
   
-  // Test parallelism
+  // Test parallelism.
   std::cerr << "Testing parallelism..." << std::endl;
   {
     Pwn_vector points;
@@ -161,7 +158,7 @@ int main()
 
     std::vector<Plane> before = get_ransac_planes(ransac);
     
-    // Test regularization
+    // Test regularization.
     Efficient_ransac::Plane_range planes = ransac.planes();
     CGAL::regularize_planes (points,
                              Point_map(),
@@ -189,7 +186,7 @@ int main()
     ransac.clear ();
   }
 
-  // Test orthogonality
+  // Test orthogonality.
   std::cerr << "Testing orthogonality..." << std::endl;
   {
     Pwn_vector points;
@@ -235,7 +232,7 @@ int main()
     ransac.clear ();
   }
 
-  // Test coplanarity
+  // Test coplanarity.
   std::cerr << "Testing coplanarity..." << std::endl;
   {
     Pwn_vector points;
@@ -280,7 +277,7 @@ int main()
     ransac.clear ();
   }
 
-  // Test symmetry
+  // Test symmetry.
   std::cerr << "Testing symmetry..." << std::endl;
   {
     Pwn_vector points;
@@ -330,7 +327,5 @@ int main()
     ransac.clear ();
   }
 
-  
-  
   return EXIT_SUCCESS;
 }

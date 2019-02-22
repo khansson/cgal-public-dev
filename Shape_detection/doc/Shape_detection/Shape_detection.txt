@@ -19,9 +19,9 @@ This \cgal component implements two algorithms for shape detection:
 
 \section Shape_detection_RANSAC Efficient RANSAC
 
-From an unstructured point set with unoriented normals, this algorithm detects a set of shapes (see \cgalFigureRef{Efficient_RANSAC_overview}). 
+From an unstructured point set with unoriented normals, this algorithm detects a set of shapes (see Figure \cgalFigureRef{Efficient_RANSAC_overview}). 
 Five types of primitive shapes are provided by this package: plane, sphere, cylinder, cone, and torus. Other primitive shapes can be easily added 
-by the user (see \ref Shape_detection_RANSACExample_with_custom_shapes).
+by the user (see Section \ref Shape_detection_RANSACExample_with_custom_shapes).
 
 \cgalFigureBegin{Efficient_RANSAC_overview, Efficient_RANSAC/overview2.png}
 Input and output of the Efficient RANSAC method.
@@ -33,16 +33,16 @@ This method takes as input a point set with unoriented normals and provides as o
 The output of the algorithm is a set of detected shapes with assigned points and all remaining points not covered by these shapes. 
 Each input point can be assigned to at most one detected shape.
 
-The shapes are detected via a RANSAC-type approach, i.e., a random sample consensus. The basic RANSAC approach repeats the following steps: 
+The shapes are detected via a RANSAC-type approach, that is a random sample consensus. The basic RANSAC approach repeats the following steps: 
 
 -# Randomly select samples from the input points; 
 -# Fit a shape to the selected samples; 
 -# Count the number of inliers to the shape, inliers being within a user-specified error tolerance to the shape. 
 
-Steps 1-3 are repeated for a prescribed number of iterations and the shape with the highest number of inliers, referred to as largest shape, is kept. 
+Steps 1-3 are repeated for a prescribed number of iterations and the shape with the highest number of inliers, referred to as the largest shape, is kept. 
 
 In our context, the error between a point and a shape is defined by its distance and normal deviation to the shape. 
-A random subset corresponds to the minimal number of points (with normals) required to uniquely define a primitive.
+A random subset corresponds to the minimum number of points (with normals) required to uniquely define a primitive.
 
 For very large point sets, the basic RANSAC method is not practical when testing all possible shape candidates against the input data in order to find the largest shape. 
 The main idea behind the Efficient RANSAC method is testing shape candidates against subsets of the input data. 
@@ -51,8 +51,8 @@ The largest shape is repeatedly extracted until no more shapes, restricted to co
 An additional gain in efficiency is achieved through exploiting the normal attributes during initial shape construction and enumeration of inliers.
 
 The *support* of a shape refers to the footprint of the points covered by the primitive. 
-To avoid generating shapes with fragmented support, we enforce a connectivity constraint by considering only one connected component, referred to as *cluster*, 
-selected as the one covering the largest number of inliers. See Section \ref Shape_detection_RANSACParameters for more details.
+To avoid generating shapes with the fragmented support, we enforce a connectivity constraint by considering only one connected component, referred to as *cluster*, 
+selected as the one covering the largest number of inliers (see Section \ref Shape_detection_RANSACParameters for more details).
 
 
 \subsection Shape_detection_RANSACParameters Parameters
@@ -63,14 +63,14 @@ The algorithm has five parameters:
 The error between a point-with-normal \f$p\f$ and a shape \f$S\f$ is defined by its Euclidean distance and normal deviation to \f$S\f$. 
 The normal deviation is computed between the normal at \f$p\f$ and the normal of \f$S\f$ at the closest projection of \f$p\f$ onto \f$S\f$. 
 The parameter `epsilon` defines the absolute maximum tolerance Euclidean distance between a point and a shape. 
-A high value for `epsilon` leads to the detection of fewer large shapes and hence a less detailed detection. 
-A low value for `epsilon` yields a more detailed detection, but may lead to either lower coverage or over-segmentation. 
+A high value of `epsilon` leads to the detection of fewer large shapes and hence a less detailed detection. 
+A low value of `epsilon` yields a more detailed detection, but may lead to either lower coverage or over-segmentation. 
 Over-segmentation translates into detection of fragmented shapes when `epsilon` is within or below the noise level. 
 When the input point set is made of free-form parts, a higher tolerance `epsilon` allows for detecting more primitive shapes that approximate some of the free-form surfaces. 
 The impact of this parameter is depicted by Figure \cgalFigureRef{Efficient_RANSAC_parameter_epsilon_variation}. Its impact on performance is evaluated in Section \ref Shape_detection_RANSACPerformance.
 
 \cgalFigureBegin{Efficient_RANSAC_parameter_epsilon_variation, Efficient_RANSAC/epsilon_variation2.png}
-Impact of the epsilon parameter over levels of detail of the detection. 
+Impact of the epsilon parameter over the levels of detail of the detection. 
 (a) Input point set. 
 (b) Detection of planar shapes with `epsilon` set to 2.0 (one color per detected shape). Most details such as chimneys on the roof are not distinguished. 
 (c) Detection with `epsilon` set to 0.5. The facades are correctly detected and some details of the roof are detected. 
@@ -89,9 +89,9 @@ The impact of the parameter `cluster_epsilon` is depicted in Figure \cgalFigureR
 \cgalFigureBegin{Efficient_RANSAC_parameter_connectivity, Efficient_RANSAC/varying_connectivity.png}
 The parameter `cluster_epsilon` controls the connectivity of the points covered by a detected shape. 
 The input point set is sampled on four coplanar squares. 
-(a) A large value for `cluster_epsilon` leads to detecting a single planar shape. 
-(b) A moderate value for `cluster_epsilon` yields the detection of four squares. Notice that a few points within the squares are not detected as not connected. 
-(c) A small value for `cluster_epsilon` leads to over-segmentation.
+(a) A large value of `cluster_epsilon` leads to detecting a single planar shape. 
+(b) A moderate value of `cluster_epsilon` yields the detection of four squares. Notice that a few points within the squares are not detected as not connected. 
+(c) A small value of `cluster_epsilon` leads to over-segmentation.
 \cgalFigureEnd
 
 - `min_points`:
@@ -106,7 +106,7 @@ A lower probability provides a higher reliability and determinism at the cost of
 
 \subsection Shape_detection_RANSACExamples Examples
 The main class `Shape_detection::Efficient_RANSAC` takes a template parameter `Shape_detection::Efficient_RANSAC_traits` that defines the geometric types and input format. 
-Property maps provide a means to interface with user-specific data structures. 
+Property maps provide a means to interface with the user-specific data structures. 
 The first parameter of the `Shape_detection::Efficient_RANSAC_traits` class is the common `Kernel`. 
 In order to match the constraints of property maps, an iterator type and two maps that map an iterator to a point and a normal are specified in the `Shape_detection::Efficient_RANSAC_traits` class. 
 The concept behind property maps is detailed in Manual \ref chapterProperty_map "CGAL and Property Maps".
@@ -122,7 +122,7 @@ Typical usage consists of five steps:
 
 \subsubsection Shape_detection_RANSACExample_minimal Basic Plane Detection
 
-The following minimal example reads a point set from a file and detects only planar shapes. The default parameters are used for detection.
+The following example reads a point set from a file and detects only planar shapes. The default parameters are used for detection.
 
 \cgalExample{Shape_detection/Efficient_RANSAC/example_efficient_RANSAC_basic.cpp}
 
@@ -144,7 +144,7 @@ The input point set is sampled on a surface mostly composed of piecewise planar 
 
 Basic information of the detected shapes is written to the standard output: if the shape is either a plane or a cylinder, 
 specific parameters are recovered, otherwise the general method `info()` is used to get the shape parameters in a string object. 
-Note that specific parameters can be recovered for any of the provided shape.
+Note that specific parameters can be recovered for any of the provided shapes.
 
 \cgalExample{Shape_detection/Efficient_RANSAC/example_efficient_RANSAC_with_parameters.cpp}
 
@@ -162,7 +162,7 @@ A timer measures the running performance.
 Other shape types can be detected by implementing a shape class derived from the class `Shape_detection::Shape_base` and registering it to the shape detection factory of the Efficient RANSAC object. 
 This class must provide the following functions: 
 construct a shape from a small set of given points, 
-compute the squared distance from a query point to the shape and 
+compute the squared distance from a query point to the shape, and 
 compute the normal deviation between a query point with the normal and the normal to the shape at the closest point from the query. 
 The used shape parameters are added as members to the derived class.
 
@@ -171,15 +171,15 @@ The algorithm aims at detecting the largest shape via many random samples, and t
 
 More specifically, the functions to be implemented are defined in the base class `Shape_detection::Shape_base`:
 
-- `Shape_detection::Shape_base::minimum_sample_size()` const: Returns the minimal number of required samples.
-- `Shape_detection::Shape_base::create_shape(const std::vector<size_t> &indices)`: The randomly generated samples are provided via a vector of indices. `Shape_detection::Shape_base::point``(std::size_t index)` 
+- `Shape_detection::Shape_base::minimum_sample_size()` const: Returns the minimum number of required samples.
+- `Shape_detection::Shape_base::create_shape(const std::vector<size_t>& indices)`: The randomly generated samples are provided via a vector of indices. `Shape_detection::Shape_base::point``(std::size_t index)` 
 and `Shape_detection::Shape_base::normal``(std::size_t index)` are used to retrieve the actual points and normals (see the example below). 
-The provided number of samples might actually be larger than the set minimal number of required samples, depending on the other shape types. 
-If the provided samples are not sufficient to define a unique shape, e.g., in a degenerated case, the shape is considered invalid.
-- `Shape_detection::Shape_base::squared_distance``(const Point &point)` const: This function computes the squared distance from a query point to the shape. 
+The provided number of samples might actually be larger than the above minimum number of required samples, depending on the other shape types. 
+If the provided samples are not sufficient to define a unique shape, for example in a degenerated case, the shape is considered invalid.
+- `Shape_detection::Shape_base::squared_distance``(const Point& point)` const: This function computes the squared distance from a query point to the shape. 
 It is used for traversing the hierarchical spatial data structure.
-- `Shape_detection::Shape_base::squared_distance(std::vector<FT> &distances, const std::vector<size_t> &indices)` and
-- `Shape_detection::Shape_base::cos_to_normal``(const std::vector<size_t> &indices, std::vector<FT> &angles)` const.
+- `Shape_detection::Shape_base::squared_distance(std::vector<FT>& distances, const std::vector<size_t>& indices)` and
+- `Shape_detection::Shape_base::cos_to_normal``(const std::vector<size_t>& indices, std::vector<FT>& angles)` const.
 
 The last two functions are used to determine the number of inlier points to the shape. They compute respectively the squared distance from a set of points to the shape, 
 and the dot product between the point normals and the normals at the shape for the closest points on the shape. 
@@ -189,8 +189,8 @@ The resulting squared distance/dot product is stored in the vector provided as t
 
 By default, the connected component is detected via the neighbor graph as mentioned above. However, for shapes that admit a faster approach to detect a connected component, 
 the user can provide his/her own implementation to extract the connected component via:
-- `Shape_detection::Shape_base::connected_component``(std::vector<std::size_t> &indices, FT cluster_epsilon)`: The indices of all supporting points are stored in the vector `indices`. 
-All points not belonging to the largest cluster of points are removed from the vector `indices`. 
+- `Shape_detection::Shape_base::connected_component``(std::vector<std::size_t>& indices, FT cluster_epsilon)`: The indices of all supporting points are stored in the vector `indices`. 
+All points that do not belong to the largest cluster of points are removed from the vector `indices`. 
 
 Another optional method can be implemented to provide a helper function providing the shape parameters written to a string:
 - `Shape_detection::Shape_base::info``()`: This function returns a string suitable for printing the shape parameters into a log/console. 
@@ -206,18 +206,18 @@ which is used by the example \ref Shape_detection/Efficient_RANSAC/example_effic
  
 The running time and detection performance of the Efficient RANSAC depend on the chosen parameters. 
 A selective error tolerance parameter leads to higher running time and fewer shapes, as many shape candidates are generated to find the largest shape. 
-We plot the detection performance against the `epsilon` error tolerance parameter for detecting planes in a complex scene with 5M points, see \cgalFigureRef{Efficient_RANSAC_performance_epsilon}. 
+We plot the detection performance against the `epsilon` error tolerance parameter for detecting planes in a complex scene with 5M points (see Figure \cgalFigureRef{Efficient_RANSAC_performance_epsilon}). 
 The `probability` parameter controls the endurance when searching for the largest candidate at each iteration. 
 It barely impacts the number of detected shapes, has a moderate impact on the size of the detected shapes, and increases the running time. 
-We plot the performance against the `probability` parameter, see \cgalFigureRef{Efficient_RANSAC_performance_probability}.
+We plot the performance against the `probability` parameter (see Figure \cgalFigureRef{Efficient_RANSAC_performance_probability}).
 
 \cgalFigureBegin{Efficient_RANSAC_performance_epsilon, Efficient_RANSAC/epsilon_graph.png}
-The graph depicts the number of detected shapes (purple) and the coverage (green), i.e., the ratio assignedPoints / totalPoints, against the `epsilon` tolerance parameter. 
-A higher value for `epsilon`, i.e., a more tolerant error, leads to fewer but larger shapes and shorter running times.
+The graph depicts the number of detected shapes (purple) and the coverage (green), that is the ratio assignedPoints / totalPoints, against the `epsilon` tolerance parameter. 
+A higher value for `epsilon`, that is a more tolerant error, leads to fewer but larger shapes and shorter running times.
 \cgalFigureEnd
 
 \cgalFigureBegin{Efficient_RANSAC_performance_probability, Efficient_RANSAC/prob_graph.png}
-The graph depicts the time, coverage, and the number of detected primitives against the search endurance parameter, i.e., the `probability` to miss the largest shape at each iteration. 
+The graph depicts the time, coverage, and the number of detected primitives against the search endurance parameter, that is `probability` to miss the largest shape at each iteration. 
 The number of shapes is stable and the coverage increases when the `probability` is lowered. 
 The running time increases significantly as many more candidates are generated during each iteration of the algorithm.
 \cgalFigureEnd
@@ -519,12 +519,12 @@ a faster version of Region Growing, use a floating type based kernel.
 
 The Efficient RANSAC algorithm is very quick, however, since it is not deterministic, some small shapes might be missed in the detection process.
 
-Instead, the Region Growing algorithm usually takes longer to complete than the Efficient RANSAC, but it may provide better quality output in the presence of large scenes 
-with numerous small details: as it iterates throughout all items of the scene, there are fewer chances to miss a shape. 
+Instead, the Region Growing algorithm usually takes longer to complete, but it may provide better quality output in the presence of large scenes 
+with numerous small details. Since it iterates throughout all items of the scene, there are fewer chances to miss a shape. 
 In addition, it is deterministic (for a given input and a given set of parameters, it always returns the same output, 
-whereas as the Efficient RANSAC algorithm is randomized and so the output may vary at each run). See figure \cgalFigureRef{Shape_detection_comparison_figure}.
+whereas the Efficient RANSAC algorithm is randomized and so the output may vary at each run), see Figure \cgalFigureRef{Shape_detection_comparison}.
 
-\cgalFigureBegin{Shape_detection_comparison_figure, Efficient_RANSAC/comparison.png}
+\cgalFigureBegin{Shape_detection_comparison, Efficient_RANSAC/comparison.png}
 Comparison of the Efficient RANSAC and Region Growing algorithms. 
 Top: the input point set. 
 Bottom left: the output of the Efficient RANSAC, \f$78\%\f$ of the shapes are correctly detected in 8 seconds. 
@@ -537,14 +537,14 @@ Unassigned points are in black in both output images.
 
 Shape detection applies to man-made scenes or objects such as urban scenes or scans of mechanical parts. 
 Such scenes often contain a wide range of geometric regularities such as parallelism, orthogonality, or symmetry. 
-This package offers a function to reinforce four types of regularities for planar shapes: `CGAL::regularize_planes()`:
+This package offers a function to reinforce four types of regularities for planar shapes, `CGAL::regularize_planes()`:
 
-- Planes that are near *parallel* are made parallel: normal vectors of planes that form angles smaller than a user-defined threshold are made equal;
-- Parallel planes that are near *coplanar* are made coplanar;
+- Planes that are near *parallel* are made parallel: normal vectors of planes that form angles smaller than a user-defined threshold are made exactly equal;
+- Parallel planes that are near *coplanar* are made exactly coplanar;
 - Planes that are near *orthogonal* are made exactly orthogonal;
-- Planes that are near *symmetrical* with respect to a user-defined axis are made symmetrical.
+- Planes that are near *symmetrical* with respect to a user-defined axis are made exactly symmetrical.
 
-The user can choose to only regularize one or several of these four properties (see \link CGAL::regularize_planes() Reference Manual\endlink). 
+The user can choose to regularize only one or several of these four properties (see \link CGAL::regularize_planes() Reference Manual\endlink). 
 The process is greedy and based on a hierarchical decomposition (coplanar clusters are subgroups of parallel clusters, 
 which are subgroups of axis-symmetric and orthogonal clusters) as described by Verdie et al. \cgalCite{cgal:vla-lod-15}
 
@@ -553,11 +553,11 @@ which are subgroups of axis-symmetric and orthogonal clusters) as described by V
 
 \section Shape_detection_History History
 
-The Efficient RANSAC implementation was developed by Sven Oesau based on a prototype version created by Yannick Verdie, 
+The Efficient RANSAC component was developed by Sven Oesau based on the prototype version created by Yannick Verdie, 
 with the help of Clément Jamin and under the supervision of Pierre Alliez. Plane regularization was added by Simon Giraudot 
 based on the prototype version developed by Florent Lafarge.
 
-The Region Growing algorithm on 3D points was first developed by Simon Giraudot based on the prototype version developed by Florent Lafarge 
+The Region Growing algorithm on 3D points was first implemented by Simon Giraudot based on the prototype version developed by Florent Lafarge 
 and then generalized to arbitrary items including versions for 2D points, 3D points, and a polygon mesh by Thien Hoang during the 
 Google Summer of Code 2018 under the supervision of Dmitry Anisimov.
 

@@ -23,23 +23,24 @@
 #ifndef CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_CONE_H
 #define CGAL_SHAPE_DETECTION_EFFICIENT_RANSAC_CONE_H
 
-// #include <CGAL/license/Shape_detection.h>
+#include <CGAL/license/Shape_detection.h>
 
-
-#include <CGAL/Shape_detection/Efficient_RANSAC/Shape_base.h>
-#include <CGAL/number_utils.h>
 #include <cmath>
+#include <CGAL/number_utils.h>
+#include <CGAL/Shape_detection/Efficient_RANSAC/Shape_base.h>
 
 namespace CGAL {
   namespace Shape_detection {
   /*!
-   \brief Cone implements Shape_base.
+    \brief Cone implements Shape_base.
+    
     The cone is represented by its apex, the axis, and the opening angle.
     This representation models an open infinite single-cone.
-    \tparam Traits a model of `EfficientRANSACTraits`
-   \ingroup PkgShapeDetectionRANSACShapes
-   */
-
+    
+    \tparam Traits is a model of `EfficientRANSACTraits`.
+    
+    \ingroup PkgShapeDetectionRANSACShapes
+  */
   template <class Traits>
   class Cone : public Shape_base<Traits> {
     using Shape_base<Traits>::update_label;
@@ -55,25 +56,24 @@ namespace CGAL {
     typedef typename Traits::Vector_3 Vector_3;///< vector type.
     /// \endcond
 
-
     Cone() : Shape_base<Traits>(), m_wrap(false) {}
       
     /*!
-      The opening angle between the axis and the surface of the cone.
+      Opening angle between the axis and the surface of the cone.
      */
     FT angle() const {
         return m_angle;
     }
     
     /*!
-      The apex of the cone.
+      Apex of the cone.
      */
     Point_3 apex() const {
         return m_apex;
     }
     
     /*!
-      The axis points from the apex into the cone.
+      Axis points from the apex into the cone.
      */
     Vector_3 axis() const {
         return m_axis;
@@ -415,7 +415,7 @@ namespace CGAL {
       }
       else {
         // Map onto triangle.
-        // u coordinate is arclength
+        // u coordinate is arc length
         // v coordinate is distance to apex
 
         Vector_3 d = this->constr_vec(m_apex, this->point(indices[0]));
