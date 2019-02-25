@@ -13,9 +13,9 @@ if(CGAL_FOUND)
   include(CGAL_CreateSingleSourceCGALProgram)
 
   create_single_source_cgal_program(
-    "example_region_growing_on_points_2.cpp")
+    "example_region_growing_on_point_set_2.cpp")
   create_single_source_cgal_program(
-    "example_region_growing_on_points_3.cpp")
+    "example_region_growing_on_point_set_3.cpp")
   create_single_source_cgal_program(
     "example_region_growing_on_polygon_mesh.cpp")
   create_single_source_cgal_program(

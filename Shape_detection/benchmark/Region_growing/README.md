@@ -1,17 +1,17 @@
 # This code generates the benchmark table in the user manual.
 
-First, compile the file `benchmark_region_growing_on_points_2.cpp` using the provided cmake file:
+First, compile the file `benchmark_region_growing_on_point_set_2.cpp` using the provided cmake file:
 
 ```bash
 $ cd /path/to/build/directory
 $ cmake -DCGAL_DIR=/path/to/cgal/release/build -DCMAKE_BUILD_TYPE=Release /path/to/benchmark/Region_growing
-$ make benchmark_region_growing_on_points_2
+$ make benchmark_region_growing_on_point_set_2
 ```
 
-The program uses the data file `data/points_2.xyz`, run the benchmark program as follows:
+The program uses the data file `data/point_set_2.xyz`, run the benchmark program as follows:
 
 ```bash
-$ ./benchmark_region_growing_on_points_2 /path/to/data/points_2.xyz
+$ ./benchmark_region_growing_on_point_set_2 /path/to/data/point_set_2.xyz
 ```
 
 Results:

@@ -13,7 +13,7 @@ if(CGAL_FOUND)
   include(CGAL_CreateSingleSourceCGALProgram)
 
   create_single_source_cgal_program(
-    "benchmark_region_growing_on_points_2.cpp")
+    "benchmark_region_growing_on_point_set_2.cpp")
 
 else()
   message(WARNING 

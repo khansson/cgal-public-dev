@@ -11,7 +11,7 @@ approach to access connected items in a given set.
 `CGAL::Shape_detection::Polygon_mesh_adjacent_faces_connectivity`
 */
 
-class RegionGrowingConnectivity {
+class NeighborQuery {
 
 public:
 

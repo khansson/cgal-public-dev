@@ -20,13 +20,18 @@
 // Author(s)     : Florent Lafarge, Simon Giraudot, Thien Hoang, Dmitry Anisimov
 //
 
-#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_ON_POLYGON_MESH_H
-#define CGAL_SHAPE_DETECTION_REGION_GROWING_ON_POLYGON_MESH_H
+#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_ON_POINT_SET_H
+#define CGAL_SHAPE_DETECTION_REGION_GROWING_ON_POINT_SET_H
 
 #include <CGAL/license/Shape_detection.h>
 
-#include <CGAL/Shape_detection/Region_growing/Region_growing_on_polygon_mesh/One_ring_neighbor_query.h>
-#include <CGAL/Shape_detection/Region_growing/Region_growing_on_polygon_mesh/Least_squares_plane_fit_region.h>
-#include <CGAL/Shape_detection/Region_growing/Region_growing_on_polygon_mesh/Least_squares_plane_fit_sorting.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_point_set/K_neighbor_query.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_point_set/Sphere_neighbor_query.h>
 
-#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_ON_POLYGON_MESH_H
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_point_set/Least_squares_line_fit_region.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_point_set/Least_squares_plane_fit_region.h>
+
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_point_set/Least_squares_line_fit_sorting.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_point_set/Least_squares_plane_fit_sorting.h>
+
+#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_ON_POINT_SET_H

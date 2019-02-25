@@ -15,15 +15,15 @@ if(CGAL_FOUND)
   create_single_source_cgal_program(
     "test_region_growing_on_cube.cpp")
   create_single_source_cgal_program(
-    "test_region_growing_on_points_2.cpp")
+    "test_region_growing_on_point_set_2.cpp")
   create_single_source_cgal_program(
-    "test_region_growing_on_points_3.cpp")
+    "test_region_growing_on_point_set_3.cpp")
   create_single_source_cgal_program(
     "test_region_growing_on_polygon_mesh.cpp")
   create_single_source_cgal_program(
-    "test_region_growing_on_points_2_with_sorting.cpp")
+    "test_region_growing_on_point_set_2_with_sorting.cpp")
   create_single_source_cgal_program(
-    "test_region_growing_on_points_3_with_sorting.cpp")
+    "test_region_growing_on_point_set_3_with_sorting.cpp")
   create_single_source_cgal_program(
     "test_region_growing_on_polygon_mesh_with_sorting.cpp")
 
