@@ -23,7 +23,7 @@
 #ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_LEAST_SQUARES_PLANE_FIT_SORTING_H
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_LEAST_SQUARES_PLANE_FIT_SORTING_H
 
-// #include <CGAL/license/Shape_detection.h>
+#include <CGAL/license/Shape_detection.h>
 
 // STL includes.
 #include <vector>
@@ -49,6 +49,7 @@
 
 namespace CGAL {
 namespace Shape_detection {
+namespace Polygon_mesh {
 
   /*!
     \ingroup PkgShapeDetectionRGOnMesh
@@ -80,10 +81,10 @@ namespace Shape_detection {
   template<
   typename GeomTraits, 
   typename FaceListGraph,
-  typename Connectivity,
+  typename NeighborQuery,
   typename FaceRange = typename FaceListGraph::Face_range,
   typename VertexToPointMap = typename boost::property_map<FaceListGraph, CGAL::vertex_point_t>::type>
-  class Polygon_mesh_least_squares_plane_fit_sorting {
+  class Least_squares_plane_fit_sorting {
 
   public:
 
@@ -93,13 +94,16 @@ namespace Shape_detection {
     /// \cond SKIP_IN_MANUAL
     using Traits = GeomTraits;
     using Face_graph = FaceListGraph;
-    using Input_connectivity = Connectivity;
+    using Neighbor_query = NeighborQuery;
     using Face_range = FaceRange;
     using Vertex_to_point_map = VertexToPointMap;
+    using Seed_map = internal::Seed_property_map;
     /// \endcond
 
-    /// Property map that returns the quality ordered seed indices of the faces.
-    using Seed_map = internal::Seed_property_map;
+    #ifdef DOXYGEN_RUNNING
+      /// Property map that returns the quality ordered seed indices of the faces.
+      typedef unspecified_type Seed_map;
+    #endif
 
     /// @}
 
@@ -122,12 +126,12 @@ namespace Shape_detection {
 
       \pre `total_number_of_faces > 0`
     */
-    Polygon_mesh_least_squares_plane_fit_sorting(
+    Least_squares_plane_fit_sorting(
       const FaceListGraph& polygon_mesh,
-      Connectivity& connectivity,
+      NeighborQuery& neighbor_query,
       const VertexToPointMap vertex_to_point_map = VertexToPointMap()) :
     m_face_graph(polygon_mesh),
-    m_connectivity(connectivity),
+    m_neighbor_query(neighbor_query),
     m_face_range(CGAL::faces(m_face_graph)),
     m_vertex_to_point_map(vertex_to_point_map) {
 
@@ -185,13 +189,15 @@ namespace Shape_detection {
     void compute_scores() {
 
       std::vector<std::size_t> neighbors;
+      std::vector<Local_point_3> points;
+
       for (std::size_t i = 0; i < m_face_range.size(); ++i) {
         
         neighbors.clear();
-        m_connectivity.neighbors(i, neighbors);
+        m_neighbor_query(i, neighbors);
         neighbors.push_back(i);
 
-        std::vector<Local_point_3> points;
+        points.clear();  
         for (std::size_t j = 0; j < neighbors.size(); ++j) {
 
           CGAL_precondition(neighbors[j] >= 0);
@@ -201,9 +207,9 @@ namespace Shape_detection {
           const auto& halfedge = CGAL::halfedge(face, m_face_graph);
 
           const auto& vertices = CGAL::vertices_around_face(halfedge, m_face_graph);
-          for (auto vertex = vertices.begin(); vertex != vertices.end(); ++vertex) {
+          for (const auto& vertex : vertices) {
                             
-            const auto& tmp_point = get(m_vertex_to_point_map, *vertex);
+            const auto& tmp_point = get(m_vertex_to_point_map, vertex);
             points.push_back(m_to_local_converter(tmp_point));
           }
         }
@@ -228,7 +234,7 @@ namespace Shape_detection {
 
     // Fields.
     const Face_graph& m_face_graph;
-    Input_connectivity& m_connectivity;
+    Neighbor_query& m_neighbor_query;
     const Face_range m_face_range;
     const Vertex_to_point_map m_vertex_to_point_map;
 
@@ -238,6 +244,7 @@ namespace Shape_detection {
     const To_local_converter m_to_local_converter;
   };
 
+} // namespace Polygon_mesh
 } // namespace Shape_detection
 } // namespace CGAL
 

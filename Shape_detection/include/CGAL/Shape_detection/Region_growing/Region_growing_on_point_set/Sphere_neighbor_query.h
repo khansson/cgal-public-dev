@@ -20,10 +20,10 @@
 // Author(s)     : Florent Lafarge, Simon Giraudot, Thien Hoang, Dmitry Anisimov
 //
 
-#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_FUZZY_SPHERE_CONNECTIVITY_H
-#define CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_FUZZY_SPHERE_CONNECTIVITY_H
+#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_POINT_SET_SPHERE_NEIGHBOR_QUERY_H
+#define CGAL_SHAPE_DETECTION_REGION_GROWING_POINT_SET_SPHERE_NEIGHBOR_QUERY_H
 
-// #include <CGAL/license/Shape_detection.h>
+#include <CGAL/license/Shape_detection.h>
 
 // STL includes.
 #include <typeinfo>
@@ -46,6 +46,7 @@
 
 namespace CGAL {
 namespace Shape_detection {
+namespace Point_set {
 
   /*!
     \ingroup PkgShapeDetectionRGOnPoints
@@ -75,7 +76,7 @@ namespace Shape_detection {
   typename GeomTraits, 
   typename InputRange, 
   typename PointMap>
-  class Points_fuzzy_sphere_connectivity {
+  class Sphere_neighbor_query {
 
   public:
             
@@ -91,7 +92,7 @@ namespace Shape_detection {
     /// \endcond
 
     /// Number type.
-    using FT = typename GeomTraits::FT;
+    typedef typename GeomTraits::FT FT;
 
     /// \cond SKIP_IN_MANUAL
     using Index_to_point_map = 
@@ -136,12 +137,12 @@ namespace Shape_detection {
       \pre `input_range.size() > 0`
       \pre `search_radius >= 0`
     */
-    Points_fuzzy_sphere_connectivity(
+    Sphere_neighbor_query(
       const InputRange& input_range, 
-      const FT search_radius = FT(1), 
+      const FT sphere_radius = FT(1), 
       const PointMap point_map = PointMap()) :
     m_input_range(input_range),
-    m_search_radius(search_radius),
+    m_sphere_radius(sphere_radius),
     m_point_map(point_map),
     m_index_to_point_map(m_input_range, m_point_map),
     m_tree(
@@ -150,10 +151,10 @@ namespace Shape_detection {
       Splitter(),
       Search_traits(m_index_to_point_map)) { 
 
-      CGAL_precondition(m_input_range.size() > 0);
+      CGAL_precondition(input_range.size() > 0);
 
       m_tree.build();
-      CGAL_precondition(m_search_radius >= FT(0));
+      CGAL_precondition(sphere_radius >= FT(0));
     }
 
     /// @}
@@ -180,16 +181,18 @@ namespace Shape_detection {
 
       \pre `query_index >= 0 && query_index < total_number_of_points`
     */
-    void neighbors(
+    void operator()(
       const std::size_t query_index, 
       std::vector<std::size_t>& neighbors) const {
                 
       CGAL_precondition(query_index >= 0);
       CGAL_precondition(query_index < m_input_range.size());
       
+      const std::size_t sphere_center = query_index;
+      
       const Fuzzy_sphere sphere(
-        query_index, 
-        m_search_radius, 
+        sphere_center, 
+        m_sphere_radius, 
         FT(0), 
         m_tree.traits());
 
@@ -203,7 +206,7 @@ namespace Shape_detection {
     // Fields.
     const Input_range& m_input_range;
     
-    const FT m_search_radius;
+    const FT m_sphere_radius;
 
     const Point_map m_point_map;
     const Index_to_point_map m_index_to_point_map;
@@ -211,7 +214,8 @@ namespace Shape_detection {
     Tree m_tree;
   };
 
+} // namespace Point_set
 } // namespace Shape_detection
 } // namespace CGAL
 
-#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_FUZZY_SPHERE_CONNECTIVITY_H
+#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_POINT_SET_SPHERE_NEIGHBOR_QUERY_H

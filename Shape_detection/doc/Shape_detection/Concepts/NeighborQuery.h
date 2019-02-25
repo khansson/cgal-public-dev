@@ -21,7 +21,7 @@ public:
 
     This function is called each time when a new query item is chosen.
   */
-  void neighbors(
+  void operator()(
     const std::size_t query_index, 
     std::vector<std::size_t>& neighbors) {
         

@@ -1,8 +1,10 @@
 // STL includes.
 #include <string>
+#include <vector>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 
 // CGAL includes.
 #include <CGAL/memory.h>
@@ -33,20 +35,20 @@ using Color = CGAL::Color;
     using Polygon_mesh = CGAL::Surface_mesh<Point_3>;
     using Face_range   = typename Polygon_mesh::Face_range;
 
-    using Connectivity = CGAL::Shape_detection::Polygon_mesh_adjacent_faces_connectivity<Polygon_mesh>;
-    using Conditions   = CGAL::Shape_detection::Polygon_mesh_least_squares_plane_fit_conditions<Kernel, Polygon_mesh>;
+    using Neighbor_query = CGAL::Shape_detection::Polygon_mesh::One_ring_neighbor_query<Polygon_mesh>;
+    using Region_type    = CGAL::Shape_detection::Polygon_mesh::Least_squares_plane_fit_region<Kernel, Polygon_mesh>;
 
 #else
 
     using Polygon_mesh = CGAL::Polyhedron_3<Kernel, CGAL::Polyhedron_items_3, CGAL::HalfedgeDS_vector>;
     using Face_range   = typename CGAL::Iterator_range<typename boost::graph_traits<Polygon_mesh>::face_iterator>;
     
-    using Connectivity = CGAL::Shape_detection::Polygon_mesh_adjacent_faces_connectivity<Polygon_mesh, Face_range>;
-    using Conditions   = CGAL::Shape_detection::Polygon_mesh_least_squares_plane_fit_conditions<Kernel, Polygon_mesh, Face_range>;
+    using Neighbor_query = CGAL::Shape_detection::Polygon_mesh::One_ring_neighbor_query<Polygon_mesh, Face_range>;
+    using Region_type    = CGAL::Shape_detection::Polygon_mesh::Least_squares_plane_fit_region<Kernel, Polygon_mesh, Face_range>;
 
 #endif
 
-using Region_growing = CGAL::Shape_detection::Region_growing<Face_range, Connectivity, Conditions>;
+using Region_growing = CGAL::Shape_detection::Region_growing<Face_range, Neighbor_query, Region_type>;
 
 int main(int argc, char *argv[]) {
 
@@ -72,30 +74,30 @@ int main(int argc, char *argv[]) {
 
   // Default parameter values for the data file polygon_mesh.off.
   const FT          max_distance_to_plane = FT(1);
-  const FT          normal_threshold      = FT(7) / FT(10);
+  const FT          max_accepted_angle    = FT(45);
   const std::size_t min_region_size       = 5;
 
-  // Create instances of the classes Connectivity and Conditions.
-  Connectivity connectivity(
-    polygon_mesh);
+  // Create instances of the classes Neighbor_query and Region_type.
+  Neighbor_query neighbor_query(polygon_mesh);
 
-  using Vertex_to_point_map = typename Conditions::Vertex_to_point_map;
+  using Vertex_to_point_map = typename Region_type::Vertex_to_point_map;
   const Vertex_to_point_map vertex_to_point_map(
     get(CGAL::vertex_point, polygon_mesh));
 
-  Conditions conditions(
+  Region_type region_type(
     polygon_mesh, 
-    max_distance_to_plane, normal_threshold, min_region_size, 
+    max_distance_to_plane, max_accepted_angle, min_region_size, 
     vertex_to_point_map);
 
   // Create an instance of the region growing class.
-  Region_growing region_growing(face_range, connectivity, conditions);
+  Region_growing region_growing(face_range, neighbor_query, region_type);
 
   // Run the algorithm.
-  region_growing.detect();
+  std::vector< std::vector<std::size_t> > regions;
+  region_growing.detect(std::back_inserter(regions));
 
   // Print the number of found regions.
-  std::cout << "* " << region_growing.number_of_regions() << 
+  std::cout << "* " << regions.size() << 
     " regions have been found" 
   << std::endl;
 
@@ -103,9 +105,6 @@ int main(int argc, char *argv[]) {
   #if defined(USE_SURFACE_MESH)
   
     using Face_index = typename Polygon_mesh::Face_index;
-
-    // Get all found regions.
-    const auto& regions = region_growing.regions();
       
     // Save result to a file in the user-provided path if any.
     srand(time(NULL));
@@ -132,7 +131,7 @@ int main(int argc, char *argv[]) {
       std::ofstream out(fullpath);
 
       // Iterate through all regions.
-      for (auto region = regions.begin(); region != regions.end(); ++region) {
+      for (const auto& region : regions) {
               
         // Generate a random color.
         const Color color(
@@ -141,7 +140,7 @@ int main(int argc, char *argv[]) {
           static_cast<unsigned char>(rand() % 256));
 
         // Iterate through all region items.
-        for (auto index : *region)
+        for (const auto index : region)
           face_color[Face_index(index)] = color;
       }
 

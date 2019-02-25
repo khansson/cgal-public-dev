@@ -11,7 +11,7 @@ approach to control if items in a given set form a region.
 `CGAL::Shape_detection::Polygon_mesh_least_squares_plane_fit_conditions`
 */
 
-class RegionValidation {
+class RegionType {
 
 public:
 
@@ -21,7 +21,7 @@ public:
 
     This function is called each time when trying to add a new item to a region.
   */
-  bool is_inside_region(
+  bool is_part_of_region(
     const std::size_t query_index, 
     const std::vector<std::size_t>& region) {
         

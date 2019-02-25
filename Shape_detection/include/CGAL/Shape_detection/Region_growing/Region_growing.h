@@ -23,7 +23,7 @@
 #ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_H
 #define CGAL_SHAPE_DETECTION_REGION_GROWING_H
 
-// #include <CGAL/license/Shape_detection.h>
+#include <CGAL/license/Shape_detection.h>
 
 // STL includes.
 #include <queue>
@@ -31,7 +31,6 @@
 
 // CGAL includes.
 #include <CGAL/assertions.h>
-#include <CGAL/Iterator_range.h>
 
 // Internal includes.
 #include <CGAL/Shape_detection/Region_growing/internal/property_maps.h>
@@ -70,39 +69,23 @@ namespace Shape_detection {
   */
   template<
   typename InputRange, 
-  typename Connectivity, 
-  typename Conditions,
+  typename NeighborQuery, 
+  typename RegionType,
   typename SeedMap = internal::Identity_seed_property_map>
   class Region_growing {
 
   public:
 
-    /// \name Types
-    /// @{
-
     /// \cond SKIP_IN_MANUAL
     using Input_range = InputRange;
-    using Input_connectivity = Connectivity;
-    using Input_conditions = Conditions;
+    using Neighbor_query = NeighborQuery;
+    using Region_type = RegionType;
     using Seed_map = SeedMap;
 
     using Visited_items = std::vector<bool>;
-    using Running_queue = std::queue<std::size_t>;    
+    using Running_queue = std::queue<std::size_t>;
+    using Indices       = std::vector<std::size_t>;
     /// \endcond
-
-    /// An `std::vector` with indices of all input items provided via `InputRange`.
-    using Item_indices = std::vector<std::size_t>;
-    
-    /// An `std::vector` that stores all found regions, where each region is of type `Region_growing::Item_indices`.
-    using Regions = std::vector<Item_indices>;
-    
-    /// An `Iterator_range` of the iterators in `Region_growing::Regions`.
-    using Region_range = CGAL::Iterator_range<typename Regions::const_iterator>;
-    
-    /// An `Iterator_range` of the iterators in `Region_growing::Item_indices`.
-    using Item_range = CGAL::Iterator_range<typename Item_indices::const_iterator>;
-    
-    /// @}
 
     /// \name Initialization
     /// @{
@@ -130,52 +113,21 @@ namespace Shape_detection {
     */
     Region_growing(
       const InputRange& input_range, 
-      Connectivity& connectivity, 
-      Conditions& conditions,
+      NeighborQuery& neighbor_query, 
+      RegionType& region_type,
       const SeedMap seed_map = SeedMap()) :
     m_input_range(input_range),
-    m_connectivity(connectivity),
-    m_conditions(conditions),
+    m_neighbor_query(neighbor_query),
+    m_region_type(region_type),
     m_seed_map(seed_map) { 
 
-      CGAL_precondition(m_input_range.size() > 0);
+      CGAL_precondition(input_range.size() > 0);
     }
 
     /// @}
 
     /// \name Detection 
     /// @{
-
-    /*!
-      \brief Runs the Region Growing algorithm and stores its result internally.
-
-      Runs the Region Growing algorithm on the input range with items, 
-      using a `Connectivity` class to find neighbors and a `Conditions` class 
-      to validate regions. The `SeedMap` property map is used to define the
-      seeding order of items inside the algorithm.
-    */
-    void detect() {
-
-      // Detect regions.
-      detect(std::back_inserter(m_regions));
-      m_output_regions = 
-      Region_range(m_regions.begin(), m_regions.end());
-
-      // Return indices of all unassigned items.
-      for (std::size_t i = 0; i < m_input_range.size(); ++i) {
-        const std::size_t seed_index = get(m_seed_map, i);
-
-        // Skip items that user does not want to use.
-        if (seed_index == std::size_t(-1))
-          continue;
-
-        if (!m_visited[seed_index]) 
-          m_unassigned.push_back(seed_index);
-      }
-
-      m_output_unassigned = 
-      Item_range(m_unassigned.begin(), m_unassigned.end());
-    }
 
     /*!
       \brief Runs the Region Growing algorithm and returns its result
@@ -202,7 +154,7 @@ namespace Shape_detection {
     void detect(OutputIterator regions) {
 
       clear();
-      Item_indices region;
+      Indices region;
 
       // Grow regions.
       for (std::size_t i = 0; i < m_input_range.size(); ++i) {
@@ -217,7 +169,7 @@ namespace Shape_detection {
           propagate(seed_index, region);
 
           // Check global conditions.
-          if (!m_conditions.is_valid_region(region)) 
+          if (!m_region_type.is_valid_region(region)) 
             revert(region);
           else 
             *(regions++) = region;
@@ -227,19 +179,8 @@ namespace Shape_detection {
 
     /// @}
 
-    /// \name Access
+    /// \name Output
     /// @{  
-
-    /*!
-      \brief Returns found regions.      
-
-      Returns an `CGAL::Iterator_range` with a bidirectional iterator whose value type
-      is `Region_growing::Item_indices`. It is empty if the function `Region_growing::detect()`
-      has not been called.
-    */
-    const Region_range& regions() const {
-      return m_output_regions;
-    }
 
     /*!
       \brief Returns indices of all unassigned items.
@@ -248,22 +189,20 @@ namespace Shape_detection {
       is `std::size_t`. It is empty if the function `Region_growing::detect()`
       has not been called.
     */
-    const Item_range& unassigned_items() const {
-      return m_output_unassigned;
-    }
+    template<typename OutputIterator>
+    void output_unassigned_items(OutputIterator output) const {
+      
+      // Return indices of all unassigned items.
+      for (std::size_t i = 0; i < m_input_range.size(); ++i) {
+        const std::size_t seed_index = get(m_seed_map, i);
 
-    /*!
-      \brief Returns the number of found regions.
-    */
-    const std::size_t number_of_regions() const {
-      return m_regions.size();
-    }
+        // Skip items that user does not want to use.
+        if (seed_index == std::size_t(-1))
+          continue;
 
-    /*!
-      \brief Returns the number of unassigned items.
-    */
-    const std::size_t number_of_unassigned_items() const {
-      return m_unassigned.size();
+        if (!m_visited[seed_index]) 
+          *(output++) = seed_index;
+      }
     }
 
     /// @}
@@ -278,14 +217,6 @@ namespace Shape_detection {
                 
       m_visited.clear();
       m_visited.resize(m_input_range.size(), false);
-      
-      m_regions.clear();
-      m_unassigned.clear();
-      
-      m_output_regions = 
-      Region_range(m_regions.begin(), m_regions.end());
-      m_output_unassigned = 
-      Item_range(m_unassigned.begin(), m_unassigned.end());
     }
 
     /*!
@@ -295,24 +226,13 @@ namespace Shape_detection {
 
       m_visited.clear();
       m_visited.shrink_to_fit();
-
-      m_regions.clear();
-      m_regions.shrink_to_fit();
-
-      m_unassigned.clear();
-      m_unassigned.shrink_to_fit();
-
-      m_output_regions = 
-      Region_range(m_regions.begin(), m_regions.end());
-      m_output_unassigned = 
-      Item_range(m_unassigned.begin(), m_unassigned.end());
     }
 
     /// @}
 
   private:
 
-    void propagate(const std::size_t seed_index, Item_indices& region) {
+    void propagate(const std::size_t seed_index, Indices& region) {
       region.clear();
 
       // Use two queues, while running on this queue, push to the other queue;
@@ -326,10 +246,10 @@ namespace Shape_detection {
       running_queue[depth_index].push(seed_index);
       region.push_back(seed_index);
 
-      // Update internal properties of the propagating region.
-      m_conditions.update(region);
+      // Update internal properties of the region.
+      m_region_type.update(region);
 
-      Item_indices neighbors;
+      Indices neighbors;
       while (
         !running_queue[depth_index].empty() || 
         !running_queue[!depth_index].empty()) {
@@ -340,18 +260,17 @@ namespace Shape_detection {
 
         // Get neighbors of the current item.
         neighbors.clear();
-        m_connectivity.neighbors(item_index, neighbors);
+        m_neighbor_query(item_index, neighbors);
 
-        // Visit the neighbors.
-        for (std::size_t i = 0; i < neighbors.size(); ++i) {
-          const std::size_t neighbor_index = neighbors[i];
+        // Visit all found neighbors.
+        for (const std::size_t neighbor_index : neighbors) {
 
           // Skip items that user does not want to use.
           if (neighbor_index == std::size_t(-1))
             continue;
 
           if (!m_visited[neighbor_index] && 
-            m_conditions.belongs_to_region(neighbor_index, region)) {
+            m_region_type.is_part_of_region(neighbor_index, region)) {
 
             // Add this neighbor to the other queue so that we can visit it later.
             m_visited[neighbor_index] = true;
@@ -360,35 +279,27 @@ namespace Shape_detection {
           }
         }
 
-        // Update internal properties of the propagating region.
+        // Update internal properties of the region.
         if (running_queue[depth_index].empty()) {
 
-          m_conditions.update(region);
+          m_region_type.update(region);
           depth_index = !depth_index;
         }
       }
     }
 
-    void revert(const Item_indices& region) {
-      for (std::size_t i = 0; i < region.size(); ++i)
-        m_visited[region[i]] = false;
+    void revert(const Indices& region) {
+      for (const std::size_t item_index : region)
+        m_visited[item_index] = false;
     }
 
     // Fields.
     const Input_range& m_input_range;
-    Input_connectivity& m_connectivity;
-    Input_conditions& m_conditions;
+    Neighbor_query& m_neighbor_query;
+    Region_type& m_region_type;
     const Seed_map m_seed_map;
 
     Visited_items m_visited;
-    Regions m_regions;
-    Item_indices m_unassigned;
-
-    Region_range m_output_regions = 
-    Region_range(m_regions.begin(), m_regions.end());
-
-    Item_range m_output_unassigned = 
-    Item_range(m_unassigned.begin(), m_unassigned.end());
   };
 
 } // namespace Shape_detection

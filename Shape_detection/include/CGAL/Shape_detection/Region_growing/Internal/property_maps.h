@@ -30,8 +30,8 @@
 #include <CGAL/assertions.h>
 #include <CGAL/property_map.h>
 
-#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_PROPERTY_MAPS_H
-#define CGAL_SHAPE_DETECTION_REGION_GROWING_PROPERTY_MAPS_H
+#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_INTERNAL_PROPERTY_MAPS_H
+#define CGAL_SHAPE_DETECTION_REGION_GROWING_INTERNAL_PROPERTY_MAPS_H
 
 namespace CGAL {
 namespace Shape_detection {
@@ -98,11 +98,10 @@ namespace internal {
     m_item_range(item_range) { 
 
       value_type i = 0;
-      for (auto item = m_item_range.begin(); 
-        item != m_item_range.end(); 
-        ++item, ++i) {
-      
-        m_item_map[*item] = i;
+      for (const auto& item : item_range) {
+
+        m_item_map[item] = i;
+        ++i;
       }
     }
 
@@ -179,4 +178,4 @@ namespace internal {
 } // namespace Shape_detection
 } // namespace CGAL
 
-#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_PROPERTY_MAPS_H
+#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_INTERNAL_PROPERTY_MAPS_H

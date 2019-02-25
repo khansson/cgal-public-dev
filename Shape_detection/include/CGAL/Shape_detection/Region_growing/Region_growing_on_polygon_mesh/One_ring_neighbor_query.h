@@ -20,10 +20,10 @@
 // Author(s)     : Florent Lafarge, Simon Giraudot, Thien Hoang, Dmitry Anisimov
 //
 
-#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_ADJACENT_FACES_CONNECTIVITY_H
-#define CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_ADJACENT_FACES_CONNECTIVITY_H
+#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_ONE_RING_NEIGHBOR_QUERY_H
+#define CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_ONE_RING_NEIGHBOR_QUERY_H
 
-// #include <CGAL/license/Shape_detection.h>
+#include <CGAL/license/Shape_detection.h>
 
 // Boost includes.
 #include <boost/graph/properties.hpp>
@@ -42,6 +42,7 @@
 
 namespace CGAL {
 namespace Shape_detection {
+namespace Polygon_mesh {
 
   /*!
     \ingroup PkgShapeDetectionRGOnMesh
@@ -64,7 +65,7 @@ namespace Shape_detection {
   template<
   typename FaceListGraph, 
   typename FaceRange = typename FaceListGraph::Face_range>
-  class Polygon_mesh_adjacent_faces_connectivity {
+  class One_ring_neighbor_query {
 
   public:
 
@@ -87,7 +88,7 @@ namespace Shape_detection {
 
       \pre `total_number_of_faces > 0`
     */
-    Polygon_mesh_adjacent_faces_connectivity(
+    One_ring_neighbor_query(
       const FaceListGraph& polygon_mesh) :
     m_face_graph(polygon_mesh),
     m_face_range(CGAL::faces(m_face_graph)),
@@ -119,7 +120,7 @@ namespace Shape_detection {
 
       \pre `query_index >= 0 && query_index < total_number_of_faces`
     */
-    void neighbors(
+    void operator()(
       const std::size_t query_index, 
       std::vector<std::size_t>& neighbors) const {
                     
@@ -130,9 +131,8 @@ namespace Shape_detection {
       const auto& query_halfedge = CGAL::halfedge(query_face, m_face_graph);
 
       const auto& faces = CGAL::faces_around_face(query_halfedge, m_face_graph);
-      
-      for (auto face = faces.begin(); face != faces.end(); ++face) {
-        const std::size_t face_index = get(m_face_to_index_map, *face);
+      for (const auto& face : faces) {
+        const std::size_t face_index = get(m_face_to_index_map, face);
         
         if (face_index != std::size_t(-1)) // not a null face
           neighbors.push_back(face_index);
@@ -150,7 +150,8 @@ namespace Shape_detection {
     const Face_to_index_map m_face_to_index_map;
   };
 
+} // namespace Polygon_mesh
 } // namespace Shape_detection
 } // namespace CGAL
 
-#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_ADJACENT_FACES_CONNECTIVITY_H
+#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_ONE_RING_NEIGHBOR_QUERY_H

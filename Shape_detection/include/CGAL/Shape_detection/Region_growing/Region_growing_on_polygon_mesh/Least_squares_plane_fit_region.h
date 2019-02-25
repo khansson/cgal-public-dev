@@ -20,10 +20,10 @@
 // Author(s)     : Florent Lafarge, Simon Giraudot, Thien Hoang, Dmitry Anisimov
 //
 
-#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_LEAST_SQUARES_PLANE_FIT_CONDITIONS_H
-#define CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_LEAST_SQUARES_PLANE_FIT_CONDITIONS_H
+#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_LEAST_SQUARES_PLANE_FIT_REGION_H
+#define CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_LEAST_SQUARES_PLANE_FIT_REGION_H
 
-// #include <CGAL/license/Shape_detection.h>
+#include <CGAL/license/Shape_detection.h>
 
 // STL includes.
 #include <vector>
@@ -49,7 +49,8 @@
 
 namespace CGAL {
 namespace Shape_detection {
-
+namespace Polygon_mesh {
+  
   /*!
     \ingroup PkgShapeDetectionRGOnMesh
 
@@ -79,7 +80,7 @@ namespace Shape_detection {
   typename FaceListGraph,
   typename FaceRange = typename FaceListGraph::Face_range,
   typename VertexToPointMap = typename boost::property_map<FaceListGraph, CGAL::vertex_point_t>::type>
-  class Polygon_mesh_least_squares_plane_fit_conditions {
+  class Least_squares_plane_fit_region {
 
   public:
 
@@ -109,13 +110,13 @@ namespace Shape_detection {
     /// @{
 
     /// Number type.
-    using FT = typename GeomTraits::FT;
+    typedef typename GeomTraits::FT FT;
 
     /// Point type.
-    using Point_3 = typename GeomTraits::Point_3; 
+    typedef typename GeomTraits::Point_3 Point_3; 
 
     /// Type of the plane.
-    using Plane_3 = typename GeomTraits::Plane_3;
+    typedef typename GeomTraits::Plane_3 Plane_3;
 
     /// @}
 
@@ -151,17 +152,20 @@ namespace Shape_detection {
       \pre `normal_threshold >= 0 && normal_threshold <= 1`
       \pre `min_region_size > 0`
     */
-    Polygon_mesh_least_squares_plane_fit_conditions(
+    Least_squares_plane_fit_region(
       const FaceListGraph& polygon_mesh,
       const FT distance_threshold = FT(1), 
-      const FT normal_threshold = FT(9) / FT(10), 
+      const FT angle_threshold = FT(25), 
       const std::size_t min_region_size = 1, 
       const VertexToPointMap vertex_to_point_map = VertexToPointMap(), 
       const GeomTraits traits = GeomTraits()) :
     m_face_graph(polygon_mesh),
     m_face_range(CGAL::faces(m_face_graph)),
     m_distance_threshold(distance_threshold),
-    m_normal_threshold(normal_threshold),
+    m_normal_threshold(static_cast<FT>(
+      std::cos(
+        CGAL::to_double(
+          (angle_threshold * static_cast<FT>(CGAL_PI)) / FT(180))))),
     m_min_region_size(min_region_size),
     m_vertex_to_point_map(vertex_to_point_map),
     m_squared_length_3(traits.compute_squared_length_3_object()),
@@ -171,9 +175,9 @@ namespace Shape_detection {
 
       CGAL_precondition(m_face_range.size() > 0);
 
-      CGAL_precondition(m_distance_threshold >= FT(0));
-      CGAL_precondition(m_normal_threshold >= FT(0) && m_normal_threshold <= FT(1));
-      CGAL_precondition(m_min_region_size > 0);
+      CGAL_precondition(distance_threshold >= FT(0));
+      CGAL_precondition(angle_threshold >= FT(0) && angle_threshold <= FT(90));
+      CGAL_precondition(min_region_size > 0);
     }
 
     /// @}
@@ -197,7 +201,7 @@ namespace Shape_detection {
 
       \pre `query_index >= 0 && query_index < total_number_of_faces`
     */
-    bool belongs_to_region(
+    bool is_part_of_region(
       const std::size_t query_index, 
       const std::vector<std::size_t>&) const {
 
@@ -212,11 +216,11 @@ namespace Shape_detection {
       const FT distance_to_fitted_plane = 
       get_max_face_distance(face);
       
-      const FT cos_angle = 
+      const FT cos_value = 
       CGAL::abs(m_scalar_product_3(face_normal, m_normal_of_best_fit));
 
       return (( distance_to_fitted_plane <= m_distance_threshold ) && 
-        ( cos_angle >= m_normal_threshold ));
+        ( cos_value >= m_normal_threshold ));
     }
 
     /*!
@@ -279,9 +283,9 @@ namespace Shape_detection {
           const auto& halfedge = CGAL::halfedge(face, m_face_graph);
 
           const auto& vertices = CGAL::vertices_around_face(halfedge, m_face_graph);
-          for (auto vertex = vertices.begin(); vertex != vertices.end(); ++vertex) {
+          for (const auto& vertex : vertices) {
                             
-            const Point_3& tmp_point = get(m_vertex_to_point_map, *vertex);
+            const Point_3& tmp_point = get(m_vertex_to_point_map, vertex);
             points.push_back(m_to_local_converter(tmp_point));
           }
         }
@@ -338,15 +342,14 @@ namespace Shape_detection {
       FT y = FT(0);
       FT z = FT(0);
                 
-      for (auto vertex = vertices.begin(); 
-      vertex != vertices.end(); 
-      ++vertex, sum += FT(1)) {
-        
-        const Point_3& point = get(m_vertex_to_point_map, *vertex);
+      for (const auto& vertex : vertices) {
+        const Point_3& point = get(m_vertex_to_point_map, vertex);
 
         x += point.x();
         y += point.y();
         z += point.z();
+
+        sum += FT(1);
       }
       
       CGAL_precondition(sum > FT(0));
@@ -365,6 +368,8 @@ namespace Shape_detection {
       // Compute normal of the face.
       const auto& halfedge = CGAL::halfedge(face, m_face_graph);
       const auto& vertices = CGAL::vertices_around_face(halfedge, m_face_graph);
+
+      CGAL_precondition(vertices.size() >= 3);
 
       auto vertex = vertices.begin();
       const Point_3& point1 = get(m_vertex_to_point_map, *vertex); ++vertex;
@@ -386,10 +391,10 @@ namespace Shape_detection {
       const auto& vertices = CGAL::vertices_around_face(halfedge, m_face_graph);
 
       FT max_face_distance = -FT(1);
-      for (auto vertex = vertices.begin(); vertex != vertices.end(); ++vertex) {
+      for (const auto& vertex : vertices) {
         
         const Point_3& point = 
-        get(m_vertex_to_point_map, *vertex);
+        get(m_vertex_to_point_map, vertex);
 
         const FT distance = 
         m_sqrt(m_squared_distance_3(point, m_plane_of_best_fit));
@@ -423,7 +428,8 @@ namespace Shape_detection {
     Vector_3 m_normal_of_best_fit;
   };
 
+} // namespace Polygon_mesh
 } // namespace Shape_detection
 } // namespace CGAL
 
-#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_LEAST_SQUARES_PLANE_FIT_CONDITIONS_H
+#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_POLYGON_MESH_LEAST_SQUARES_PLANE_FIT_REGION_H

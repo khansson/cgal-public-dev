@@ -20,10 +20,10 @@
 // Author(s)     : Florent Lafarge, Simon Giraudot, Thien Hoang, Dmitry Anisimov
 //
 
-#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_3_LEAST_SQUARES_PLANE_FIT_SORTING_H
-#define CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_3_LEAST_SQUARES_PLANE_FIT_SORTING_H
+#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_POINT_SET_LEAST_SQUARES_PLANE_FIT_SORTING_H
+#define CGAL_SHAPE_DETECTION_REGION_GROWING_POINT_SET_LEAST_SQUARES_PLANE_FIT_SORTING_H
 
-// #include <CGAL/license/Shape_detection.h>
+#include <CGAL/license/Shape_detection.h>
 
 // STL includes.
 #include <vector>
@@ -41,6 +41,7 @@
 
 namespace CGAL {
 namespace Shape_detection {
+namespace Point_set {
 
   /*! 
     \ingroup PkgShapeDetectionRGOnPoints
@@ -71,9 +72,9 @@ namespace Shape_detection {
   template<
   typename GeomTraits,
   typename InputRange,
-  typename Connectivity,
+  typename NeighborQuery,
   typename PointMap>
-  class Points_3_least_squares_plane_fit_sorting {
+  class Least_squares_plane_fit_sorting {
 
   public:
 
@@ -83,12 +84,15 @@ namespace Shape_detection {
     /// \cond SKIP_IN_MANUAL
     using Traits = GeomTraits;
     using Input_range = InputRange;
-    using Input_connectivity = Connectivity;
+    using Neighbor_query = NeighborQuery;
     using Point_map = PointMap;
-    /// \endcond
-
-    /// Property map that returns the quality ordered seed indices of the points.
     using Seed_map = internal::Seed_property_map;
+    /// \endcond
+    
+    #ifdef DOXYGEN_RUNNING
+      /// Property map that returns the quality ordered seed indices of the points.
+      typedef unspecified_type Seed_map;
+    #endif
 
     /// @}
 
@@ -111,15 +115,15 @@ namespace Shape_detection {
 
       \pre `input_range.size() > 0`
     */
-    Points_3_least_squares_plane_fit_sorting(
+    Least_squares_plane_fit_sorting(
       const InputRange& input_range,
-      Connectivity& connectivity,
+      NeighborQuery& neighbor_query,
       const PointMap point_map = Point_map()) :
     m_input_range(input_range),
-    m_connectivity(connectivity),
+    m_neighbor_query(neighbor_query),
     m_point_map(point_map) { 
       
-      CGAL_precondition(m_input_range.size() > 0);
+      CGAL_precondition(input_range.size() > 0);
       
       m_order.resize(m_input_range.size());
       for (std::size_t i = 0; i < m_input_range.size(); ++i) 
@@ -173,15 +177,15 @@ namespace Shape_detection {
     void compute_scores() {
 
       std::vector<std::size_t> neighbors;
+      std::vector<Local_point_3> points;
+
       for (std::size_t i = 0; i < m_input_range.size(); ++i) {
         
         neighbors.clear();
-        m_connectivity.neighbors(i, neighbors);
+        m_neighbor_query(i, neighbors);
         neighbors.push_back(i);
 
-        std::vector<Local_point_3> points;
-        points.reserve(neighbors.size());
-
+        points.clear();
         for (std::size_t j = 0; j < neighbors.size(); ++j) {
 
           CGAL_precondition(neighbors[j] >= 0);
@@ -211,7 +215,7 @@ namespace Shape_detection {
 
     // Fields.
     const Input_range& m_input_range;
-    Input_connectivity& m_connectivity;
+    Neighbor_query& m_neighbor_query;
     const Point_map m_point_map;
     
     std::vector<std::size_t> m_order;
@@ -220,7 +224,8 @@ namespace Shape_detection {
     const To_local_converter m_to_local_converter;
   };
 
+} // namespace Point_set
 } // namespace Shape_detection
 } // namespace CGAL
 
-#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_3_LEAST_SQUARES_PLANE_FIT_SORTING_H
+#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_POINT_SET_LEAST_SQUARES_PLANE_FIT_SORTING_H

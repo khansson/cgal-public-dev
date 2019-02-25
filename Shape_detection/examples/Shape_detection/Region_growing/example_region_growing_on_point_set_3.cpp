@@ -1,8 +1,10 @@
 // STL includes.
 #include <string>
+#include <vector>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 
 // CGAL includes.
 #include <CGAL/array.h>
@@ -14,7 +16,7 @@
 #include <CGAL/Point_set_3/IO.h>
 
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
-#include <CGAL/Shape_detection/Region_growing/Region_growing_on_points.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_point_set.h>
 
 // Type declarations.
 using Kernel = CGAL::Exact_predicates_inexact_constructions_kernel;
@@ -27,9 +29,9 @@ using Input_range = CGAL::Point_set_3<Point_3>;
 using Point_map   = typename Input_range::Point_map;
 using Normal_map  = typename Input_range::Vector_map;
 
-using Connectivity   = CGAL::Shape_detection::Points_k_nearest_neighbors_connectivity<Kernel, Input_range, Point_map>;
-using Conditions     = CGAL::Shape_detection::Points_3_least_squares_plane_fit_conditions<Kernel, Input_range, Point_map, Normal_map>;
-using Region_growing = CGAL::Shape_detection::Region_growing<Input_range, Connectivity, Conditions>;
+using Neighbor_query = CGAL::Shape_detection::Point_set::K_neighbor_query<Kernel, Input_range, Point_map>;
+using Region_type    = CGAL::Shape_detection::Point_set::Least_squares_plane_fit_region<Kernel, Input_range, Point_map, Normal_map>;
+using Region_growing = CGAL::Shape_detection::Region_growing<Input_range, Neighbor_query, Region_type>;
 
 using Color            = CGAL::cpp11::array<unsigned char, 3>;
 using Point_with_color = std::pair<Point_3, Color>;
@@ -64,21 +66,21 @@ namespace CGAL {
 int main(int argc, char *argv[]) {
     
   std::cout << std::endl << 
-    "region_growing_on_points_3 example started" 
+    "region_growing_on_point_set_3 example started" 
   << std::endl << std::endl;
     
   std::cout << 
-    "Note: if 0 points are loaded, please specify the path to the file data/points_3.xyz by hand!" 
+    "Note: if 0 points are loaded, please specify the path to the file data/point_set_3.xyz by hand!" 
   << std::endl << std::endl;
 
   // Load xyz data either from a local folder or a user-provided file.
-  std::ifstream in(argc > 1 ? argv[1] : "../data/points_3.xyz");
+  std::ifstream in(argc > 1 ? argv[1] : "../data/point_set_3.xyz");
   CGAL::set_ascii_mode(in);
 
   const bool with_normal_map = true;
   Input_range input_range(with_normal_map);
 
-  in >> input_range;    
+  in >> input_range;
   in.close();
 
   std::cout << 
@@ -87,42 +89,40 @@ int main(int argc, char *argv[]) {
     " points with normals" 
   << std::endl;
 
-  // Default parameter values for the data file points_3.xyz.
-  const size_t num_neighbors         = 100;
+  // Default parameter values for the data file point_set_3.xyz.
+  const size_t k                     = 100;
   const FT     max_distance_to_plane = FT(5) / FT(10);
-  const FT     normal_threshold      = FT(9) / FT(10);
+  const FT     max_accepted_angle    = FT(25);
   const size_t min_region_size       = 3;
 
-  // Create instances of the classes Connectivity and Conditions.
-  Connectivity connectivity(
+  // Create instances of the classes Neighbor_query and Region_type.
+  Neighbor_query neighbor_query(
     input_range, 
-    num_neighbors, 
+    k, 
     input_range.point_map());
     
-  Conditions conditions(
+  Region_type region_type(
     input_range, 
-    max_distance_to_plane, normal_threshold, min_region_size, 
+    max_distance_to_plane, max_accepted_angle, min_region_size,
     input_range.point_map(), input_range.normal_map());
 
   // Create an instance of the region growing class.
-  Region_growing region_growing(input_range, connectivity, conditions);
+  Region_growing region_growing(input_range, neighbor_query, region_type);
 
   // Run the algorithm.
-  region_growing.detect();
+  std::vector< std::vector<std::size_t> > regions;
+  region_growing.detect(std::back_inserter(regions));
 
   // Print the number of found regions.
-  std::cout << "* " << region_growing.number_of_regions() << 
+  std::cout << "* " << regions.size() << 
     " regions have been found" 
   << std::endl;
-
-  // Get all found regions.
-  const auto& regions = region_growing.regions();
 
   Pwc_vector pwc;
   srand(time(NULL));
 
   // Iterate through all regions.
-  for (auto region = regions.begin(); region != regions.end(); ++region) {
+  for (const auto& region : regions) {
         
     // Generate a random color.
     const Color color = 
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
         static_cast<unsigned char>(rand() % 256));
 
     // Iterate through all region items.
-    for (auto index : *region) {
+    for (const auto index : region) {
       const auto& key = *(input_range.begin() + index);
             
       const Point_3& point = get(input_range.point_map(), key);
@@ -144,7 +144,7 @@ int main(int argc, char *argv[]) {
   if (argc > 2) {
         
     const std::string path     = argv[2];
-    const std::string fullpath = path + "regions_points_3.ply";
+    const std::string fullpath = path + "regions_point_set_3.ply";
 
     std::ofstream out(fullpath);
 
@@ -162,18 +162,20 @@ int main(int argc, char *argv[]) {
     out.close();
   }
 
+  // Get all unassigned points.
+  std::vector<std::size_t> unassigned_items;
+  region_growing.output_unassigned_items(
+    std::back_inserter(unassigned_items));
+
   // Print the number of unassigned points.
-  std::cerr << "* " << region_growing.number_of_unassigned_items() << 
+  std::cerr << "* " << unassigned_items.size() << 
     " points do not belong to any region" 
   << std::endl;
-
-  // Get all unassigned points.
-  const auto &unassigned_items = region_growing.unassigned_items();
 
   // Store all unassigned points.
   std::vector<Point_3> unassigned_points;
 
-  for (auto index : unassigned_items) {
+  for (const auto index : unassigned_items) {
     const auto& key = *(input_range.begin() + index);
 
     const Point_3& point = get(input_range.point_map(), key);
@@ -185,7 +187,7 @@ int main(int argc, char *argv[]) {
   << std::endl;
   
   std::cout << std::endl << 
-    "region_growing_on_points_3 example finished" 
+    "region_growing_on_point_set_3 example finished" 
   << std::endl << std::endl;
 
   return EXIT_SUCCESS;

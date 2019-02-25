@@ -99,10 +99,10 @@ on a polygon mesh.}
 
 ## Region Growing Concepts ##
 - `NeighborQuery`
-- `RegionValidation`
+- `RegionType`
 
 ## Region Growing Main Class ##
-- `CGAL::Shape_detection::Region_growing<InputRange, NeighborQuery, RegionValidation, SeedMap>`
+- `CGAL::Shape_detection::Region_growing<InputRange, NeighborQuery, RegionType, SeedMap>`
 
 ## Region Growing On Point Set ##
 - `CGAL::Shape_detection::Point_set::K_neighbor_query<GeomTraits, InputRange, PointMap>`

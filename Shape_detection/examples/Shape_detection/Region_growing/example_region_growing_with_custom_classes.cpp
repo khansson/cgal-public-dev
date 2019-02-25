@@ -1,13 +1,15 @@
 // STL includes.
 #include <map>
+#include <list>
 #include <vector>
 #include <string>
 #include <iostream>
+#include <iterator>
 
 // CGAL includes.
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
 
-// Custom Connectivity, Conditions, and Seed_map classes for region growing.
+// Custom Neighbor_query, Region_type, and Seed_map classes for region growing.
 namespace custom {
 
   // An object that stores indices of all adjacent to it other objects.
@@ -18,19 +20,18 @@ namespace custom {
   // A range of objects.
   using Objects = std::vector<Object>;
 
-  // Connectivity class, where the function neighbors()
+  // Neighbor_query class that
   // simply returns indices of all neighbors stored in
-  // the object struct above. This is the only function that 
-  // we have to define.
-  class Connectivity {
+  // the object struct above.
+  class Neighbor_query {
     const Objects& m_objects;
 
   public:
-    Connectivity(Objects& objects) : 
+    Neighbor_query(Objects& objects) : 
     m_objects(objects) 
     { }
 
-    void neighbors(
+    void operator()(
       const std::size_t query_index, 
       std::vector<std::size_t>& neighbors) const {
       
@@ -38,18 +39,18 @@ namespace custom {
     }
   };
 
-  // Conditions class, where the function belongs_to_region() checks
+  // Region_type class, where the function is_part_of_region() checks
   // a very specific condition that the first and second objects in the
   // range are in fact neighbors; is_valid_region() function always 
   // returns true after the first call to the update() function.
   // These are the only functions that we have to define.
-  class Conditions {
+  class Region_type {
     bool m_is_valid = false;
 
   public:
-    Conditions() { }
+    Region_type() { }
 
-    bool belongs_to_region(
+    bool is_part_of_region(
       const std::size_t query_index,
       const std::vector<std::size_t>& region) const {
 
@@ -103,13 +104,13 @@ namespace custom {
 }
 
 // Type declarations.
-using Objects      = custom::Objects;
-using Connectivity = custom::Connectivity;
-using Conditions   = custom::Conditions;
-using Seed_map     = custom::Seed_map;
+using Objects        = custom::Objects;
+using Neighbor_query = custom::Neighbor_query;
+using Region_type    = custom::Region_type;
+using Seed_map       = custom::Seed_map;
 
 using Region_growing = 
-CGAL::Shape_detection::Region_growing<Objects, Connectivity, Conditions, Seed_map>;
+CGAL::Shape_detection::Region_growing<Objects, Neighbor_query, Region_type, Seed_map>;
 
 int main(int argc, char *argv[]) { 
   
@@ -131,9 +132,9 @@ int main(int argc, char *argv[]) {
   // Extra object to skip.
   objects[3].neighbors.resize(0);
 
-  // Create instances of the classes Connectivity and Conditions.
-  Connectivity connectivity = Connectivity(objects);
-  Conditions   conditions   = Conditions();
+  // Create instances of the classes Neighbor_query and Region_type.
+  Neighbor_query neighbor_query = Neighbor_query(objects);
+  Region_type    region_type    = Region_type();
 
   // Create a seed map.
   std::map<std::size_t, std::size_t> objects_map;
@@ -144,14 +145,14 @@ int main(int argc, char *argv[]) {
   const Seed_map seed_map(objects_map);
 
   // Create an instance of the region growing class.
-  Region_growing region_growing(objects, connectivity, conditions, seed_map);
+  Region_growing region_growing(objects, neighbor_query, region_type, seed_map);
 
   // Run the algorithm.
-  region_growing.detect();
+  std::list< std::vector<std::size_t> > regions;
+  region_growing.detect(std::back_inserter(regions));
 
   // Print the number of found regions. It must be two regions.
-  std::cout << "* " << 
-  region_growing.number_of_regions() << 
+  std::cout << "* " << regions.size() << 
     " regions have been found among " << objects.size() <<  " objects" 
   << std::endl;
   

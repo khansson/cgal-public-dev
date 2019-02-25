@@ -20,10 +20,10 @@
 // Author(s)     : Florent Lafarge, Simon Giraudot, Thien Hoang, Dmitry Anisimov
 //
 
-#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_K_NEAREST_NEIGHBORS_CONNECTIVITY_H
-#define CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_K_NEAREST_NEIGHBORS_CONNECTIVITY_H
+#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_POINT_SET_K_NEIGHBOR_QUERY_H
+#define CGAL_SHAPE_DETECTION_REGION_GROWING_POINT_SET_K_NEIGHBOR_QUERY_H
 
-// #include <CGAL/license/Shape_detection.h>
+#include <CGAL/license/Shape_detection.h>
 
 // STL includes.
 #include <typeinfo>
@@ -46,6 +46,7 @@
 
 namespace CGAL {
 namespace Shape_detection {
+namespace Point_set {
 
   /*!
     \ingroup PkgShapeDetectionRGOnPoints
@@ -74,7 +75,7 @@ namespace Shape_detection {
   typename GeomTraits, 
   typename InputRange, 
   typename PointMap>
-  class Points_k_nearest_neighbors_connectivity {
+  class K_neighbor_query {
 
   public:
 
@@ -139,12 +140,12 @@ namespace Shape_detection {
       \pre `input_range.size() > 0`
       \pre `number_of_neighbors >= 0`
     */
-    Points_k_nearest_neighbors_connectivity(
+    K_neighbor_query(
       const InputRange& input_range, 
-      const std::size_t number_of_neighbors = 12, 
+      const std::size_t k = 12, 
       const PointMap point_map = PointMap()) :
     m_input_range(input_range),
-    m_number_of_neighbors(number_of_neighbors),
+    m_number_of_neighbors(k),
     m_point_map(point_map),
     m_index_to_point_map(m_input_range, m_point_map),
     m_distance(m_index_to_point_map),
@@ -154,10 +155,10 @@ namespace Shape_detection {
       Splitter(),
       Search_traits(m_index_to_point_map)) { 
 
-      CGAL_precondition(m_input_range.size() > 0);
+      CGAL_precondition(input_range.size() > 0);
 
       m_tree.build();
-      CGAL_precondition(m_number_of_neighbors >= 0);
+      CGAL_precondition(k >= 0);
     }
 
     /// @}
@@ -183,7 +184,7 @@ namespace Shape_detection {
 
       \pre `query_index >= 0 && query_index < total_number_of_points`
     */
-    void neighbors(
+    void operator()(
       const std::size_t query_index, 
       std::vector<std::size_t>& neighbors) const {
 
@@ -218,7 +219,8 @@ namespace Shape_detection {
     Tree m_tree;
   };
 
+} // namespace Point_set
 } // namespace Shape_detection
 } // namespace CGAL
 
-#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_K_NEAREST_NEIGHBORS_CONNECTIVITY_H
+#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_POINT_SET_K_NEIGHBOR_QUERY_H

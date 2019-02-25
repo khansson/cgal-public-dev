@@ -20,10 +20,10 @@
 // Author(s)     : Florent Lafarge, Simon Giraudot, Thien Hoang, Dmitry Anisimov
 //
 
-#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_2_LEAST_SQUARES_LINE_FIT_CONDITIONS_H
-#define CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_2_LEAST_SQUARES_LINE_FIT_CONDITIONS_H
+#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_POINT_SET_LEAST_SQUARES_LINE_FIT_REGION_H
+#define CGAL_SHAPE_DETECTION_REGION_GROWING_POINT_SET_LEAST_SQUARES_LINE_FIT_REGION_H
 
-// #include <CGAL/license/Shape_detection.h>
+#include <CGAL/license/Shape_detection.h>
 
 // STL includes.
 #include <vector>
@@ -40,6 +40,7 @@
 
 namespace CGAL {
 namespace Shape_detection {
+namespace Point_set {
 
   /*! 
     \ingroup PkgShapeDetectionRGOnPoints
@@ -72,7 +73,7 @@ namespace Shape_detection {
   typename InputRange, 
   typename PointMap, 
   typename NormalMap>
-  class Points_2_least_squares_line_fit_conditions {
+  class Least_squares_line_fit_region {
 
   public:
 
@@ -87,16 +88,16 @@ namespace Shape_detection {
     /// \endcond
 
     /// Number type.
-    using FT = typename GeomTraits::FT;
+    typedef typename GeomTraits::FT FT;
 
     /// Point type.
-    using Point_2 = typename GeomTraits::Point_2;
+    typedef typename GeomTraits::Point_2 Point_2;
 
     /// Vector type.
-    using Vector_2 = typename GeomTraits::Vector_2;
+    typedef typename GeomTraits::Vector_2 Vector_2;
 
     /// Type of the line.
-    using Line_2 = typename GeomTraits::Line_2;
+    typedef typename GeomTraits::Line_2 Line_2;
 
     /// \cond SKIP_IN_MANUAL
     using Local_traits = Exact_predicates_inexact_constructions_kernel;
@@ -153,17 +154,20 @@ namespace Shape_detection {
       \pre `normal_threshold >= 0 && normal_threshold <= 1`
       \pre `min_region_size > 0`
     */
-    Points_2_least_squares_line_fit_conditions(
+    Least_squares_line_fit_region(
       const InputRange& input_range, 
       const FT distance_threshold = FT(1), 
-      const FT normal_threshold = FT(9) / FT(10), 
+      const FT angle_threshold = FT(25), 
       const std::size_t min_region_size = 2, 
       const PointMap point_map = PointMap(), 
       const NormalMap normal_map = NormalMap(), 
       const GeomTraits traits = GeomTraits()) :
     m_input_range(input_range),
     m_distance_threshold(distance_threshold),
-    m_normal_threshold(normal_threshold),
+    m_normal_threshold(static_cast<FT>(
+      std::cos(
+        CGAL::to_double(
+          (angle_threshold * static_cast<FT>(CGAL_PI)) / FT(180))))),
     m_min_region_size(min_region_size),
     m_point_map(point_map),
     m_normal_map(normal_map),
@@ -172,11 +176,11 @@ namespace Shape_detection {
     m_scalar_product_2(traits.compute_scalar_product_2_object()),
     m_sqrt(Get_sqrt::sqrt_object(traits)) {
 
-      CGAL_precondition(m_input_range.size() > 0); 
+      CGAL_precondition(input_range.size() > 0); 
 
-      CGAL_precondition(m_distance_threshold >= FT(0));
-      CGAL_precondition(m_normal_threshold >= FT(0) && m_normal_threshold <= FT(1));
-      CGAL_precondition(m_min_region_size > 0);
+      CGAL_precondition(distance_threshold >= FT(0));
+      CGAL_precondition(angle_threshold >= FT(0) && angle_threshold <= FT(90));
+      CGAL_precondition(min_region_size > 0);
     }
 
     /// @}
@@ -200,7 +204,7 @@ namespace Shape_detection {
 
       \pre `query_index >= 0 && query_index < total_number_of_points`
     */
-    bool belongs_to_region(
+    bool is_part_of_region(
       const std::size_t query_index, 
       const std::vector<std::size_t>&) const {
 
@@ -218,11 +222,11 @@ namespace Shape_detection {
       const FT distance_to_fitted_line = 
       m_sqrt(m_squared_distance_2(query_point, m_line_of_best_fit));
       
-      const FT cos_angle = 
+      const FT cos_value = 
       CGAL::abs(m_scalar_product_2(query_normal, m_normal_of_best_fit));
 
       return (( distance_to_fitted_line <= m_distance_threshold ) && 
-        ( cos_angle >= m_normal_threshold ));
+        ( cos_value >= m_normal_threshold ));
     }
 
     /*!
@@ -272,8 +276,11 @@ namespace Shape_detection {
         const FT normal_length = m_sqrt(m_squared_length_2(normal));
         CGAL_precondition(normal_length > FT(0));
 
-        m_line_of_best_fit = Line_2(point, normal).perpendicular(point);
-        m_normal_of_best_fit = normal / normal_length;
+        m_normal_of_best_fit = 
+        normal / normal_length;
+        
+        m_line_of_best_fit = 
+        Line_2(point, m_normal_of_best_fit).perpendicular(point);
 
       } else { // update reference line and normal
 
@@ -347,7 +354,8 @@ namespace Shape_detection {
     Vector_2 m_normal_of_best_fit;
   };
 
+} // namespace Point_set
 } // namespace Shape_detection
 } // namespace CGAL
 
-#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_POINTS_2_LEAST_SQUARES_LINE_FIT_CONDITIONS_H
+#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_POINT_SET_LEAST_SQUARES_LINE_FIT_REGION_H
