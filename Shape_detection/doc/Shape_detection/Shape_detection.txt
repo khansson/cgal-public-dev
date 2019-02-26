@@ -322,13 +322,13 @@ the third object forms the second region, and the last object is skipped.
 
 If one wants to detect lines (see \ref Shape_detection_RegionGrowingPoints_examples "2D Example")
 
-\cgalFigureBegin{Region_growing_on_points_2, Region_growing/region_growing_on_points_2.png}
+\cgalFigureBegin{Region_growing_on_point_set_2, Region_growing/region_growing_on_point_set_2.png}
 A 2D point set depicted with one color per detected line.
 \cgalFigureEnd
 
 or planes (see \ref Shape_detection_RegionGrowingPoints_examples "3D Example") 
 
-\cgalFigureBegin{Region_growing_on_points_3, Region_growing/region_growing_on_points_3.png}
+\cgalFigureBegin{Region_growing_on_point_set_3, Region_growing/region_growing_on_point_set_3.png}
 A 3D point set depicted with one color per detected plane.
 \cgalFigureEnd
 
@@ -372,7 +372,7 @@ to work for each case.
 - `search_radius` This parameter is used by the class `Shape_detection::Points_fuzzy_sphere_connectivity` 
 and defines a radius of a search circle in 2D case and sphere in 3D case;
 
-- `number_of_neighbors` This parameter defines the number K of nearest neighbors in the class `Shape_detection::Points_k_nearest_neighbors_connectivity`.
+- `number_of_neighbors` This parameter defines the number K of nearest neighbors in the class `Shape_detection::Point_set::K_neighbor_query`.
 
 The right choice for the `search_radius` or `number_of_neighbors` parameters plays an important role in producing a good result. 
 For example, if we consider the fuzzy sphere connectivity, when `search_radius` is too large, we have fewer regions, and the details are not clearly separated. 
@@ -420,12 +420,12 @@ Typical usage of the Region Growing component consists of five steps:
 Given a 2D point set, in the example below, we detect 2D lines on this set using fuzzy sphere neighbors search. We then color these regions and save them in a file. 
 The points with assigned to them normal vectors are stored in `std::vector` and the used `Kernel` is `CGAL::Simple_cartesian`, where the number type is `double`.
 
-\cgalExample{Shape_detection/Region_growing/example_region_growing_on_points_2.cpp}
+\cgalExample{Shape_detection/Region_growing/example_region_growing_on_point_set_2.cpp}
 
 If we are given a 3D point set, then the example below shows how to detect 3D planes on this set using the K nearest neighbors search. We color found regions 
 and save them in a file. The point set with associated normals is stored in `CGAL::Point_set_3` and the used `Kernel` is `CGAL::Exact_predicates_inexact_constructions_kernel`.
 
-\cgalExample{Shape_detection/Region_growing/example_region_growing_on_points_3.cpp}
+\cgalExample{Shape_detection/Region_growing/example_region_growing_on_point_set_3.cpp}
 
 We can improve the quality of Region Growing by providing a different seeding order. In the example below, we 
 first sort indices of 2D input points by the best local least squares line fit quality and only then detect regions. Moreover,

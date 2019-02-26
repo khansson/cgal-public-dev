@@ -15,7 +15,7 @@
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
 #include <CGAL/Shape_detection/Region_growing/Region_growing_on_point_set.h>
 
-namespace SD = CGAL::Shape_detection::Point_set;
+namespace SD = CGAL::Shape_detection;
 
 using Kernel = CGAL::Exact_predicates_inexact_constructions_kernel;
 
@@ -28,8 +28,8 @@ using Input_range       = std::vector<Point_with_normal>;
 using Point_map         = CGAL::First_of_pair_property_map<Point_with_normal>;
 using Normal_map        = CGAL::Second_of_pair_property_map<Point_with_normal>;
 
-using Neighbor_query = SD::Sphere_neighbor_query<Kernel, Input_range, Point_map>;
-using Region_type    = SD::Least_squares_line_fit_region<Kernel, Input_range, Point_map, Normal_map>;
+using Neighbor_query = SD::Point_set::Sphere_neighbor_query<Kernel, Input_range, Point_map>;
+using Region_type    = SD::Point_set::Least_squares_line_fit_region<Kernel, Input_range, Point_map, Normal_map>;
 using Region_growing = SD::Region_growing<Input_range, Neighbor_query, Region_type>;
 
 using Timer = CGAL::Timer;
@@ -58,8 +58,9 @@ void benchmark_region_growing_on_points_2(
 
   // Run the algorithm.
   Timer timer;
-  timer.start();
   std::vector< std::vector<std::size_t> > regions;
+  
+  timer.start();
   region_growing.detect(std::back_inserter(regions));
   timer.stop();
 

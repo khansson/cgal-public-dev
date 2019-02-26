@@ -1,7 +1,9 @@
 // STL includes.
+#include <vector>
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 
 // CGAL includes.
 #include <CGAL/property_map.h>
@@ -13,12 +15,12 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
-#include <CGAL/Shape_detection/Region_growing/Region_growing_on_points.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_point_set.h>
 
 namespace SD = CGAL::Shape_detection;
 
 template<class Kernel>
-bool test_region_growing_on_points_3(int argc, char *argv[]) {
+bool test_region_growing_on_point_set_3(int argc, char *argv[]) {
 
   using FT       = typename Kernel::FT;
   using Point_3  = typename Kernel::Point_3;
@@ -27,18 +29,18 @@ bool test_region_growing_on_points_3(int argc, char *argv[]) {
   using Point_map   = typename Input_range::Point_map;
   using Normal_map  = typename Input_range::Vector_map;
 
-  using Connectivity   = SD::Points_k_nearest_neighbors_connectivity<Kernel, Input_range, Point_map>;
-  using Conditions     = SD::Points_3_least_squares_plane_fit_conditions<Kernel, Input_range, Point_map, Normal_map>;
-  using Region_growing = SD::Region_growing<Input_range, Connectivity, Conditions>;
+  using Neighbor_query = SD::Point_set::K_neighbor_query<Kernel, Input_range, Point_map>;
+  using Region_type    = SD::Point_set::Least_squares_plane_fit_region<Kernel, Input_range, Point_map, Normal_map>;
+  using Region_growing = SD::Region_growing<Input_range, Neighbor_query, Region_type>;
 
-  // Default parameter values for the data file points_3.xyz.
-  const std::size_t num_neighbors         = 100;
+  // Default parameter values for the data file point_set_3.xyz.
+  const std::size_t k                     = 100;
   const FT          max_distance_to_plane = FT(5) / FT(10);
-  const FT          normal_threshold      = FT(9) / FT(10);
+  const FT          angle_threshold       = FT(25);
   const std::size_t min_region_size       = 3;
     
   // Load data.
-  std::ifstream in(argc > 1 ? argv[1] : "../data/points_3.xyz");
+  std::ifstream in(argc > 1 ? argv[1] : "../data/point_set_3.xyz");
   CGAL::set_ascii_mode(in);
 
   const bool with_normal_map = true;
@@ -51,39 +53,37 @@ bool test_region_growing_on_points_3(int argc, char *argv[]) {
   if (input_range.size() != 300000) 
     return false;
 
-  // Create connectivity and conditions.
-  Connectivity connectivity(
+  // Create parameter classes.
+  Neighbor_query neighbor_query(
     input_range, 
-    num_neighbors, 
+    k, 
     input_range.point_map());
 
-  Conditions conditions(
+  Region_type region_type(
     input_range, 
-    max_distance_to_plane, normal_threshold, min_region_size, 
+    max_distance_to_plane, angle_threshold, min_region_size, 
     input_range.point_map(), input_range.normal_map());
 
   // Run region growing.
-  Region_growing region_growing(input_range, connectivity, conditions);
-  region_growing.detect();
+  Region_growing region_growing(input_range, neighbor_query, region_type);
+  
+  std::vector< std::vector<std::size_t> > regions;
+  region_growing.detect(std::back_inserter(regions));
 
   // Test data.
-  const auto& regions = region_growing.regions();
-
-  CGAL_assertion(regions.size() == 1108);
-  if (regions.size() != 1108) 
+  CGAL_assertion(regions.size() == 1190);
+  if (regions.size() != 1190) 
     return false;
 
-  for (auto region = regions.begin(); region != regions.end(); ++region)
-    if (!conditions.is_valid_region(*region)) 
+  for (const auto& region : regions)
+    if (!region_type.is_valid_region(region)) 
       return false;
 
-  const auto& unassigned_points = region_growing.unassigned_items();
- 
-  CGAL_assertion(
-    unassigned_points.size() == 1063 && 
-    unassigned_points.size() == region_growing.number_of_unassigned_items());
+  std::vector<std::size_t> unassigned_points;
+  region_growing.output_unassigned_items(std::back_inserter(unassigned_points));
 
-  if (unassigned_points.size() != 1063) 
+  CGAL_assertion(unassigned_points.size() == 1134);
+  if (unassigned_points.size() != 1134) 
     return false;
 
   return true;
@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
   // ------>
 
   bool cartesian_double_test_success = true;
-  if (!test_region_growing_on_points_3< CGAL::Simple_cartesian<double> >(argc, argv)) 
+  if (!test_region_growing_on_point_set_3< CGAL::Simple_cartesian<double> >(argc, argv)) 
     cartesian_double_test_success = false;
     
   std::cout << "cartesian_double_test_success: " << cartesian_double_test_success << std::endl;
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
   // ------>
 
   bool exact_inexact_test_success = true;
-  if (!test_region_growing_on_points_3<CGAL::Exact_predicates_inexact_constructions_kernel>(argc, argv)) 
+  if (!test_region_growing_on_point_set_3<CGAL::Exact_predicates_inexact_constructions_kernel>(argc, argv)) 
     exact_inexact_test_success = false;
     
   std::cout << "exact_inexact_test_success: " << exact_inexact_test_success << std::endl;

@@ -3,7 +3,7 @@
 \cgalConcept
 
 A concept that describes the set of methods used by the `CGAL::Shape_detection::Region_growing` 
-approach to access connected items in a given set.
+to access connected items in a given set.
 
 \cgalHasModel 
 `CGAL::Shape_detection::Points_fuzzy_sphere_connectivity`, 
@@ -16,8 +16,7 @@ class NeighborQuery {
 public:
 
   /*!  
-    Returns indices of all items, which are connected to an item with the index `query_index`.
-    The indices are returned in `neighbors`.
+    Fills the vector `neighbors` with indices of all items, which are connected to an item with the index `query_index`.
 
     This function is called each time when a new query item is chosen.
   */

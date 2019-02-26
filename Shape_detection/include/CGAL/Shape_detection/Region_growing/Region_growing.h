@@ -29,6 +29,9 @@
 #include <queue>
 #include <vector>
 
+// Boost headers.
+#include <boost/optional/optional.hpp>
+
 // CGAL includes.
 #include <CGAL/assertions.h>
 
@@ -41,9 +44,9 @@ namespace Shape_detection {
   /*!
     \ingroup PkgShapeDetectionRG
     
-    \brief Generic Region Growing algorithm.
+    \brief Main class/entry point for running the region growing algorithm.
 
-    This version of Region Growing algorithm allows to grow regions on a set
+    This version of the region growing algorithm allows to grow regions on a set
     of user-defined items given a way to access neighbors of each item via a 
     `Connectivity` parameter class and control if items should form a region
     via a `Conditions` class. The `SeedMap` property map allows to define the
@@ -52,9 +55,6 @@ namespace Shape_detection {
     
     \tparam InputRange 
     is a model of `ConstRange`. Its iterator type is `RandomAccessIterator`. 
-    Its value type depends on the item type used in Region Growing, 
-    for example it can be `CGAL::Point_2`, `std::pair<CGAL::Point_3, CGAL::Vector_3>`, 
-    or any user-defined type.
 
     \tparam Connectivity 
     is a model of `RegionGrowingConnectivity`.
@@ -96,11 +96,11 @@ namespace Shape_detection {
       \param input_range 
       Contains items, which are planned to be used to grow regions upon.
 
-      \param connectivity 
+      \param neighbor_query 
       An instance of the `Connectivity` class that is used internally to 
       access item neighbors.
 
-      \param conditions 
+      \param region_type 
       An instance of the `Conditions` class that is used internally to 
       control if items should form a region.
 
@@ -130,8 +130,7 @@ namespace Shape_detection {
     /// @{
 
     /*!
-      \brief Runs the Region Growing algorithm and returns its result
-      via an output iterator.
+      \brief Runs the Region Growing algorithm and  fills an output iterator with the results
 
       Runs the Region Growing algorithm on the input range with items, 
       using a `Connectivity` class to find neighbors and a `Conditions` class 
@@ -151,7 +150,7 @@ namespace Shape_detection {
       \warning All functions from Access Section will return empty values.
     */
     template<typename OutputIterator>
-    void detect(OutputIterator regions) {
+    boost::optional<OutputIterator> detect(OutputIterator regions) {
 
       clear();
       Indices region;
@@ -175,6 +174,8 @@ namespace Shape_detection {
             *(regions++) = region;
         }
       }
+
+      return boost::optional<OutputIterator>(regions);
     }
 
     /// @}
@@ -190,7 +191,7 @@ namespace Shape_detection {
       has not been called.
     */
     template<typename OutputIterator>
-    void output_unassigned_items(OutputIterator output) const {
+    boost::optional<OutputIterator> output_unassigned_items(OutputIterator output) const {
       
       // Return indices of all unassigned items.
       for (std::size_t i = 0; i < m_input_range.size(); ++i) {
@@ -203,6 +204,8 @@ namespace Shape_detection {
         if (!m_visited[seed_index]) 
           *(output++) = seed_index;
       }
+
+      return boost::optional<OutputIterator>(output);
     }
 
     /// @}

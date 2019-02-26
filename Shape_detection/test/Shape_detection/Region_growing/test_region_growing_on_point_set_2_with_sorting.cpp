@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 
 // CGAL includes.
 #include <CGAL/assertions.h>
@@ -12,7 +13,7 @@
 #include <CGAL/Simple_cartesian.h>
 
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
-#include <CGAL/Shape_detection/Region_growing/Region_growing_on_points.h>
+#include <CGAL/Shape_detection/Region_growing/Region_growing_on_point_set.h>
 
 namespace SD = CGAL::Shape_detection;
 
@@ -28,15 +29,15 @@ using Input_range       = std::vector<Point_with_normal>;
 using Point_map         = CGAL::First_of_pair_property_map<Point_with_normal>;
 using Normal_map        = CGAL::Second_of_pair_property_map<Point_with_normal>;
 
-using Connectivity   = SD::Points_fuzzy_sphere_connectivity<Kernel, Input_range, Point_map>;
-using Conditions     = SD::Points_2_least_squares_line_fit_conditions<Kernel, Input_range, Point_map, Normal_map>;
-using Sorting        = SD::Points_2_least_squares_line_fit_sorting<Kernel, Input_range, Connectivity, Point_map>;
-using Region_growing = SD::Region_growing<Input_range, Connectivity, Conditions, typename Sorting::Seed_map>;
+using Neighbor_query = SD::Point_set::Sphere_neighbor_query<Kernel, Input_range, Point_map>;
+using Region_type    = SD::Point_set::Least_squares_line_fit_region<Kernel, Input_range, Point_map, Normal_map>;
+using Sorting        = SD::Point_set::Least_squares_line_fit_sorting<Kernel, Input_range, Neighbor_query, Point_map>;
+using Region_growing = SD::Region_growing<Input_range, Neighbor_query, Region_type, typename Sorting::Seed_map>;
 
 int main(int argc, char *argv[]) {
 
   // Load xyz data either from a local folder or a user-provided file.
-  std::ifstream in(argc > 1 ? argv[1] : "../data/points_2.xyz");
+  std::ifstream in(argc > 1 ? argv[1] : "../data/point_set_2.xyz");
   CGAL::set_ascii_mode(in);
 
   Input_range input_range;
@@ -47,33 +48,33 @@ int main(int argc, char *argv[]) {
       std::make_pair(Point_2(a, b), Vector_2(d, e)));
   in.close();
 
-  // Default parameter values for the data file points_2.xyz.
-  const FT     search_radius        = FT(5);
+  // Default parameter values for the data file point_set_2.xyz.
+  const FT     sphere_radius        = FT(5);
   const FT     max_distance_to_line = FT(45) / FT(10);
-  const FT     normal_threshold     = FT(7)  / FT(10);
+  const FT     angle_threshold      = FT(45);
   const size_t min_region_size      = 5;
 
-  // Create instances of the classes Connectivity and Conditions.
-  Connectivity connectivity(
+  // Create instances of the parameter classes.
+  Neighbor_query neighbor_query(
     input_range, 
-    search_radius);
+    sphere_radius);
 
-  Conditions conditions(
+  Region_type region_type(
     input_range, 
-    max_distance_to_line, normal_threshold, min_region_size);
+    max_distance_to_line, angle_threshold, min_region_size);
 
   // Sort point indices.
   Sorting sorting(
-    input_range, connectivity);
+    input_range, neighbor_query);
   sorting.sort();
     
   // Create an instance of the region growing class.
   Region_growing region_growing(
-    input_range, connectivity, conditions, 
+    input_range, neighbor_query, region_type, 
     sorting.seed_map());
 
   // Run the algorithm.
-  std::vector<typename Region_growing::Item_indices> regions;
+  std::vector< std::vector<std::size_t> > regions;
   region_growing.detect(std::back_inserter(regions));
 
   region_growing.release_memory();

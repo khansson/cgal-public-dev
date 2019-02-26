@@ -129,7 +129,7 @@ namespace Point_set {
       \param input_range 
       An instance of an `InputRange` container with 2D or 3D points.
 
-      \param number_of_neighbors 
+      \param k 
       The fixed number that defines how many closest points to the query 
       point should be identified.
 

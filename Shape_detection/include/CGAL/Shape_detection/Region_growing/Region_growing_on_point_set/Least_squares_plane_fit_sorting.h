@@ -105,7 +105,7 @@ namespace Point_set {
       \param input_range 
       An instance of an `InputRange` container with 3D points.
 
-      \param connectivity 
+      \param neighbor_query 
       An instance of the `Connectivity` class that is used
       internally to access point neighbors.
 

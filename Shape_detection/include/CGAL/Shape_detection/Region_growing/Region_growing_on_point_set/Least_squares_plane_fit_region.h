@@ -61,7 +61,7 @@ namespace Point_set {
     or any user-defined type.
 
     \tparam PointMap 
-    is an `LvaluePropertyMap` that maps to `CGAL::Point_3`.
+    is an `LvaluePropertyMap` that maps key to `CGAL::Point_3`.
 
     \tparam NormalMap 
     is an `LvaluePropertyMap` that maps to `CGAL::Vector_3`.
@@ -101,7 +101,6 @@ namespace Point_set {
 
     /// \cond SKIP_IN_MANUAL
     using Local_traits = Exact_predicates_inexact_constructions_kernel;
-    using Local_FT = typename Local_traits::FT;
     using Local_point_3 = typename Local_traits::Point_3;
     using Local_plane_3 = typename Local_traits::Plane_3;
     using To_local_converter = Cartesian_converter<Traits, Local_traits>;
@@ -130,7 +129,7 @@ namespace Point_set {
       Maximum distance from a point to the region represented by a plane of 
       the type `CGAL::Plane_3`.
 
-      \param normal_threshold 
+      \param angle_threshold 
       Minimum dot product between the normal assigned to the point and 
       the normal assigned to the region represented by a plane 
       of the type `CGAL::Plane_3`.
@@ -302,17 +301,10 @@ namespace Point_set {
 
         // The best fit plane will be a plane fitted to all region points with 
         // its normal being perpendicular to the plane.
-        #ifndef CGAL_EIGEN3_ENABLED
-          linear_least_squares_fitting_3(
-            points.begin(), points.end(), 
-            fitted_plane, fitted_centroid, CGAL::Dimension_tag<0>(), 
-            Local_traits(), CGAL::Default_diagonalize_traits<Local_FT, 3>());
-        #else 
-          linear_least_squares_fitting_3(
-            points.begin(), points.end(), 
-            fitted_plane, fitted_centroid, CGAL::Dimension_tag<0>(), 
-            Local_traits(), CGAL::Eigen_diagonalize_traits<Local_FT, 3>());
-        #endif
+        CGAL::linear_least_squares_fitting_3(
+          points.begin(), points.end(), 
+          fitted_plane, fitted_centroid, 
+          CGAL::Dimension_tag<0>());
                     
         m_plane_of_best_fit = 
         Plane_3(

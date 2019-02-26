@@ -116,7 +116,7 @@ namespace Polygon_mesh {
       \param polygon_mesh 
       An instance of a `FaceListGraph` that represents a polygon mesh.
 
-      \param connectivity 
+      \param neighbor_query 
       An instance of the `Connectivity` class that is used
       internally to access face neighbors.
 

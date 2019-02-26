@@ -1,8 +1,10 @@
 // STL includes.
+#include <vector>
 #include <string>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 
 // CGAL includes.
 #include <CGAL/assertions.h>
@@ -24,10 +26,10 @@ using Point_3 = typename Kernel::Point_3;
 using Polygon_mesh = CGAL::Surface_mesh<Point_3>;
 using Face_range   = typename Polygon_mesh::Face_range;
 
-using Connectivity   = SD::Polygon_mesh_adjacent_faces_connectivity<Polygon_mesh>;
-using Conditions     = SD::Polygon_mesh_least_squares_plane_fit_conditions<Kernel, Polygon_mesh>;
-using Sorting        = SD::Polygon_mesh_least_squares_plane_fit_sorting<Kernel, Polygon_mesh, Connectivity>;
-using Region_growing = SD::Region_growing<Face_range, Connectivity, Conditions, typename Sorting::Seed_map>;
+using Neighbor_query = SD::Polygon_mesh::One_ring_neighbor_query<Polygon_mesh>;
+using Region_type    = SD::Polygon_mesh::Least_squares_plane_fit_region<Kernel, Polygon_mesh>;
+using Sorting        = SD::Polygon_mesh::Least_squares_plane_fit_sorting<Kernel, Polygon_mesh, Neighbor_query>;
+using Region_growing = SD::Region_growing<Face_range, Neighbor_query, Region_type, typename Sorting::Seed_map>;
 
 int main(int argc, char *argv[]) {
 
@@ -43,40 +45,40 @@ int main(int argc, char *argv[]) {
 
   // Default parameter values for the data file polygon_mesh.off.
   const FT          max_distance_to_plane = FT(1);
-  const FT          normal_threshold      = FT(7) / FT(10);
+  const FT          angle_threshold       = FT(45);
   const std::size_t min_region_size       = 5;
 
-  // Create instances of the classes Connectivity and Conditions.
-  Connectivity connectivity(polygon_mesh);
+  // Create instances of the parameter classes.
+  Neighbor_query neighbor_query(polygon_mesh);
 
-  using Vertex_to_point_map = typename Conditions::Vertex_to_point_map;
+  using Vertex_to_point_map = typename Region_type::Vertex_to_point_map;
   const Vertex_to_point_map vertex_to_point_map(
     get(CGAL::vertex_point, polygon_mesh));
 
-  Conditions conditions(
+  Region_type region_type(
     polygon_mesh, 
-    max_distance_to_plane, normal_threshold, min_region_size, 
+    max_distance_to_plane, angle_threshold, min_region_size, 
     vertex_to_point_map);
 
   // Sort face indices.
   Sorting sorting(
-    polygon_mesh, connectivity,
+    polygon_mesh, neighbor_query,
     vertex_to_point_map);
   sorting.sort();
 
   // Create an instance of the region growing class.
   Region_growing region_growing(
-    face_range, connectivity, conditions, 
+    face_range, neighbor_query, region_type, 
     sorting.seed_map());
 
   // Run the algorithm.
-  std::vector<typename Region_growing::Item_indices> regions;
+  std::vector< std::vector<std::size_t> > regions;
   region_growing.detect(std::back_inserter(regions));
 
   region_growing.release_memory();
-  CGAL_assertion(regions.size() == 321);
+  CGAL_assertion(regions.size() == 325);
 
-  const bool exact_exact_test_success = (regions.size() == 321);
+  const bool exact_exact_test_success = (regions.size() == 325);
   std::cout << "exact_exact_test_success: " << exact_exact_test_success << std::endl;
 
   return EXIT_SUCCESS;

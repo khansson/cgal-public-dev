@@ -76,35 +76,39 @@ on a polygon mesh.}
 
 \cgalClassifedRefPages
 
-## Efficient RANSAC Concepts ##
+## Efficient RANSAC ##
+
+### Concepts ###
 - `EfficientRANSACTraits`
 
-## Efficient RANSAC Main Classes ##
+### Main Classes ###
 - `CGAL::Shape_detection::Efficient_RANSAC_traits<GeomTraits, InputRange, PointMap, NormalMap>`
 - `CGAL::Shape_detection::Efficient_RANSAC<Traits>`
 
-## Efficient RANSAC Shape Interface ##
+### Shape Interface ###
 - `CGAL::Shape_detection::Shape_base<Traits>`
 
-## Efficient RANSAC Shape Classes ##
+### Shape Classes ###
 - `CGAL::Shape_detection::Plane<Traits>`
 - `CGAL::Shape_detection::Sphere<Traits>`
 - `CGAL::Shape_detection::Cylinder<Traits>`
 - `CGAL::Shape_detection::Cone<Traits>`
 - `CGAL::Shape_detection::Torus<Traits>`
 
-## Efficient RANSAC Property Maps ##
+### Property Maps ###
 - `CGAL::Shape_detection::Plane_map<Traits>`
 - `CGAL::Shape_detection::Point_to_shape_index_map<Traits>`
 
-## Region Growing Concepts ##
+## Region Growing ##
+
+### Concepts ###
 - `NeighborQuery`
 - `RegionType`
 
-## Region Growing Main Class ##
+### Main Class ###
 - `CGAL::Shape_detection::Region_growing<InputRange, NeighborQuery, RegionType, SeedMap>`
 
-## Region Growing On Point Set ##
+### Point Set ###
 - `CGAL::Shape_detection::Point_set::K_neighbor_query<GeomTraits, InputRange, PointMap>`
 - `CGAL::Shape_detection::Point_set::Sphere_neighbor_query<GeomTraits, InputRange, PointMap>`
 - `CGAL::Shape_detection::Point_set::Least_squares_line_fit_region<GeomTraits, InputRange, PointMap, NormalMap>`
@@ -112,7 +116,7 @@ on a polygon mesh.}
 - `CGAL::Shape_detection::Point_set::Least_squares_line_fit_sorting<GeomTraits, InputRange, NeighborQuery, PointMap>`
 - `CGAL::Shape_detection::Point_set::Least_squares_plane_fit_sorting<GeomTraits, InputRange, NeighborQuery, PointMap>`
 
-## Region Growing On Polygon Mesh ##
+### Polygon Mesh ###
 - `CGAL::Shape_detection::Polygon_mesh::One_ring_neighbor_query<FaceListGraph, FaceRange>`
 - `CGAL::Shape_detection::Polygon_mesh::Least_squares_plane_fit_region<GeomTraits, FaceListGraph, FaceRange, VertexToPointMap>`
 - `CGAL::Shape_detection::Polygon_mesh::Least_squares_plane_fit_sorting<GeomTraits, FaceListGraph, NeighborQuery, FaceRange, VertexToPointMap>`

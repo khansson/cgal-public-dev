@@ -48,9 +48,9 @@ namespace Point_set {
 
     \brief Least squares line fit sorting of 2D points.
 
-    This class allows to sort indices of 2D points, where the sorting is
+    sort the indices of 2D points
     based on the quality of the local best least squares line fit. 
-    The line is fitted to each point and its neighbors found via the 
+    The line (which one?) is fitted to each point and its neighbors found via the 
     `Connectivity` class. The points are sorted in the decreasing quality order,
     that is the first index - the best quality.
 
@@ -105,7 +105,7 @@ namespace Point_set {
       \param input_range 
       An instance of an `InputRange` container with 2D points.
 
-      \param connectivity 
+      \param neighbor_query 
       An instance of the `Connectivity` class that is used
       internally to access point neighbors.
 

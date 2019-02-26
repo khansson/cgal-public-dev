@@ -101,7 +101,6 @@ namespace Point_set {
 
     /// \cond SKIP_IN_MANUAL
     using Local_traits = Exact_predicates_inexact_constructions_kernel;
-    using Local_FT = typename Local_traits::FT;
     using Local_point_2 = typename Local_traits::Point_2;
     using Local_line_2 = typename Local_traits::Line_2;
     using To_local_converter = Cartesian_converter<Traits, Local_traits>;
@@ -130,7 +129,7 @@ namespace Point_set {
       Maximum distance from a point to the region represented by a line of 
       the type `CGAL::Line_2`.
 
-      \param normal_threshold 
+      \param angle_threshold 
       Minimum dot product between the normal assigned to the point and 
       the normal assigned to the region represented by a line 
       of the type `CGAL::Line_2`.
@@ -191,8 +190,7 @@ namespace Point_set {
     /*!
       \brief Checks if a point belongs to a region.
 
-      Checks if the point with the index `query_index` belongs to the region
-      that is currently getting developed using the `distance_threshold` and
+      developed using the `distance_threshold` and
       `normal_threshold` values.
 
       \param query_index
@@ -302,17 +300,10 @@ namespace Point_set {
 
         // The best fit line will be a line fitted to all region points with 
         // its normal being perpendicular to the line.
-        #ifndef CGAL_EIGEN2_ENABLED
-          linear_least_squares_fitting_2(
-            points.begin(), points.end(), 
-            fitted_line, fitted_centroid, CGAL::Dimension_tag<0>(), 
-            Local_traits(), CGAL::Default_diagonalize_traits<Local_FT, 2>());
-        #else 
-          linear_least_squares_fitting_2(
-            points.begin(), points.end(), 
-            fitted_line, fitted_centroid, CGAL::Dimension_tag<0>(), 
-            Local_traits(), CGAL::Eigen_diagonalize_traits<Local_FT, 2>());
-        #endif
+        CGAL::linear_least_squares_fitting_2(
+          points.begin(), points.end(), 
+          fitted_line, fitted_centroid, 
+          CGAL::Dimension_tag<0>());
                     
         m_line_of_best_fit = 
         Line_2(

@@ -54,9 +54,7 @@ namespace Point_set {
     \brief Kd tree based fuzzy sphere search for neighbors on a set 
     of `Point_2` or `Point_3`.
 
-    This class uses a Kd tree to search for all points, which belong to a sphere
-    of the fixed radius centered at the query point, and thus being its 
-    direct neighbors.
+   This class uses a kd-tree to define the neighbors of a query points as its k nearest neighbors.
 
     \tparam GeomTraits 
     is a model of `Kernel`.
@@ -122,12 +120,12 @@ namespace Point_set {
     /// @{
 
     /*!
-      \brief Initializes all internal data structures.
+      \brief Builds a Kd tree.
 
       \param input_range 
       An instance of an `InputRange` container with 2D or 3D points.
 
-      \param search_radius 
+      \param sphere_radius 
       Fixed radius of the fuzzy sphere used for searching neighbors.
 
       \param point_map

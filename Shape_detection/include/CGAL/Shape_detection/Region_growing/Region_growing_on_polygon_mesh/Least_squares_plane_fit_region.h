@@ -93,7 +93,6 @@ namespace Polygon_mesh {
     using Vector_3 = typename Traits::Vector_3;
 
     using Local_traits = Exact_predicates_inexact_constructions_kernel;
-    using Local_FT = typename Local_traits::FT;
     using Local_point_3 = typename Local_traits::Point_3;
     using Local_plane_3 = typename Local_traits::Plane_3;
     using To_local_converter = Cartesian_converter<Traits, Local_traits>;
@@ -133,7 +132,7 @@ namespace Polygon_mesh {
       Maximum distance from a face to the region represented by a plane of 
       the type `CGAL::Plane_3`.
 
-      \param normal_threshold 
+      \param angle_threshold 
       Minimum dot product between the face normal and the normal assigned 
       to the region represented by a plane of the type `CGAL::Plane_3`.
 
@@ -296,17 +295,10 @@ namespace Polygon_mesh {
 
         // The best fit plane will be a plane fitted to all vertices of all
         // region faces with its normal being perpendicular to the plane.
-        #ifndef CGAL_EIGEN3_ENABLED
-          linear_least_squares_fitting_3(
-            points.begin(), points.end(), 
-            fitted_plane, fitted_centroid, CGAL::Dimension_tag<0>(), 
-            Local_traits(), CGAL::Default_diagonalize_traits<Local_FT, 3>());
-        #else 
-          linear_least_squares_fitting_3(
-            points.begin(), points.end(), 
-            fitted_plane, fitted_centroid, CGAL::Dimension_tag<0>(), 
-            Local_traits(), CGAL::Eigen_diagonalize_traits<Local_FT, 3>());
-        #endif
+        CGAL::linear_least_squares_fitting_3(
+          points.begin(), points.end(), 
+          fitted_plane, fitted_centroid, 
+          CGAL::Dimension_tag<0>());
 
         m_plane_of_best_fit = 
         Plane_3(
