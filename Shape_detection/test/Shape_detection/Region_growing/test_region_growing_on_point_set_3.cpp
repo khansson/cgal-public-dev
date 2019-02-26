@@ -34,10 +34,10 @@ bool test_region_growing_on_point_set_3(int argc, char *argv[]) {
   using Region_growing = SD::Region_growing<Input_range, Neighbor_query, Region_type>;
 
   // Default parameter values for the data file point_set_3.xyz.
-  const std::size_t k                     = 100;
-  const FT          max_distance_to_plane = FT(5) / FT(10);
-  const FT          angle_threshold       = FT(25);
-  const std::size_t min_region_size       = 3;
+  const std::size_t k                     = 12;
+  const FT          max_distance_to_plane = FT(2);
+  const FT          angle_threshold       = FT(20);
+  const std::size_t min_region_size       = 25;
     
   // Load data.
   std::ifstream in(argc > 1 ? argv[1] : "../data/point_set_3.xyz");
@@ -71,8 +71,8 @@ bool test_region_growing_on_point_set_3(int argc, char *argv[]) {
   region_growing.detect(std::back_inserter(regions));
 
   // Test data.
-  CGAL_assertion(regions.size() == 1190);
-  if (regions.size() != 1190) 
+  CGAL_assertion(regions.size() == 140);
+  if (regions.size() != 140) 
     return false;
 
   for (const auto& region : regions)
@@ -82,8 +82,8 @@ bool test_region_growing_on_point_set_3(int argc, char *argv[]) {
   std::vector<std::size_t> unassigned_points;
   region_growing.output_unassigned_items(std::back_inserter(unassigned_points));
 
-  CGAL_assertion(unassigned_points.size() == 1134);
-  if (unassigned_points.size() != 1134) 
+  CGAL_assertion(unassigned_points.size() == 13467);
+  if (unassigned_points.size() != 13467) 
     return false;
 
   return true;

@@ -37,6 +37,7 @@ using Color = CGAL::Color;
 
     using Neighbor_query = CGAL::Shape_detection::Polygon_mesh::One_ring_neighbor_query<Polygon_mesh>;
     using Region_type    = CGAL::Shape_detection::Polygon_mesh::Least_squares_plane_fit_region<Kernel, Polygon_mesh>;
+    using Sorting        = CGAL::Shape_detection::Polygon_mesh::Least_squares_plane_fit_sorting<Kernel, Polygon_mesh, Neighbor_query>;
 
 #else
 
@@ -45,10 +46,11 @@ using Color = CGAL::Color;
     
     using Neighbor_query = CGAL::Shape_detection::Polygon_mesh::One_ring_neighbor_query<Polygon_mesh, Face_range>;
     using Region_type    = CGAL::Shape_detection::Polygon_mesh::Least_squares_plane_fit_region<Kernel, Polygon_mesh, Face_range>;
+    using Sorting        = CGAL::Shape_detection::Polygon_mesh::Least_squares_plane_fit_sorting<Kernel, Polygon_mesh, Neighbor_query, Face_range>;
 
 #endif
 
-using Region_growing = CGAL::Shape_detection::Region_growing<Face_range, Neighbor_query, Region_type>;
+using Region_growing = CGAL::Shape_detection::Region_growing<Face_range, Neighbor_query, Region_type, typename Sorting::Seed_map>;
 
 int main(int argc, char *argv[]) {
 
@@ -89,8 +91,16 @@ int main(int argc, char *argv[]) {
     max_distance_to_plane, max_accepted_angle, min_region_size, 
     vertex_to_point_map);
 
+  // Sort face indices.
+  Sorting sorting(
+    polygon_mesh, neighbor_query,
+    vertex_to_point_map);
+  sorting.sort();
+
   // Create an instance of the region growing class.
-  Region_growing region_growing(face_range, neighbor_query, region_type);
+  Region_growing region_growing(
+    face_range, neighbor_query, region_type,
+    sorting.seed_map());
 
   // Run the algorithm.
   std::vector< std::vector<std::size_t> > regions;
@@ -153,6 +163,9 @@ int main(int argc, char *argv[]) {
     }
 
   #endif
+
+  // Release all internal memory.
+  region_growing.release_memory();
 
   std::cout << std::endl << 
     "region_growing_on_polygon_mesh example finished" 

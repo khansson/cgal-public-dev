@@ -10,5 +10,4 @@
 \example Shape_detection/Region_growing/example_region_growing_on_point_set_3.cpp
 \example Shape_detection/Region_growing/example_region_growing_on_polygon_mesh.cpp
 \example Shape_detection/Region_growing/example_region_growing_with_custom_classes.cpp
-\example Shape_detection/Region_growing/example_region_growing_with_sorting.cpp
 */

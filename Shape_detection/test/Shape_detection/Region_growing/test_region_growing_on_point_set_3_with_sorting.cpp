@@ -47,10 +47,10 @@ int main(int argc, char *argv[]) {
   in.close();
 
   // Default parameter values for the data file point_set_3.xyz.
-  const size_t k                     = 100;
-  const FT     max_distance_to_plane = FT(5) / FT(10);
-  const FT     angle_threshold       = FT(25);
-  const size_t min_region_size       = 3;
+  const size_t k                     = 12;
+  const FT     max_distance_to_plane = FT(2);
+  const FT     angle_threshold       = FT(20);
+  const size_t min_region_size       = 25;
 
   // Create instances of the parameter classes.
   Neighbor_query neighbor_query(
@@ -79,9 +79,9 @@ int main(int argc, char *argv[]) {
   region_growing.detect(std::back_inserter(regions));
 
   region_growing.release_memory();
-  CGAL_assertion(regions.size() == 1271);
+  CGAL_assertion(regions.size() == 140);
 
-  const bool exact_inexact_test_success = (regions.size() == 1271);
+  const bool exact_inexact_test_success = (regions.size() == 140);
   std::cout << "exact_inexact_test_success: " << exact_inexact_test_success << std::endl;
 
   return EXIT_SUCCESS;

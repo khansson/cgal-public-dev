@@ -10,7 +10,7 @@
 #include <CGAL/Shape_detection/Region_growing/Region_growing.h>
 
 // Custom Neighbor_query, Region_type, and Seed_map classes for region growing.
-namespace custom {
+namespace Custom {
 
   // An object that stores indices of all adjacent to it other objects.
   struct Object {
@@ -18,7 +18,7 @@ namespace custom {
   };
 
   // A range of objects.
-  using Objects = std::vector<Object>;
+  using Objects = std::list<Object>;
 
   // Neighbor_query class that
   // simply returns indices of all neighbors stored in
@@ -35,7 +35,14 @@ namespace custom {
       const std::size_t query_index, 
       std::vector<std::size_t>& neighbors) const {
       
-      neighbors = m_objects[query_index].neighbors;
+      std::size_t i = 0;
+      for (const auto& object : m_objects) {
+        if (i == query_index) {
+          
+          neighbors = object.neighbors;
+          return;
+        } ++i;
+      }
     }
   };
 
@@ -88,7 +95,7 @@ namespace custom {
     { }
 
     value_type operator[](const key_type key) const { 
-      return m_objects_map.at(key);
+      return m_objects_map.find(key)->second;
     }
 
     friend value_type get(
@@ -104,10 +111,11 @@ namespace custom {
 }
 
 // Type declarations.
-using Objects        = custom::Objects;
-using Neighbor_query = custom::Neighbor_query;
-using Region_type    = custom::Region_type;
-using Seed_map       = custom::Seed_map;
+using Object         = Custom::Object;
+using Objects        = Custom::Objects;
+using Neighbor_query = Custom::Neighbor_query;
+using Region_type    = Custom::Region_type;
+using Seed_map       = Custom::Seed_map;
 
 using Region_growing = 
 CGAL::Shape_detection::Region_growing<Objects, Neighbor_query, Region_type, Seed_map>;
@@ -120,17 +128,24 @@ int main(int argc, char *argv[]) {
 
   // Define a range of objects, where the first two objects form
   // the first region, while the third object forms the second region.
-  Objects objects(4);
+  Objects objects;
 
   // Region 1.
-  objects[0].neighbors.resize(1, 1);
-  objects[1].neighbors.resize(1, 0);
+  Object object1;
+  object1.neighbors.resize(1, 1); 
+  objects.push_back(object1);
+  
+  Object object2;
+  object2.neighbors.resize(1, 0); 
+  objects.push_back(object2);
 
   // Region 2.
-  objects[2].neighbors.resize(0);
+  Object object3;
+  objects.push_back(object3);
 
   // Extra object to skip.
-  objects[3].neighbors.resize(0);
+  Object object4;
+  objects.push_back(object4);
 
   // Create instances of the classes Neighbor_query and Region_type.
   Neighbor_query neighbor_query = Neighbor_query(objects);
@@ -148,7 +163,8 @@ int main(int argc, char *argv[]) {
   Region_growing region_growing(objects, neighbor_query, region_type, seed_map);
 
   // Run the algorithm.
-  std::list< std::vector<std::size_t> > regions;
+  using Region = std::vector<std::size_t>;
+  std::list<Region> regions;
   region_growing.detect(std::back_inserter(regions));
 
   // Print the number of found regions. It must be two regions.

@@ -39,7 +39,7 @@ void benchmark_region_growing_on_points_2(
   const Input_range& input_range, 
   const FT search_radius, 
   const FT max_distance_to_line, 
-  const FT normal_threshold, 
+  const FT angle_threshold, 
   const size_t min_region_size) {
 
   // Create instances of the classes Neighbor_query and Region_type.
@@ -50,7 +50,7 @@ void benchmark_region_growing_on_points_2(
   Region_type region_type(
     input_range, 
     max_distance_to_line, 
-    normal_threshold, 
+    angle_threshold, 
     min_region_size);
     
   // Create an instance of the region growing class.
@@ -77,7 +77,7 @@ void benchmark_region_growing_on_points_2(
   std::cout << "  search_radius = "              << search_radius                               << std::endl;
   std::cout << "  min_region_size = "            << min_region_size                             << std::endl;
   std::cout << "  max_distance_to_line = "       << max_distance_to_line                        << std::endl;
-  std::cout << "  normal_threshold = "           << normal_threshold                            << std::endl;
+  std::cout << "  angle_threshold = "            << angle_threshold                             << std::endl;
   std::cout << "  -----"                                                                        << std::endl;
   std::cout << "  Time elapsed: "                << timer.time()                                << std::endl;
   std::cout << "  Number of detected regions: "  << regions.size()                              << std::endl;
@@ -102,19 +102,19 @@ int main(int argc, char *argv[]) {
 
   // Default parameter values for the data file point_set_2.xyz.
   const FT     max_distance_to_line = FT(45) / FT(10);
-  const FT     normal_threshold     = FT(7)  / FT(10);
+  const FT     angle_threshold      = FT(45);
   const size_t min_region_size      = 5;
 
   // Run benchmarks.
   benchmark_region_growing_on_points_2(1, input_range, FT(1), 
-  max_distance_to_line, normal_threshold, min_region_size);
+  max_distance_to_line, angle_threshold, min_region_size);
 
   benchmark_region_growing_on_points_2(2, input_range, FT(3), 
-  max_distance_to_line, normal_threshold, min_region_size);
+  max_distance_to_line, angle_threshold, min_region_size);
 
   benchmark_region_growing_on_points_2(3, input_range, FT(6), 
-  max_distance_to_line, normal_threshold, min_region_size);
+  max_distance_to_line, angle_threshold, min_region_size);
 
   benchmark_region_growing_on_points_2(4, input_range, FT(9), 
-  max_distance_to_line, normal_threshold, min_region_size);
+  max_distance_to_line, angle_threshold, min_region_size);
 }

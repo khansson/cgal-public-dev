@@ -6,10 +6,12 @@
 #include <iostream>
 #include <iterator>
 
+// Boost includes.
+#include <boost/function_output_iterator.hpp>
+
 // CGAL includes.
-#include <CGAL/array.h>
-#include <CGAL/property_map.h>
-#include <CGAL/IO/write_ply_points.h>
+#include <CGAL/Timer.h>
+#include <CGAL/Random.h>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 
 #include <CGAL/Point_set_3.h>
@@ -33,35 +35,65 @@ using Neighbor_query = CGAL::Shape_detection::Point_set::K_neighbor_query<Kernel
 using Region_type    = CGAL::Shape_detection::Point_set::Least_squares_plane_fit_region<Kernel, Input_range, Point_map, Normal_map>;
 using Region_growing = CGAL::Shape_detection::Region_growing<Input_range, Neighbor_query, Region_type>;
 
-using Color            = CGAL::cpp11::array<unsigned char, 3>;
-using Point_with_color = std::pair<Point_3, Color>;
-using Pwc_vector       = std::vector<Point_with_color>;
-using PLY_Point_map    = CGAL::First_of_pair_property_map<Point_with_color>;
-using PLY_Color_map    = CGAL::Second_of_pair_property_map<Point_with_color>;
+using Output_range = CGAL::Point_set_3<Point_3>;
 
-// Define how a color should be stored.
-namespace CGAL {
+// Define an insert iterator.
+struct Insert_point_colored_by_region_index {
+      
+  using argument_type = std::vector<std::size_t>;
+  using result_type   = void;
+
+  using Color_map = 
+  typename Output_range:: template Property_map<unsigned char>;
+
+  const Input_range& m_input_range;
+  const   Point_map  m_point_map;
+       Output_range& m_output_range;
+        std::size_t& m_number_of_regions;
+
+  Color_map m_red, m_green, m_blue;
     
-  template<class F>
-  struct Output_rep< ::Color, F > {
+  Insert_point_colored_by_region_index(
+    const Input_range& input_range,
+    const   Point_map  point_map,
+         Output_range& output_range,
+          std::size_t& number_of_regions) : 
+  m_input_range(input_range),
+  m_point_map(point_map),
+  m_output_range(output_range),
+  m_number_of_regions(number_of_regions) {
         
-    const ::Color& c;
-    static const bool is_specialized = true;
-    
-    Output_rep(const ::Color& c) : c(c) { }
+    m_red = 
+    m_output_range.template add_property_map<unsigned char>("r", 0).first;
+    m_green = 
+    m_output_range.template add_property_map<unsigned char>("g", 0).first;
+    m_blue = 
+    m_output_range.template add_property_map<unsigned char>("b", 0).first;
+  }
 
-    std::ostream& operator()(std::ostream& out) const {
-            
-      if (is_ascii(out)) 
-        out << int(c[0]) << " " << int(c[1]) << " " << int(c[2]);
-      else 
-        out.write(reinterpret_cast<const char*>(&c), sizeof(c));
-            
-      return out;
+  result_type operator()(const argument_type& region) {
+
+    CGAL::Random rand(m_number_of_regions);
+    const unsigned char r = 
+    static_cast<unsigned char>(64 + rand.get_int(0, 192));
+    const unsigned char g = 
+    static_cast<unsigned char>(64 + rand.get_int(0, 192));
+    const unsigned char b = 
+    static_cast<unsigned char>(64 + rand.get_int(0, 192));
+
+    for (const std::size_t index : region) {
+      const auto& key = *(m_input_range.begin() + index);
+
+      const Point_3& point = get(m_point_map, key);
+      const auto it = m_output_range.insert(point);
+
+      m_red[*it]   = r;
+      m_green[*it] = g;
+      m_blue[*it]  = b;
     }
-  };
-
-} // namespace CGAL
+    m_number_of_regions++;
+  }
+};
 
 int main(int argc, char *argv[]) {
     
@@ -90,10 +122,10 @@ int main(int argc, char *argv[]) {
   << std::endl;
 
   // Default parameter values for the data file point_set_3.xyz.
-  const size_t k                     = 100;
-  const FT     max_distance_to_plane = FT(5) / FT(10);
-  const FT     max_accepted_angle    = FT(25);
-  const size_t min_region_size       = 3;
+  const std::size_t k                     = 12;
+  const FT          max_distance_to_plane = FT(2);
+  const FT          max_accepted_angle    = FT(20);
+  const std::size_t min_region_size       = 25;
 
   // Create instances of the classes Neighbor_query and Region_type.
   Neighbor_query neighbor_query(
@@ -107,38 +139,28 @@ int main(int argc, char *argv[]) {
     input_range.point_map(), input_range.normal_map());
 
   // Create an instance of the region growing class.
-  Region_growing region_growing(input_range, neighbor_query, region_type);
+  Region_growing region_growing(
+    input_range, neighbor_query, region_type);
 
   // Run the algorithm.
-  std::vector< std::vector<std::size_t> > regions;
-  region_growing.detect(std::back_inserter(regions));
+  Output_range output_range; 
+  std::size_t number_of_regions = 0;
+
+  Insert_point_colored_by_region_index inserter(
+     input_range, input_range.point_map(), 
+    output_range, number_of_regions);
+  
+  CGAL::Timer timer;
+
+  timer.start();
+  const auto it = region_growing.detect(
+    boost::make_function_output_iterator(inserter));
+  timer.stop();
 
   // Print the number of found regions.
-  std::cout << "* " << regions.size() << 
-    " regions have been found" 
+  std::cout << "* " << number_of_regions << 
+    " regions have been found in " << timer.time() << " seconds" 
   << std::endl;
-
-  Pwc_vector pwc;
-  srand(time(NULL));
-
-  // Iterate through all regions.
-  for (const auto& region : regions) {
-        
-    // Generate a random color.
-    const Color color = 
-      CGAL::make_array(
-        static_cast<unsigned char>(rand() % 256),
-        static_cast<unsigned char>(rand() % 256),
-        static_cast<unsigned char>(rand() % 256));
-
-    // Iterate through all region items.
-    for (const auto index : region) {
-      const auto& key = *(input_range.begin() + index);
-            
-      const Point_3& point = get(input_range.point_map(), key);
-      pwc.push_back(std::make_pair(point, color));
-    }
-  }
 
   // Save result to a file in the user-provided path if any.
   if (argc > 2) {
@@ -147,16 +169,7 @@ int main(int argc, char *argv[]) {
     const std::string fullpath = path + "regions_point_set_3.ply";
 
     std::ofstream out(fullpath);
-
-    CGAL::set_ascii_mode(out);
-    CGAL::write_ply_points_with_properties(
-      out, pwc,
-      CGAL::make_ply_point_writer(PLY_Point_map()),
-        std::make_tuple(
-          PLY_Color_map(), 
-          CGAL::PLY_property<unsigned char>("red"),
-          CGAL::PLY_property<unsigned char>("green"),
-          CGAL::PLY_property<unsigned char>("blue")));
+    out << output_range;
 
     std::cout << "* found regions are saved in " << fullpath << std::endl;
     out.close();
@@ -185,7 +198,10 @@ int main(int argc, char *argv[]) {
   std::cout << "* " << unassigned_points.size() << 
     " unassigned points are stored" 
   << std::endl;
-  
+
+  // Release all internal memory.
+  region_growing.release_memory();
+
   std::cout << std::endl << 
     "region_growing_on_point_set_3 example finished" 
   << std::endl << std::endl;
