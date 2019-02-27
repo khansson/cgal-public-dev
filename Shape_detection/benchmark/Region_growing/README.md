@@ -8,7 +8,8 @@ $ cmake -DCGAL_DIR=/path/to/cgal/release/build -DCMAKE_BUILD_TYPE=Release /path/
 $ make benchmark_region_growing_on_point_set_2
 ```
 
-The program uses the data file `data/point_set_2.xyz`, run the benchmark program as follows:
+The program uses the data file `data/point_set_2.xyz`.
+You can run the benchmark program as follows:
 
 ```bash
 $ ./benchmark_region_growing_on_point_set_2 /path/to/data/point_set_2.xyz
@@ -18,49 +19,49 @@ Results:
 
 ```
 Test #1
-  search_radius = 1
+  sphere_radius = 1
   min_region_size = 5
-  max_distance_to_line = 4.5
-  normal_threshold = 0.7
+  distance_threshold = 4.5
+  angle_threshold = 45
   -----
-  Time elapsed: 0.138201
-  Number of detected regions: 796
-  Number of assigned points: 4491
-  Number of unassigned points: 63277
+  Time elapsed: 0.138831
+  Number of detected regions: 794
+  Number of assigned points: 4483
+  Number of unassigned points: 63285
 
 
 Test #2
-  search_radius = 3
+  sphere_radius = 3
   min_region_size = 5
-  max_distance_to_line = 4.5
-  normal_threshold = 0.7
+  distance_threshold = 4.5
+  angle_threshold = 45
   -----
-  Time elapsed: 0.072401
-  Number of detected regions: 3054
-  Number of assigned points: 63154
-  Number of unassigned points: 4614
+  Time elapsed: 0.069098
+  Number of detected regions: 3063
+  Number of assigned points: 63038
+  Number of unassigned points: 4730
 
 
 Test #3
-  search_radius = 6
+  sphere_radius = 6
   min_region_size = 5
-  max_distance_to_line = 4.5
-  normal_threshold = 0.7
+  distance_threshold = 4.5
+  angle_threshold = 45
   -----
-  Time elapsed: 0.080463
-  Number of detected regions: 2483
-  Number of assigned points: 64977
-  Number of unassigned points: 2791
+  Time elapsed: 0.077703
+  Number of detected regions: 2508
+  Number of assigned points: 64906
+  Number of unassigned points: 2862
 
 
 Test #4
-  search_radius = 9
+  sphere_radius = 9
   min_region_size = 5
-  max_distance_to_line = 4.5
-  normal_threshold = 0.7
+  distance_threshold = 4.5
+  angle_threshold = 45
   -----
-  Time elapsed: 0.093556
-  Number of detected regions: 2282
-  Number of assigned points: 65353
-  Number of unassigned points: 2415
+  Time elapsed: 0.093415
+  Number of detected regions: 2302
+  Number of assigned points: 65334
+  Number of unassigned points: 2434
 ```

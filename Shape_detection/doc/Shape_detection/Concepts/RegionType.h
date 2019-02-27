@@ -3,12 +3,15 @@
 \cgalConcept
 
 A concept that describes the set of methods used by the `CGAL::Shape_detection::Region_growing` 
-to control if a given set of items forms a region.
+to maintain a region.
+
+A region is represented by a set of indices of the items, which are included in 
+this region. These indices are stored in `region`.
 
 \cgalHasModel 
-`CGAL::Shape_detection::Points_2_least_squares_line_fit_conditions`, 
-`CGAL::Shape_detection::Points_3_least_squares_plane_fit_conditions`, 
-`CGAL::Shape_detection::Polygon_mesh_least_squares_plane_fit_conditions`
+- `CGAL::Shape_detection::Point_set::Least_squares_line_fit_region`, 
+- `CGAL::Shape_detection::Point_set::Least_squares_plane_fit_region`, 
+- `CGAL::Shape_detection::Polygon_mesh::Least_squares_plane_fit_region`
 */
 
 class RegionType {
@@ -16,10 +19,11 @@ class RegionType {
 public:
 
   /*!  
-    checks if an item with the index `query_index` belongs to the `region` 
-    defined by the items with indices in `region`.
+    verifies if the item with the index `query_index` can be added to the `region`.
 
     This function is called each time when trying to add a new item to a region.
+    If it returns `true`, the `query_index` is pushed to the `region`, otherwise 
+    it is ignored.
   */
   bool is_part_of_region(
     const std::size_t query_index, 
@@ -28,11 +32,11 @@ public:
   }
 
   /*!  
-    checks if the items with indices in region defines a valid region
+    verifies if the `region` satisfies all necessary conditions.
     
-    This function is called each time when propagation is no longer possible 
-    for the given seed item. If it is `true`, the region is accepted, otherwise rejected 
-    and all its items become again available for the Region Growing.
+    This function is called at the end of each propagation phase. If it returns `true`, 
+    the `region` is accepted, otherwise rejected. If the `region` is rejected,
+    all its items are released and available for region growing again.
   */
   bool is_valid_region(
     const std::vector<std::size_t>& region) {
@@ -40,9 +44,11 @@ public:
   }
 
   /*!
-    This function is called each time when a new seed item is chosen and each time when 
-    we expand current region with several new items. In the first case, the number 
-    of items in the region is one.
+    allows to update any information that is maintained with the `region`.
+
+    This function is called each time when a new seed item is selected. This item 
+    is pushed to the `region` and hence its size is one. It is also called 
+    periodically when enlarging the `region`.
   */
   void update(
     const std::vector<std::size_t>& region) {

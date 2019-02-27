@@ -30,7 +30,7 @@ namespace CGAL {
   namespace Shape_detection {
   /*!
     \ingroup PkgShapeDetectionRANSAC
-    \brief %Default traits class for the shape detection class `Efficient_RANSAC`.
+    \brief %Default traits class for the `CGAL::Shape_detection::Efficient_RANSAC`.
     
     \cgalModels `EfficientRANSACTraits`
 

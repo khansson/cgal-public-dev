@@ -225,73 +225,69 @@ The running time increases significantly as many more candidates are generated d
 
 \section Shape_detection_RegionGrowing Region Growing
 
-This shape detection component is based on the Region Growing algorithm applied to a set of user-specified items.
-Shapes are detected by growing regions from estimated seeds as follows:
+This shape detection component is based on the region growing algorithm applied to a set of user-specified items.
+Shapes are detected by growing regions from seed items, where each region is created as follows:
 
 -# Pick the next available seed item;
--# Find its direct neighbors in the data set; 
--# Check if these neighbors satisfy all necessary conditions to be included in the region; 
--# Add all items that satisfy these conditions and repeat the procedure using these items as seed items;
--# If no further neighbor satisfies the conditions, start a new region.
+-# Find its neighbors in the data set; 
+-# Include those neighbors, which satisfy the region requirements;
+-# Repeat the procedure for all included neighbors;
+-# If no further neighbor satisfies the requirements, start a new region.
 
-Together with the generic algorithm's implementation `Shape_detection::Region_growing`, three particular instances of this algorithm are provided:
+Together with the generic algorithm's implementation `CGAL::Shape_detection::Region_growing`, three particular instances of this algorithm are provided:
 
-- Line detection on a \ref Shape_detection_RegionGrowingPoints "2D point set";
-- Plane detection on a \ref Shape_detection_RegionGrowingPoints "3D point set";
+- Line detection in a \ref Shape_detection_RegionGrowingPoints "2D point set";
+- Plane detection in a \ref Shape_detection_RegionGrowingPoints "3D point set";
 - Plane detection on a \ref Shape_detection_RegionGrowingMesh "polygon mesh".
 
-Other instances can be easily added by the user as explained below. 
+Other instances can be easily added by the user, as explained below. 
 
 
 \subsection Shape_detection_RegionGrowingFramework Framework
 
-The main class `Shape_detection::Region_growing` is parameterized by 
+The main class `CGAL::Shape_detection::Region_growing` is parameterized by 
 
-- `InputRange` with user-defined items, which can be any objects;
-- \ref Shape_detection_RegionGrowingFramework_connectivity "Connectivity" that provides the means for getting connectivity among the items;
-- \ref Shape_detection_RegionGrowingFramework_conditions "Conditions" that provides conditions for validating regions;
+- `InputRange` that stores a range of user-defined input items;
+- \ref Shape_detection_RegionGrowingFramework_connectivity "NeighborQuery" that provides the means for accessing neighbors of an item;
+- \ref Shape_detection_RegionGrowingFramework_conditions "RegionType" that provides the means for validating regions;
 - \ref Shape_detection_RegionGrowingFramework_seeding "SeedMap" that defines the seeding order of items.
 
-Using this generic framework, users can detect shapes or simply grow regions on any set of items with 
+Using this generic framework, users can grow any type of regions on a set of arbitrary items with 
 their own propagation and seeding conditions (see \ref Shape_detection_RegionGrowingFramework_examples "an example").
 
 
-\subsubsection Shape_detection_RegionGrowingFramework_connectivity Connectivity
+\subsubsection Shape_detection_RegionGrowingFramework_connectivity Neighborhood
 
-The concept `RegionGrowingConnectivity` provides the means for getting connectivity among given items. 
-To create a model that respects this concept, the only requirement on the user-defined class is to implement the function:
+The concept `NeighborQuery` provides the means for accessing neighbors of an item. 
+To create a model that respects this concept, the user has to provide an overload of the operator:
 
-- `RegionGrowingConnectivity::neighbors()` that should return all items, 
-which are defined to be neighbors of the query item. This function is called whenever a new item is queried.
+- `NeighborQuery::operator()()` that has to fill a vector with indices of all items, which 
+are neighbors of the query item.
 
 
-\subsubsection Shape_detection_RegionGrowingFramework_conditions Conditions
+\subsubsection Shape_detection_RegionGrowingFramework_conditions Region Type
 
-The concept `RegionGrowingPropagationConditions` provides conditions for validating regions. 
-To create a model that respect this concept, three functions in the user-defined class must be implemented:
+The concept `RegionType` provides the means for validating regions. In fact, a model
+of this concept maintains a description of the region type that is used in region growing.
+To create a model that respect this concept, three functions have to be defined:
 
-- `RegionGrowingPropagationConditions::belongs_to_region()` This function checks if a query item 
-should belong to the region that is currently getting developed. It is called whenever 
-the algorithm tries to add an item to the region.
+- `RegionType::is_part_of_region()` This function verifies if an item satisfies
+all necessary region requirements and can be added to a region. It is checked per item.
 
-- `RegionGrowingPropagationConditions::is_valid_region()` This function checks if a region 
-satisfies all necessary user-defined conditions. It is called whenever propagation is no 
-longer possible for the given seed item. If it is `true`, the region is accepted, otherwise rejected 
-and all its items become again available for the algorithm.
+- `RegionType::is_valid_region()` This function verifies if a region satisfies 
+all necessary region requirements. It is checked per region.
 
-- `RegionGrowingPropagationConditions::update()` This function updates all necessary 
-information that goes along with the region propagation. It is called each time 
-when a new seed item is chosen and each time when we expand the current region with several new items.
-In the first case, the number of items in the region is one.
+- `RegionType::update()` This utility function  allows to update any information, 
+which is maintained with the region.
 
 
 \subsubsection Shape_detection_RegionGrowingFramework_seeding Seeding
 
-The `SeedMap` property map provided as an optional parameter to the main class allows
+The `SeedMap` property map, provided as an optional parameter to the main class, allows
 to define the seeding order of items that is which items are used first to grow regions from.
-Such items are called seed items. The `SeedMap` maps the index of an item to its 
+Such items are called seed items. The `SeedMap` maps the index of an item to its order 
 number in the overall region growing processing queue. The default map is the identity one 
-that is the seed index of an item equals to the item's index in the `input_range`. 
+that is the seed index of the item equals to the item's index in the `input_range`. 
 If it maps to `std::size_t(-1)`, then the corresponding item is skipped.
 
 
@@ -431,8 +427,6 @@ We can improve the quality of Region Growing by providing a different seeding or
 first sort indices of 2D input points by the best local least squares line fit quality and only then detect regions. Moreover,
 in this example, we also show how to store the found regions outside the region growing object so that it could be destroyed
 without affecting these regions. 3D points sorting can be done analogously.
-
-\cgalExample{Shape_detection/Region_growing/example_region_growing_with_sorting.cpp}
 
 
 \subsubsection Shape_detection_RegionGrowingPoints_performance Performance

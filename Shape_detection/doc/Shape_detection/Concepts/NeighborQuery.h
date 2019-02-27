@@ -3,12 +3,12 @@
 \cgalConcept
 
 A concept that describes the set of methods used by the `CGAL::Shape_detection::Region_growing` 
-to access connected items in a given set.
+to access neighbors of an item.
 
 \cgalHasModel 
-`CGAL::Shape_detection::Points_fuzzy_sphere_connectivity`, 
-`CGAL::Shape_detection::Points_k_nearest_neighbors_connectivity`, 
-`CGAL::Shape_detection::Polygon_mesh_adjacent_faces_connectivity`
+- `CGAL::Shape_detection::Point_set::K_neighbor_query`,
+- `CGAL::Shape_detection::Point_set::Sphere_neighbor_query`, 
+- `CGAL::Shape_detection::Polygon_mesh::One_ring_neighbor_query`
 */
 
 class NeighborQuery {
@@ -16,9 +16,10 @@ class NeighborQuery {
 public:
 
   /*!  
-    Fills the vector `neighbors` with indices of all items, which are connected to an item with the index `query_index`.
+    fills `neighbors` with the indices of all items, which are connected to the 
+    item with the index `query_index`.
 
-    This function is called each time when a new query item is chosen.
+    This function is called each time when a new query item is selected.
   */
   void operator()(
     const std::size_t query_index, 
