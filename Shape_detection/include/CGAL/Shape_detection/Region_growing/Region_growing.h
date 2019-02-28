@@ -46,32 +46,29 @@ namespace Shape_detection {
     
     \brief Main class/entry point for running the region growing algorithm.
 
-    This version of the region growing algorithm allows to grow regions on a set
-    of user-defined items given a way to access neighbors of each item via a 
-    `Connectivity` parameter class and control if items should form a region
-    via a `Conditions` class. The `SeedMap` property map allows to define the
-    order of items that is which items are used first as seed items to grow
-    regions from. It also allows to skip items that should not be used at all.
+    This version of the region growing algorithm allows to detect regions in a set
+    of user-defined items 
+    - given a way to access neighbors of each item via the `NeighborQuery` parameter class and 
+    - control if items form a valid region type via the `RegionType` parameter class,
+    - the `SeedMap` property map allows to define the seeding order of items and skip unnecessary items.
     
     \tparam InputRange 
-    is a model of `ConstRange`. Its iterator type is `RandomAccessIterator`. 
+    is a model of `ConstRange`.
 
-    \tparam Connectivity 
-    is a model of `RegionGrowingConnectivity`.
+    \tparam NeighborQuery 
+    is a model of `NeighborQuery`.
 
-    \tparam Conditions
-    is a model of `RegionGrowingPropagationConditions`
+    \tparam RegionType
+    is a model of `RegionType`.
 
     \tparam SeedMap
-    is an `LvaluePropertyMap` that maps the `std::size_t` index of an item 
-    in `input_range` to an `std::size_t` index of this item in the region growing 
-    processing queue. The default one is the identity map.
+    is an `LvaluePropertyMap` whose key and value types are `std::size_t`.
   */
   template<
   typename InputRange, 
   typename NeighborQuery, 
   typename RegionType,
-  typename SeedMap = internal::Identity_seed_property_map>
+  typename SeedMap = Identity_seed_property_map>
   class Region_growing {
 
   public:
@@ -91,23 +88,23 @@ namespace Shape_detection {
     /// @{
 
     /*!
-      \brief Initializes the Region Growing algorithm.
+      \brief initializes the region growing algorithm.
       
       \param input_range 
-      Contains items, which are planned to be used to grow regions upon.
+      A range of input items for region growing.
 
       \param neighbor_query 
-      An instance of the `Connectivity` class that is used internally to 
-      access item neighbors.
+      An instance of the `NeighborQuery` class that is used internally to 
+      access item's neighbors.
 
       \param region_type 
-      An instance of the `Conditions` class that is used internally to 
-      control if items should form a region.
+      An instance of the `RegionType` class that is used internally to 
+      control if items form a valid region type.
 
       \param seed_map 
       An instance of the `SeedMap` property map that is used internally to 
-      set the order of items to grow regions from. If it maps 
-      to `std::size_t(-1)`, then this item is skipped.
+      set the order of items in the region growing processing queue. If it maps 
+      to `std::size_t(-1)`, the corresponding item is skipped.
 
       \pre `input_range.size() > 0`
     */
@@ -130,24 +127,17 @@ namespace Shape_detection {
     /// @{
 
     /*!
-      \brief Runs the Region Growing algorithm and  fills an output iterator with the results
-
-      Runs the Region Growing algorithm on the input range with items, 
-      using a `Connectivity` class to find neighbors and a `Conditions` class 
-      to validate regions. The `SeedMap` property map is used to define the
-      seeding order of items inside the algorithm.
-
-      This is a useful function if the found regions should be stored
-      in the user-defined container outside the class. It helps to avoid
-      copying these data from internal to external storage.
+      \brief runs the region growing algorithm and fills an output iterator 
+      with the found regions.
 
       \tparam OutputIterator 
-      is an output iterator whose value type is `Item_indices`.
+      is an output iterator whose value type is `std::vector<std::size_t>`.
 
       \param regions
-      An output iterator that stores regions represented as `Item_indices`.
+      An output iterator that stores regions, where each region is returned
+      as a vector of indices of the items, which belong to this region.
 
-      \warning All functions from Access Section will return empty values.
+      \return an optional output iterator.
     */
     template<typename OutputIterator>
     boost::optional<OutputIterator> detect(OutputIterator regions) {
@@ -180,15 +170,20 @@ namespace Shape_detection {
 
     /// @}
 
-    /// \name Output
+    /// \name Unassigned Items
     /// @{  
 
     /*!
-      \brief Returns indices of all unassigned items.
+      \brief fills an output iterator with indices of all unassigned items.
+      
+      \tparam OutputIterator 
+      is an output iterator whose value type is `std::size_t`.
 
-      Returns an `CGAL::Iterator_range` with a bidirectional iterator whose value type
-      is `std::size_t`. It is empty if the function `Region_growing::detect()`
-      has not been called.
+      \param output 
+      An output iterator that stores indices of all items, which are not assigned
+      to any region.
+
+      \return an optional output iterator.
     */
     template<typename OutputIterator>
     boost::optional<OutputIterator> output_unassigned_items(OutputIterator output) const {
@@ -214,7 +209,7 @@ namespace Shape_detection {
     /// @{
 
     /*!
-      Clears all internal data structures.
+      clears all internal data structures.
     */
     void clear() {
                 
@@ -223,7 +218,7 @@ namespace Shape_detection {
     }
 
     /*!
-      Releases all memory that is used internally.
+      releases all memory that is used internally.
     */
     void release_memory() {
 

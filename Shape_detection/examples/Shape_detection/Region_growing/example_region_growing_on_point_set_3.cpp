@@ -35,12 +35,14 @@ using Neighbor_query = CGAL::Shape_detection::Point_set::K_neighbor_query<Kernel
 using Region_type    = CGAL::Shape_detection::Point_set::Least_squares_plane_fit_region<Kernel, Input_range, Point_map, Normal_map>;
 using Region_growing = CGAL::Shape_detection::Region_growing<Input_range, Neighbor_query, Region_type>;
 
+using Indices      = std::vector<std::size_t>;
 using Output_range = CGAL::Point_set_3<Point_3>;
+using Points_3     = std::vector<Point_3>;
 
 // Define an insert iterator.
 struct Insert_point_colored_by_region_index {
       
-  using argument_type = std::vector<std::size_t>;
+  using argument_type = Indices;
   using result_type   = void;
 
   using Color_map = 
@@ -64,11 +66,11 @@ struct Insert_point_colored_by_region_index {
   m_number_of_regions(number_of_regions) {
         
     m_red = 
-    m_output_range.template add_property_map<unsigned char>("r", 0).first;
+    m_output_range.template add_property_map<unsigned char>("red", 0).first;
     m_green = 
-    m_output_range.template add_property_map<unsigned char>("g", 0).first;
+    m_output_range.template add_property_map<unsigned char>("green", 0).first;
     m_blue = 
-    m_output_range.template add_property_map<unsigned char>("b", 0).first;
+    m_output_range.template add_property_map<unsigned char>("blue", 0).first;
   }
 
   result_type operator()(const argument_type& region) {
@@ -91,9 +93,9 @@ struct Insert_point_colored_by_region_index {
       m_green[*it] = g;
       m_blue[*it]  = b;
     }
-    m_number_of_regions++;
+    ++m_number_of_regions;
   }
-};
+}; // Insert_point_colored_by_region_index
 
 int main(int argc, char *argv[]) {
     
@@ -153,7 +155,7 @@ int main(int argc, char *argv[]) {
   CGAL::Timer timer;
 
   timer.start();
-  const auto it = region_growing.detect(
+  const auto rit = region_growing.detect(
     boost::make_function_output_iterator(inserter));
   timer.stop();
 
@@ -162,7 +164,7 @@ int main(int argc, char *argv[]) {
     " regions have been found in " << timer.time() << " seconds" 
   << std::endl;
 
-  // Save result to a file in the user-provided path if any.
+  // Save the result to a file in the user-provided path if any.
   if (argc > 2) {
         
     const std::string path     = argv[2];
@@ -175,18 +177,19 @@ int main(int argc, char *argv[]) {
     out.close();
   }
 
-  // Get all unassigned points.
-  std::vector<std::size_t> unassigned_items;
-  region_growing.output_unassigned_items(
+  // Get all unassigned items.
+  Indices unassigned_items;
+  const auto uit = region_growing.output_unassigned_items(
     std::back_inserter(unassigned_items));
 
-  // Print the number of unassigned points.
-  std::cerr << "* " << unassigned_items.size() << 
+  // Print the number of unassigned items.
+  std::cout << "* " << unassigned_items.size() << 
     " points do not belong to any region" 
   << std::endl;
 
   // Store all unassigned points.
-  std::vector<Point_3> unassigned_points;
+  Points_3 unassigned_points;
+  unassigned_points.reserve(unassigned_items.size());
 
   for (const auto index : unassigned_items) {
     const auto& key = *(input_range.begin() + index);

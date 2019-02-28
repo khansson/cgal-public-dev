@@ -50,6 +50,11 @@ using Color = CGAL::Color;
 
 #endif
 
+using Region  = std::vector<std::size_t>;
+using Regions = std::vector<Region>;
+
+using Vertex_to_point_map = typename Region_type::Vertex_to_point_map;
+
 using Region_growing = CGAL::Shape_detection::Region_growing<Face_range, Neighbor_query, Region_type, typename Sorting::Seed_map>;
 
 int main(int argc, char *argv[]) {
@@ -58,7 +63,7 @@ int main(int argc, char *argv[]) {
     "region_growing_on_polygon_mesh example started" 
   << std::endl << std::endl;
 
-  // Load data.
+  // Load off data either from a local folder or a user-provided file.
   std::ifstream in(argc > 1 ? argv[1] : "../data/polygon_mesh.off");
   CGAL::set_ascii_mode(in);
 
@@ -82,7 +87,6 @@ int main(int argc, char *argv[]) {
   // Create instances of the classes Neighbor_query and Region_type.
   Neighbor_query neighbor_query(polygon_mesh);
 
-  using Vertex_to_point_map = typename Region_type::Vertex_to_point_map;
   const Vertex_to_point_map vertex_to_point_map(
     get(CGAL::vertex_point, polygon_mesh));
 
@@ -103,7 +107,7 @@ int main(int argc, char *argv[]) {
     sorting.seed_map());
 
   // Run the algorithm.
-  std::vector< std::vector<std::size_t> > regions;
+  Regions regions;
   region_growing.detect(std::back_inserter(regions));
 
   // Print the number of found regions.
@@ -111,12 +115,12 @@ int main(int argc, char *argv[]) {
     " regions have been found" 
   << std::endl;
 
-  // Save result in a file only if it is stored in CGAL::Surface_mesh.
+  // Save the result in a file only if it is stored in CGAL::Surface_mesh.
   #if defined(USE_SURFACE_MESH)
   
     using Face_index = typename Polygon_mesh::Face_index;
       
-    // Save result to a file in the user-provided path if any.
+    // Save the result to a file in the user-provided path if any.
     srand(time(NULL));
     if (argc > 2) {
 

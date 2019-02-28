@@ -44,11 +44,11 @@ int main(int argc, char *argv[]) {
   const Face_range face_range = CGAL::faces(polygon_mesh);
 
   // Default parameter values for the data file polygon_mesh.off.
-  const FT          max_distance_to_plane = FT(1);
-  const FT          angle_threshold       = FT(45);
-  const std::size_t min_region_size       = 5;
+  const FT          distance_threshold = FT(1);
+  const FT          angle_threshold    = FT(45);
+  const std::size_t min_region_size    = 5;
 
-  // Create instances of the parameter classes.
+  // Create parameter classes.
   Neighbor_query neighbor_query(polygon_mesh);
 
   using Vertex_to_point_map = typename Region_type::Vertex_to_point_map;
@@ -57,10 +57,10 @@ int main(int argc, char *argv[]) {
 
   Region_type region_type(
     polygon_mesh, 
-    max_distance_to_plane, angle_threshold, min_region_size, 
+    distance_threshold, angle_threshold, min_region_size, 
     vertex_to_point_map);
 
-  // Sort face indices.
+  // Sort indices.
   Sorting sorting(
     polygon_mesh, neighbor_query,
     vertex_to_point_map);
@@ -76,9 +76,9 @@ int main(int argc, char *argv[]) {
   region_growing.detect(std::back_inserter(regions));
 
   region_growing.release_memory();
-  CGAL_assertion(regions.size() == 325);
+  CGAL_assertion(regions.size() >= 323 && regions.size() <= 327);
 
-  const bool exact_exact_test_success = (regions.size() == 325);
+  const bool exact_exact_test_success = (regions.size() >= 323 && regions.size() <= 327);
   std::cout << "exact_exact_test_success: " << exact_exact_test_success << std::endl;
 
   return EXIT_SUCCESS;

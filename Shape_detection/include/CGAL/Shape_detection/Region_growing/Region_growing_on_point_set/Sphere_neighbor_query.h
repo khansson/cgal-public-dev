@@ -51,24 +51,21 @@ namespace Point_set {
   /*!
     \ingroup PkgShapeDetectionRGOnPoints
 
-    \brief Kd tree based fuzzy sphere search for neighbors on a set 
-    of `Point_2` or `Point_3`.
+    \brief Fuzzy sphere neighbors search in a set of `Point_2` or `Point_3`.
 
-   This class uses a kd-tree to define the neighbors of a query points as its k nearest neighbors.
+    This class returns all neighbors of a query point, which fall in a sphere of
+    the fixed radius centered at this point.
 
     \tparam GeomTraits 
     is a model of `Kernel`.
 
     \tparam InputRange 
-    is a model of `ConstRange`. Its iterator type is `RandomAccessIterator`. 
-    Its value type depends on the item type used in Region Growing, 
-    for example it can be `CGAL::Point_2`, `CGAL::Point_3`, or 
-    or any user-defined type.
+    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
 
     \tparam PointMap 
-    is an `LvaluePropertyMap` that maps to `CGAL::Point_2` or `CGAL::Point_3`.
+    is an `LvaluePropertyMap` whose value type is `CGAL::Point_2` or `CGAL::Point_3`.
 
-    \cgalModels `RegionGrowingConnectivity`
+    \cgalModels `NeighborQuery`
   */
   template<
   typename GeomTraits, 
@@ -120,20 +117,21 @@ namespace Point_set {
     /// @{
 
     /*!
-      \brief Builds a Kd tree.
+      \brief initializes a Kd-tree with input points.
 
       \param input_range 
-      An instance of an `InputRange` container with 2D or 3D points.
+      An instance of `InputRange` with 2D or 3D points.
 
       \param sphere_radius 
-      Fixed radius of the fuzzy sphere used for searching neighbors.
+      The fixed radius of the fuzzy sphere used for searching neighbors 
+      of a query point. The default is 1.
 
       \param point_map
-      An instance of an `LvaluePropertyMap` that maps an item from `input_range` 
+      An instance of `PointMap` that maps an item from `input_range` 
       to `CGAL::Point_2` or to `CGAL::Point_3`.
 
       \pre `input_range.size() > 0`
-      \pre `search_radius >= 0`
+      \pre `sphere_radius >= 0`
     */
     Sphere_neighbor_query(
       const InputRange& input_range, 
@@ -161,21 +159,19 @@ namespace Point_set {
     /// @{ 
 
     /*!
-      \brief Returns all points, which are neighbors of a query point.
+      \brief fills `neighbors` of the point with the index `query_index`.
 
-      This function returns indices of all points, which belong to a sphere
-      of the fixed radius `search_radius` centered at the query point with
-      the index `query_index`, and thus being its direct neighbors. These
-      neighbors are returned in `neighbors`.
+      This function finds indices of all points, which fall in a sphere
+      of the fixed radius `sphere_radius` centered at the query point with
+      the index `query_index`. These neighbors are returned in `neighbors`.
 
       \param query_index
-      Index of the query point.
+      %Index of the query point.
 
       \param neighbors
-      An `std::vector<std::size_t>` with the indices of points, which are 
-      neighbors of the point with the index `query_index`.
+      Indices of points, which are neighbors of the query point.
 
-      Implements the function `RegionGrowingConnectivity::neighbors()`.
+      Implements `NeighborQuery::operator()()`.
 
       \pre `query_index >= 0 && query_index < total_number_of_points`
     */

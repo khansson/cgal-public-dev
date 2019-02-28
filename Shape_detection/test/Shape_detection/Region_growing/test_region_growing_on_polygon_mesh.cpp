@@ -30,9 +30,9 @@ bool test_region_growing_on_polygon_mesh(int argc, char *argv[]) {
   using Region_growing = SD::Region_growing<Face_range, Neighbor_query, Region_type>;
 
   // Default parameter values for the data file polygon_mesh.off.
-  const FT          max_distance_to_plane = FT(1);
-  const FT          angle_threshold       = FT(45);
-  const std::size_t min_region_size       = 5;
+  const FT          distance_threshold = FT(1);
+  const FT          angle_threshold    = FT(45);
+  const std::size_t min_region_size    = 5;
 
   // Load data.
   std::ifstream in(argc > 1 ? argv[1] : "../data/polygon_mesh.off");
@@ -57,18 +57,19 @@ bool test_region_growing_on_polygon_mesh(int argc, char *argv[]) {
 
   Region_type region_type(
     surface_mesh, 
-    max_distance_to_plane, angle_threshold, min_region_size, 
+    distance_threshold, angle_threshold, min_region_size, 
     vertex_to_point_map);
 
   // Run region growing.
-  Region_growing region_growing(face_range, neighbor_query, region_type);
+  Region_growing region_growing(
+    face_range, neighbor_query, region_type);
   
   std::vector< std::vector<std::size_t> > regions;
   region_growing.detect(std::back_inserter(regions));
 
   // Test data.
-  CGAL_assertion(regions.size() == 330);
-  if (regions.size() != 330) 
+  CGAL_assertion(regions.size() >= 328 && regions.size() <= 332);
+  if (regions.size() < 328 || regions.size() > 332) 
     return false;
 
   for (const auto& region : regions)
@@ -78,8 +79,8 @@ bool test_region_growing_on_polygon_mesh(int argc, char *argv[]) {
   std::vector<std::size_t> unassigned_faces;
   region_growing.output_unassigned_items(std::back_inserter(unassigned_faces));
 
-  CGAL_assertion(unassigned_faces.size() == 879);
-  if (unassigned_faces.size() != 879) 
+  CGAL_assertion(unassigned_faces.size() >= 869 && unassigned_faces.size() <= 889);
+  if (unassigned_faces.size() < 869 || unassigned_faces.size() > 889) 
     return false;
 
   return true;

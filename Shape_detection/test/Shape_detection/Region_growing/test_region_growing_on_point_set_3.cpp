@@ -34,10 +34,10 @@ bool test_region_growing_on_point_set_3(int argc, char *argv[]) {
   using Region_growing = SD::Region_growing<Input_range, Neighbor_query, Region_type>;
 
   // Default parameter values for the data file point_set_3.xyz.
-  const std::size_t k                     = 12;
-  const FT          max_distance_to_plane = FT(2);
-  const FT          angle_threshold       = FT(20);
-  const std::size_t min_region_size       = 25;
+  const std::size_t k                  = 12;
+  const FT          distance_threshold = FT(2);
+  const FT          angle_threshold    = FT(20);
+  const std::size_t min_region_size    = 25;
     
   // Load data.
   std::ifstream in(argc > 1 ? argv[1] : "../data/point_set_3.xyz");
@@ -61,18 +61,19 @@ bool test_region_growing_on_point_set_3(int argc, char *argv[]) {
 
   Region_type region_type(
     input_range, 
-    max_distance_to_plane, angle_threshold, min_region_size, 
+    distance_threshold, angle_threshold, min_region_size, 
     input_range.point_map(), input_range.normal_map());
 
   // Run region growing.
-  Region_growing region_growing(input_range, neighbor_query, region_type);
+  Region_growing region_growing(
+    input_range, neighbor_query, region_type);
   
   std::vector< std::vector<std::size_t> > regions;
   region_growing.detect(std::back_inserter(regions));
 
   // Test data.
-  CGAL_assertion(regions.size() == 140);
-  if (regions.size() != 140) 
+  CGAL_assertion(regions.size() >= 138 && regions.size() <= 142);
+  if (regions.size() < 138 || regions.size() > 142) 
     return false;
 
   for (const auto& region : regions)
@@ -82,8 +83,8 @@ bool test_region_growing_on_point_set_3(int argc, char *argv[]) {
   std::vector<std::size_t> unassigned_points;
   region_growing.output_unassigned_items(std::back_inserter(unassigned_points));
 
-  CGAL_assertion(unassigned_points.size() == 13467);
-  if (unassigned_points.size() != 13467) 
+  CGAL_assertion(unassigned_points.size() >= 13457 && unassigned_points.size() <= 13477);
+  if (unassigned_points.size() < 13457 || unassigned_points.size() > 13477) 
     return false;
 
   return true;

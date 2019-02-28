@@ -36,7 +36,7 @@ using Region_growing = SD::Region_growing<Input_range, Neighbor_query, Region_ty
 
 int main(int argc, char *argv[]) {
 
-  // Load xyz data either from a local folder or a user-provided file.
+  // Load data.
   std::ifstream in(argc > 1 ? argv[1] : "../data/point_set_3.xyz");
   CGAL::set_ascii_mode(in);
 
@@ -47,12 +47,12 @@ int main(int argc, char *argv[]) {
   in.close();
 
   // Default parameter values for the data file point_set_3.xyz.
-  const size_t k                     = 12;
-  const FT     max_distance_to_plane = FT(2);
-  const FT     angle_threshold       = FT(20);
-  const size_t min_region_size       = 25;
+  const std::size_t k                  = 12;
+  const FT          distance_threshold = FT(2);
+  const FT          angle_threshold    = FT(20);
+  const std::size_t min_region_size    = 25;
 
-  // Create instances of the parameter classes.
+  // Create parameter classes.
   Neighbor_query neighbor_query(
     input_range, 
     k, 
@@ -60,10 +60,10 @@ int main(int argc, char *argv[]) {
     
   Region_type region_type(
     input_range, 
-    max_distance_to_plane, angle_threshold, min_region_size, 
+    distance_threshold, angle_threshold, min_region_size, 
     input_range.point_map(), input_range.normal_map());
 
-  // Sort point indices.
+  // Sort indices.
   Sorting sorting(
     input_range, neighbor_query,
     input_range.point_map());
@@ -79,9 +79,9 @@ int main(int argc, char *argv[]) {
   region_growing.detect(std::back_inserter(regions));
 
   region_growing.release_memory();
-  CGAL_assertion(regions.size() == 140);
+  CGAL_assertion(regions.size() >= 138 && regions.size() <= 142);
 
-  const bool exact_inexact_test_success = (regions.size() == 140);
+  const bool exact_inexact_test_success = (regions.size() >= 138 && regions.size() <= 142);
   std::cout << "exact_inexact_test_success: " << exact_inexact_test_success << std::endl;
 
   return EXIT_SUCCESS;

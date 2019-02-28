@@ -35,10 +35,10 @@ bool test_region_growing_on_point_set_2(int argc, char *argv[]) {
   using Region_growing = SD::Region_growing<Input_range, Neighbor_query, Region_type>;
 
   // Default parameter values for the data file point_set_2.xyz.
-  const FT          sphere_radius        = FT(5);
-  const FT          max_distance_to_line = FT(45) / FT(10);
-  const FT          angle_threshold      = FT(45);
-  const std::size_t min_region_size      = 5;
+  const FT          sphere_radius      = FT(5);
+  const FT          distance_threshold = FT(45) / FT(10);
+  const FT          angle_threshold    = FT(45);
+  const std::size_t min_region_size    = 5;
     
   // Load data.
   std::ifstream in(argc > 1 ? argv[1] : "../data/point_set_2.xyz");
@@ -63,17 +63,18 @@ bool test_region_growing_on_point_set_2(int argc, char *argv[]) {
   
   Region_type region_type(
     input_range, 
-    max_distance_to_line, angle_threshold, min_region_size);
+    distance_threshold, angle_threshold, min_region_size);
 
   // Run region growing.
-  Region_growing region_growing(input_range, neighbor_query, region_type);
+  Region_growing region_growing(
+    input_range, neighbor_query, region_type);
   
   std::vector< std::vector<std::size_t> > regions;
   region_growing.detect(std::back_inserter(regions));
 
   // Test data.
-  CGAL_assertion(regions.size() == 65);
-  if (regions.size() != 65) 
+  CGAL_assertion(regions.size() >= 63 && regions.size() <= 67);
+  if (regions.size() < 63 || regions.size() > 67) 
     return false;
 
   for (const auto& region : regions)
@@ -83,8 +84,8 @@ bool test_region_growing_on_point_set_2(int argc, char *argv[]) {
   std::vector<std::size_t> unassigned_points;
   region_growing.output_unassigned_items(std::back_inserter(unassigned_points));
 
-  CGAL_assertion(unassigned_points.size() == 87);
-  if (unassigned_points.size() != 87) 
+  CGAL_assertion(unassigned_points.size() >= 77 && unassigned_points.size() <= 97);
+  if (unassigned_points.size() < 77 || unassigned_points.size() > 97) 
     return false;
 
   return true;

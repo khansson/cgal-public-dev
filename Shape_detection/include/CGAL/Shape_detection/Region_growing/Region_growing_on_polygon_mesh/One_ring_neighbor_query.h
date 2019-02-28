@@ -47,20 +47,18 @@ namespace Polygon_mesh {
   /*!
     \ingroup PkgShapeDetectionRGOnMesh
 
-    \brief Adjacent faces connectivity on a polygon mesh.
+    \brief Edge-adjacent faces connectivity in a polygon mesh.
 
-    This class finds all faces, which are adjacent to a given face on a 
-    polygon mesh and can be used to parameterize the `Shape_detection::Region_growing` 
-    algorithm. The polygon mesh is represented as a `FaceListGraph`.
+    This class returns all faces, which are edge-adjacent to a given face in a 
+    polygon mesh being a `FaceListGraph`.
 
     \tparam FaceListGraph 
     is a model of `FaceListGraph`.
 
     \tparam FaceRange 
-    is a model of `ConstRange`, whose iterator type is `RandomAccessIterator` 
-    and value type is a face type used in `FaceListGraph`.
+    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
 
-    \cgalModels `RegionGrowingConnectivity`
+    \cgalModels `NeighborQuery`
   */
   template<
   typename FaceListGraph, 
@@ -81,10 +79,10 @@ namespace Polygon_mesh {
     /// @{
 
     /*!
-      \brief Initializes all internal data structures.
+      \brief initializes all internal data structures.
 
-      \param polygon_mesh An instance of a `FaceListGraph` that represents
-      a polygon mesh.
+      \param polygon_mesh 
+      An instance of a `FaceListGraph` that represents a polygon mesh.
 
       \pre `total_number_of_faces > 0`
     */
@@ -103,20 +101,19 @@ namespace Polygon_mesh {
     /// @{ 
 
     /*!
-      \brief Returns adjacent faces to a given face.
+      \brief fills `neighbors` of the face with the index `query_index`.
 
       This function returns indices of all faces, 
-      which are adjacent to the face with the index `query_index`. 
+      which are edge-adjacent to the face with the index `query_index`. 
       These indices are returned in `neighbors`.
 
       \param query_index
-      Index of the query face.
+      %Index of the query face.
 
       \param neighbors
-      An `std::vector<std::size_t>` with the indices of faces, which are 
-      adjacent to the face with the index `query_index`.
+      Indices of faces, which are neighbors of the query face.
 
-      Implements the function `RegionGrowingConnectivity::neighbors()`.
+      Implements `NeighborQuery::operator()()`.
 
       \pre `query_index >= 0 && query_index < total_number_of_faces`
     */

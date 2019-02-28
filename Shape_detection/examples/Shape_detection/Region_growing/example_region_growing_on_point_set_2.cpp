@@ -33,6 +33,9 @@ using Neighbor_query = CGAL::Shape_detection::Point_set::Sphere_neighbor_query<K
 using Region_type    = CGAL::Shape_detection::Point_set::Least_squares_line_fit_region<Kernel, Input_range, Point_map, Normal_map>;
 using Region_growing = CGAL::Shape_detection::Region_growing<Input_range, Neighbor_query, Region_type>;
 
+using Region  = std::vector<std::size_t>;
+using Regions = std::vector<Region>;
+
 using Color            = CGAL::cpp11::array<unsigned char, 3>;
 using Point_with_color = std::pair<Point_3, Color>;
 using Pwc_vector       = std::vector<Point_with_color>;
@@ -107,20 +110,21 @@ int main(int argc, char *argv[]) {
     max_distance_to_line, max_accepted_angle, min_region_size);
     
   // Create an instance of the region growing class.
-  Region_growing region_growing(input_range, neighbor_query, region_type);
+  Region_growing region_growing(
+    input_range, neighbor_query, region_type);
 
   // Run the algorithm.
-  std::vector< std::vector<std::size_t> > regions;
+  Regions regions;
   region_growing.detect(std::back_inserter(regions));
 
   // Print the number of found regions.
-  std::cerr << "* " << regions.size() << 
+  std::cout << "* " << regions.size() << 
     " regions have been found" 
   << std::endl;
 
   Pwc_vector pwc;
   srand(time(NULL));
-
+  
   // Iterate through all regions.
   for (const auto& region : regions) {
         
@@ -140,7 +144,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  // Save result to a file in the user-provided path if any.
+  // Save the result to a file in the user-provided path if any.
   if (argc > 2) {
         
     const std::string path     = argv[2];

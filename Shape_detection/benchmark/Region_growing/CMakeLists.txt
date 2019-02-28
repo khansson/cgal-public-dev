@@ -14,6 +14,8 @@ if(CGAL_FOUND)
 
   create_single_source_cgal_program(
     "benchmark_region_growing_on_point_set_2.cpp")
+  create_single_source_cgal_program(
+    "benchmark_region_growing_on_point_set_3.cpp")
 
 else()
   message(WARNING 

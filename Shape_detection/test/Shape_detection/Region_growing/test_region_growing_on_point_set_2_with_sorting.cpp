@@ -36,7 +36,7 @@ using Region_growing = SD::Region_growing<Input_range, Neighbor_query, Region_ty
 
 int main(int argc, char *argv[]) {
 
-  // Load xyz data either from a local folder or a user-provided file.
+  // Load data.
   std::ifstream in(argc > 1 ? argv[1] : "../data/point_set_2.xyz");
   CGAL::set_ascii_mode(in);
 
@@ -49,21 +49,21 @@ int main(int argc, char *argv[]) {
   in.close();
 
   // Default parameter values for the data file point_set_2.xyz.
-  const FT     sphere_radius        = FT(5);
-  const FT     max_distance_to_line = FT(45) / FT(10);
-  const FT     angle_threshold      = FT(45);
-  const size_t min_region_size      = 5;
+  const FT          sphere_radius      = FT(5);
+  const FT          distance_threshold = FT(45) / FT(10);
+  const FT          angle_threshold    = FT(45);
+  const std::size_t min_region_size    = 5;
 
-  // Create instances of the parameter classes.
+  // Create parameter classes.
   Neighbor_query neighbor_query(
     input_range, 
     sphere_radius);
 
   Region_type region_type(
     input_range, 
-    max_distance_to_line, angle_threshold, min_region_size);
+    distance_threshold, angle_threshold, min_region_size);
 
-  // Sort point indices.
+  // Sort indices.
   Sorting sorting(
     input_range, neighbor_query);
   sorting.sort();
@@ -78,9 +78,9 @@ int main(int argc, char *argv[]) {
   region_growing.detect(std::back_inserter(regions));
 
   region_growing.release_memory();
-  CGAL_assertion(regions.size() == 64);
+  CGAL_assertion(regions.size() >= 62 && regions.size() <= 66);
 
-  const bool cartesian_double_test_success = (regions.size() == 64);
+  const bool cartesian_double_test_success = (regions.size() >= 62 && regions.size() <= 66);
   std::cout << "cartesian_double_test_success: " << cartesian_double_test_success << std::endl;
 
   return EXIT_SUCCESS;

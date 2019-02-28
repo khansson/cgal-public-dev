@@ -33,9 +33,9 @@ bool test_region_growing_on_cube(int argc, char *argv[]) {
   using Region_growing = SD::Region_growing<Face_range, Neighbor_query, Region_type>;
 
   // Default parameter values for the data file cube.off.
-  const FT          max_distance_to_plane = FT(1) / FT(10);
-  const FT          angle_threshold       = FT(25);
-  const std::size_t min_region_size       = 1;
+  const FT          distance_threshold = FT(1) / FT(10);
+  const FT          angle_threshold    = FT(25);
+  const std::size_t min_region_size    = 1;
 
   // Load data.
   std::ifstream in(argc > 1 ? argv[1] : "../data/cube.off");
@@ -51,15 +51,16 @@ bool test_region_growing_on_cube(int argc, char *argv[]) {
   if (face_range.size() != 6) 
     return false;
 
-  // Create connectivity and conditions.
+  // Create parameter classes.
   Neighbor_query neighbor_query(polyhedron);
   
   Region_type region_type(
     polyhedron, 
-    max_distance_to_plane, angle_threshold, min_region_size);
+    distance_threshold, angle_threshold, min_region_size);
 
   // Run region growing.
-  Region_growing region_growing(face_range, neighbor_query, region_type);
+  Region_growing region_growing(
+    face_range, neighbor_query, region_type);
   
   std::vector< std::vector<std::size_t> > regions;
   region_growing.detect(std::back_inserter(regions));

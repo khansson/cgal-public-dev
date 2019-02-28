@@ -12,7 +12,7 @@
 // Custom Neighbor_query, Region_type, and Seed_map classes for region growing.
 namespace Custom {
 
-  // An object that stores indices of all adjacent to it other objects.
+  // An object that stores indices of all its neighbors.
   struct Object {
     std::vector<std::size_t> neighbors;
   };
@@ -20,9 +20,8 @@ namespace Custom {
   // A range of objects.
   using Objects = std::list<Object>;
 
-  // Neighbor_query class that
-  // simply returns indices of all neighbors stored in
-  // the object struct above.
+  // The Neighbor_query functor that accesses indices of all neighbors 
+  // stored in the object struct above.
   class Neighbor_query {
     const Objects& m_objects;
 
@@ -46,11 +45,11 @@ namespace Custom {
     }
   };
 
-  // Region_type class, where the function is_part_of_region() checks
+  // The Region_type class, where the function is_part_of_region() verifies
   // a very specific condition that the first and second objects in the
   // range are in fact neighbors; is_valid_region() function always 
   // returns true after the first call to the update() function.
-  // These are the only functions that we have to define.
+  // These are the only functions that have to be defined.
   class Region_type {
     bool m_is_valid = false;
 
@@ -81,14 +80,14 @@ namespace Custom {
     }
   };
 
-  // A seed map with the minimum requirements that is using the m_objects_map 
-  // to define the seeding order of objects.
+  // The SeedMap class that uses the m_objects_map to define 
+  // the seeding order of objects.
   class Seed_map {
                         
   public:
-    using key_type = std::size_t;
+    using key_type   = std::size_t;
     using value_type = std::size_t;
-    using category = boost::lvalue_property_map_tag;
+    using category   = boost::lvalue_property_map_tag;
 
     Seed_map(const std::map<std::size_t, std::size_t>& objects_map) : 
     m_objects_map(objects_map) 
@@ -108,7 +107,8 @@ namespace Custom {
   private:
     const std::map<std::size_t, std::size_t>& m_objects_map;
   };
-}
+
+} // namespace Custom
 
 // Type declarations.
 using Object         = Custom::Object;
@@ -116,6 +116,9 @@ using Objects        = Custom::Objects;
 using Neighbor_query = Custom::Neighbor_query;
 using Region_type    = Custom::Region_type;
 using Seed_map       = Custom::Seed_map;
+
+using Region  = std::vector<std::size_t>;
+using Regions = std::list<Region>;
 
 using Region_growing = 
 CGAL::Shape_detection::Region_growing<Objects, Neighbor_query, Region_type, Seed_map>;
@@ -128,6 +131,7 @@ int main(int argc, char *argv[]) {
 
   // Define a range of objects, where the first two objects form
   // the first region, while the third object forms the second region.
+  // Note that Objects is not a random access here and may be slow.
   Objects objects;
 
   // Region 1.
@@ -160,11 +164,11 @@ int main(int argc, char *argv[]) {
   const Seed_map seed_map(objects_map);
 
   // Create an instance of the region growing class.
-  Region_growing region_growing(objects, neighbor_query, region_type, seed_map);
+  Region_growing region_growing(
+    objects, neighbor_query, region_type, seed_map);
 
   // Run the algorithm.
-  using Region = std::vector<std::size_t>;
-  std::list<Region> regions;
+  Regions regions;
   region_growing.detect(std::back_inserter(regions));
 
   // Print the number of found regions. It must be two regions.
@@ -172,8 +176,7 @@ int main(int argc, char *argv[]) {
     " regions have been found among " << objects.size() <<  " objects" 
   << std::endl;
   
-  // Release all internal memory that is used to store regions and
-  // other related data.
+  // Release all internal memory.
   region_growing.release_memory();
 
   std::cout << std::endl << 

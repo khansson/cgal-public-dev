@@ -1,21 +1,4 @@
-# This code generates the benchmark table in the user manual.
-
-First, compile the file `benchmark_region_growing_on_point_set_2.cpp` using the provided cmake file:
-
-```bash
-$ cd /path/to/build/directory
-$ cmake -DCGAL_DIR=/path/to/cgal/release/build -DCMAKE_BUILD_TYPE=Release /path/to/benchmark/Region_growing
-$ make benchmark_region_growing_on_point_set_2
-```
-
-The program uses the data file `data/point_set_2.xyz`.
-You can run the benchmark program as follows:
-
-```bash
-$ ./benchmark_region_growing_on_point_set_2 /path/to/data/point_set_2.xyz
-```
-
-Results:
+Results (Point Set 2):
 
 ```
 Test #1
@@ -64,4 +47,13 @@ Test #4
   Number of detected regions: 2302
   Number of assigned points: 65334
   Number of unassigned points: 2434
+```
+
+Results (Point Set 3):
+
+```
+Time ( 300000 points ): 0.761617 seconds
+Time ( 600000 points ): 1.68735 seconds
+Time ( 900000 points ): 2.80346 seconds
+Time ( 1200000 points ): 4.06246 seconds
 ```
