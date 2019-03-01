@@ -54,13 +54,10 @@ namespace Polygon_mesh {
   /*!
     \ingroup PkgShapeDetectionRGOnMesh
 
-    \brief Best least squares plane fit sorting of faces in a polygon mesh.
+    \brief Sorting of polygon mesh faces with respect to the local plane fit quality.
 
-    This class allows to sort indices of faces in a polygon mesh, where 
-    the sorting is based on the quality of the local best least squares plane fit. 
-    The plane is fitted to the face vertices and vertices of its neighbors 
-    found via the `Connectivity` class. The faces are sorted in the decreasing 
-    quality order, that is the first index - the best quality.
+    Indices of faces in a polygon mesh are sorted with respect to the quality of the 
+    least squares plane fit applied to the vertices of neighboring faces of each face.
 
     \tparam GeomTraits 
     is a model of `Kernel`.
@@ -68,15 +65,16 @@ namespace Polygon_mesh {
     \tparam FaceListGraph 
     is a model of `FaceListGraph`.
 
-    \tparam Connectivity 
-    is a model of `RegionGrowingConnectivity`.
+    \tparam NeighborQuery 
+    is a model of `NeighborQuery`.
 
     \tparam FaceRange 
-    is a model of `ConstRange`, whose iterator type is `RandomAccessIterator` 
-    and value type is a face type used in `FaceListGraph`.
+    is a model of `ConstRange` whose iterator type is `RandomAccessIterator` and 
+    value type is the face type of a polygon mesh.
 
     \tparam VertexToPointMap 
-    is an `LvaluePropertyMap` that maps a polygon mesh vertex to `CGAL::Point_3`.
+    is an `LvaluePropertyMap` whose key type is the vertex type of a polygon mesh and
+    value type is `CGAL::Point_3`.
   */
   template<
   typename GeomTraits, 
@@ -101,7 +99,7 @@ namespace Polygon_mesh {
     /// \endcond
 
     #ifdef DOXYGEN_RUNNING
-      /// Property map that returns the quality ordered seed indices of the faces.
+      /// Property map that provides an access to the ordered indices of polygon mesh faces.
       typedef unspecified_type Seed_map;
     #endif
 
@@ -111,17 +109,17 @@ namespace Polygon_mesh {
     /// @{
 
     /*!
-      \brief Initializes all internal data structures.
+      \brief initializes all internal data structures.
 
       \param polygon_mesh 
-      An instance of a `FaceListGraph` that represents a polygon mesh.
+      An instance of `FaceListGraph` that represents a polygon mesh.
 
       \param neighbor_query 
-      An instance of the `Connectivity` class that is used
-      internally to access face neighbors.
+      An instance of `NeighborQuery` that is used internally to 
+      access face's neighbors.
 
       \param vertex_to_point_map 
-      An instance of an `LvaluePropertyMap` that maps a polygon mesh 
+      An instance of `VertexToPointMap` that maps a polygon mesh 
       vertex to `CGAL::Point_3`.
 
       \pre `total_number_of_faces > 0`
@@ -149,7 +147,7 @@ namespace Polygon_mesh {
     /// @{
 
     /*!
-      \brief Sorts face indices.
+      \brief sorts indices of polygon mesh faces.
     */
     void sort() {
       
@@ -166,8 +164,8 @@ namespace Polygon_mesh {
     /// @{
 
     /*!
-      \brief Returns the `Seed_map` that allows to access 
-      the ordered face indices.
+      \brief returns an instance of `Seed_map` to access the ordered indices
+      of polygon mesh faces.
     */
     Seed_map seed_map() {
       return Seed_map(m_order);

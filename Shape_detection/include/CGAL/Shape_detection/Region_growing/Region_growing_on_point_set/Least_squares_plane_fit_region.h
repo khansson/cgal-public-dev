@@ -45,28 +45,28 @@ namespace Point_set {
   /*! 
     \ingroup PkgShapeDetectionRGOnPoints
 
-    \brief Least squares plane fit conditions on 3D points.
+    \brief Region type based on the quality of the least squares plane 
+    fit applied to 3D points.
 
-    This class implements propagation conditions for detecting planes 
-    on 3D points via the `Shape_detection::Region_growing` approach, 
-    where quality of detected planes is based on a local least squares plane fit.
+    This class fits a plane to chunks of points in a 3D point set and controls 
+    the quality of this fit. If all quality conditions are satisfied, the chunk
+    is accepted as a valid region, otherwise rejected.
 
     \tparam GeomTraits 
     is a model of `Kernel`.
 
     \tparam InputRange 
-    is a model of `ConstRange`. Its iterator type is `RandomAccessIterator`. 
-    Its value type depends on the item type used in Region Growing, 
-    for example it can be `std::pair<CGAL::Point_3, CGAL::Vector_3>` 
-    or any user-defined type.
+    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
 
     \tparam PointMap 
-    is an `LvaluePropertyMap` that maps key to `CGAL::Point_3`.
+    is an `LvaluePropertyMap` whose key type is `InputRange::value_type` and
+    value type is `CGAL::Point_3`.
 
     \tparam NormalMap 
-    is an `LvaluePropertyMap` that maps to `CGAL::Vector_3`.
+    is an `LvaluePropertyMap` whose key type is `InputRange::value_type` and
+    value type is `CGAL::Vector_3`.
     
-    \cgalModels `RegionGrowingPropagationConditions`
+    \cgalModels `RegionType`
   */
   template<
   typename GeomTraits, 
@@ -90,16 +90,11 @@ namespace Point_set {
     /// Number type.
     typedef typename GeomTraits::FT FT;
 
-    /// Point type.
-    typedef typename GeomTraits::Point_3 Point_3;
-
-    /// Vector type.
-    typedef typename GeomTraits::Vector_3 Vector_3;
-
-    /// Type of the plane.
-    typedef typename GeomTraits::Plane_3 Plane_3;
-
     /// \cond SKIP_IN_MANUAL
+    using Point_3 = typename GeomTraits::Point_3;
+    using Vector_3 = typename GeomTraits::Vector_3;
+    using Plane_3 = typename GeomTraits::Plane_3;
+
     using Local_traits = Exact_predicates_inexact_constructions_kernel;
     using Local_point_3 = typename Local_traits::Point_3;
     using Local_plane_3 = typename Local_traits::Plane_3;
@@ -119,38 +114,36 @@ namespace Point_set {
     /// @{
 
     /*!
-      \brief Initializes all internal data structures.
+      \brief initializes all internal data structures.
 
       \param input_range 
-      An instance of an `InputRange` container with 3D points 
-      and 3D associated normal vectors.
+      An instance of `InputRange` with 3D points and 
+      corresponding 3D normal vectors.
 
       \param distance_threshold 
-      Maximum distance from a point to the region represented by a plane of 
-      the type `CGAL::Plane_3`.
+      The maximum distance from a point to a plane. %Default is 1.
 
       \param angle_threshold 
-      Minimum dot product between the normal assigned to the point and 
-      the normal assigned to the region represented by a plane 
-      of the type `CGAL::Plane_3`.
+      The maximum accepted angle in degrees between the normal of a point and 
+      the normal of a plane. %Default is 25 degrees.
 
       \param min_region_size 
-      The minimum number of 3D points a region must have.
+      The minimum number of 3D points a region must have. %Default is 3.
 
       \param point_map
-      An instance of an `LvaluePropertyMap` that maps an item from `input_range` 
+      An instance of `PointMap` that maps an item from `input_range` 
       to `CGAL::Point_3`.
 
       \param normal_map
-      An instance of an `LvaluePropertyMap` that maps an item from `input_range` 
+      An instance of `NormalMap` that maps an item from `input_range` 
       to `CGAL::Vector_3`.
 
       \param traits
-      An instance of the `GeomTraits` class.
+      An instance of `GeomTraits`.
 
       \pre `input_range.size() > 0`
       \pre `distance_threshold >= 0`
-      \pre `normal_threshold >= 0 && normal_threshold <= 1`
+      \pre `angle_threshold >= 0 && angle_threshold <= 90`
       \pre `min_region_size > 0`
     */
     Least_squares_plane_fit_region(
@@ -188,18 +181,19 @@ namespace Point_set {
     /// @{ 
 
     /*!
-      \brief Checks if a point belongs to a region.
+      \brief implements `RegionType::is_part_of_region()`.
 
-      Checks if the point with the index `query_index` belongs to the region
-      that is currently getting developed using the `distance_threshold` and
-      `normal_threshold` values.
+      This function controls if a point with the index `query_index` is within
+      the `distance_threshold` from the corresponding plane and if the angle
+      between its normal and the plane's normal is within the `angle_threshold`.
+      If both conditions are satisfied, it returns `true`, otherwise `false`.
 
       \param query_index
-      Index of the query point.
+      %Index of the query point.
 
       The second parameter is not used in this implementation.
 
-      Implements the function `RegionGrowingPropagationConditions::belongs_to_region()`.
+      \return boolean `true` or `false`.
 
       \pre `query_index >= 0 && query_index < total_number_of_points`
     */
@@ -229,31 +223,26 @@ namespace Point_set {
     }
 
     /*!
-      \brief Validates the final `region`.
+      \brief implements `RegionType::is_valid_region()`.
 
-      Controls if the `region` that has been created contains at least 
-      `min_region_size` points.
+      This function controls if the `region` contains at least `min_region_size` points.
 
       \param region
-      Stores indices of all points that belong to the region.
+      Indices of points included in the region.
 
-      Implements the function `RegionGrowingPropagationConditions::is_valid_region()`.
+      \return boolean `true` or `false`.
     */
     inline bool is_valid_region(const std::vector<std::size_t>& region) const {
       return ( region.size() >= m_min_region_size );
     }
 
     /*!
-      \brief Recomputes the least squares plane.
+      \brief implements `RegionType::update()`.
 
-      Recomputes the internal least squares plane that represents the `region`
-      currently being developed. The plane is fitted to all points, 
-      which have been added to the `region` so far.
+      This function fits the least squares plane to all points from the `region`.
 
       \param region
-      Stores indices of all points that belong to the region.
-
-      Implements the function `RegionGrowingPropagationConditions::update()`.
+      Indices of points included in the region.
 
       \pre `region.size() > 0`
     */

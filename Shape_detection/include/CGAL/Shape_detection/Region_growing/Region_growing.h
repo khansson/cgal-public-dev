@@ -94,15 +94,15 @@ namespace Shape_detection {
       A range of input items for region growing.
 
       \param neighbor_query 
-      An instance of the `NeighborQuery` class that is used internally to 
+      An instance of `NeighborQuery` that is used internally to 
       access item's neighbors.
 
       \param region_type 
-      An instance of the `RegionType` class that is used internally to 
+      An instance of `RegionType` that is used internally to 
       control if items form a valid region type.
 
       \param seed_map 
-      An instance of the `SeedMap` property map that is used internally to 
+      An instance of `SeedMap` property map that is used internally to 
       set the order of items in the region growing processing queue. If it maps 
       to `std::size_t(-1)`, the corresponding item is skipped.
 

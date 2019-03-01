@@ -47,8 +47,8 @@ public:
     allows to update any information that is maintained with the `region`.
 
     This function is called each time when a new seed item is selected. This item 
-    is pushed to the `region` and hence its size is one. It is also called 
-    periodically when enlarging the `region`.
+    is pushed to the `region` and hence the region's size is one. The function is 
+    also called periodically when enlarging the `region`.
   */
   void update(
     const std::vector<std::size_t>& region) {

@@ -62,7 +62,8 @@ namespace Point_set {
     is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
 
     \tparam PointMap 
-    is an `LvaluePropertyMap` whose value type is `CGAL::Point_2` or `CGAL::Point_3`.
+    is an `LvaluePropertyMap` whose key type is `InputRange::value_type` and
+    value type is `CGAL::Point_2` or `CGAL::Point_3`.
 
     \cgalModels `NeighborQuery`
   */
@@ -125,7 +126,7 @@ namespace Point_set {
       An instance of `InputRange` with 2D or 3D points.
 
       \param k 
-      The number of returned neighbors per each query point. The default is 12.
+      The number of returned neighbors per each query point. %Default is 12.
 
       \param point_map
       An instance of `PointMap` that maps an item from `input_range` 
@@ -161,9 +162,9 @@ namespace Point_set {
     /// @{ 
 
     /*!
-      \brief fills `neighbors` of the point with the index `query_index`.
+      \brief implements `NeighborQuery::operator()()`.
 
-      This function finds indices of the `k` closest points to the point with 
+      This operator finds indices of the `k` closest points to the point with 
       the index `query_index` using a Kd-tree. These indices are returned in `neighbors`.
 
       \param query_index
@@ -171,8 +172,6 @@ namespace Point_set {
 
       \param neighbors
       Indices of points, which are neighbors of the query point.
-
-      Implements `NeighborQuery::operator()()`.
 
       \pre `query_index >= 0 && query_index < total_number_of_points`
     */

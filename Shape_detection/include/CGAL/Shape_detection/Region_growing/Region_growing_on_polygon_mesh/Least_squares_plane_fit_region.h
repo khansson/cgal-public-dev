@@ -54,11 +54,12 @@ namespace Polygon_mesh {
   /*!
     \ingroup PkgShapeDetectionRGOnMesh
 
-    \brief Least squares plane fit conditions on a polygon mesh.
+    \brief Region type based on the quality of the least squares plane 
+    fit applied to faces of a polygon mesh.
 
-    This class implements propagation conditions for detecting planes 
-    on a polygon mesh via the `Shape_detection::Region_growing` approach, 
-    where quality of detected planes is based on a local least squares plane fit.
+    This class fits a plane to chunks of faces in a polygon mesh and controls 
+    the quality of this fit. If all quality conditions are satisfied, the chunk
+    is accepted as a valid region, otherwise rejected.
 
     \tparam GeomTraits 
     is a model of `Kernel`.
@@ -67,13 +68,14 @@ namespace Polygon_mesh {
     is a model of `FaceListGraph`.
 
     \tparam FaceRange 
-    is a model of `ConstRange`, whose iterator type is `RandomAccessIterator` 
-    and value type is a face type used in `FaceListGraph`.
+    is a model of `ConstRange` whose iterator type is `RandomAccessIterator` and 
+    value type is the face type of a polygon mesh.
 
     \tparam VertexToPointMap 
-    is an `LvaluePropertyMap` that maps a polygon mesh vertex to `CGAL::Point_3`.
+    is an `LvaluePropertyMap` whose key type is the vertex type of a polygon mesh and
+    value type is `CGAL::Point_3`.
     
-    \cgalModels `RegionGrowingPropagationConditions`
+    \cgalModels `RegionType`
   */
   template<
   typename GeomTraits, 
@@ -90,7 +92,9 @@ namespace Polygon_mesh {
     using Face_range = FaceRange;
     using Vertex_to_point_map = VertexToPointMap;
 
+    using Point_3 = typename GeomTraits::Point_3;
     using Vector_3 = typename Traits::Vector_3;
+    using Plane_3 = typename GeomTraits::Plane_3;
 
     using Local_traits = Exact_predicates_inexact_constructions_kernel;
     using Local_point_3 = typename Local_traits::Point_3;
@@ -111,44 +115,37 @@ namespace Polygon_mesh {
     /// Number type.
     typedef typename GeomTraits::FT FT;
 
-    /// Point type.
-    typedef typename GeomTraits::Point_3 Point_3; 
-
-    /// Type of the plane.
-    typedef typename GeomTraits::Plane_3 Plane_3;
-
     /// @}
 
     /// \name Initialization
     /// @{
 
     /*!
-      \brief Initializes all internal data structures.
+      \brief initializes all internal data structures.
 
       \param polygon_mesh 
-      An instance of a `FaceListGraph` that represents a polygon mesh.
+      An instance of `FaceListGraph` that represents a polygon mesh.
 
       \param distance_threshold 
-      Maximum distance from a face to the region represented by a plane of 
-      the type `CGAL::Plane_3`.
+      The maximum distance from the furthest vertex of a face to a plane. %Default is 1.
 
       \param angle_threshold 
-      Minimum dot product between the face normal and the normal assigned 
-      to the region represented by a plane of the type `CGAL::Plane_3`.
+      The maximum accepted angle in degrees between the normal of a face and 
+      the normal of a plane. %Default is 25 degrees.
 
       \param min_region_size 
-      The minimum number of faces a region must have.
+      The minimum number of faces a region must have. %Default is 1.
       
       \param vertex_to_point_map 
-      An instance of an `LvaluePropertyMap` that maps a polygon mesh 
+      An instance of `VertexToPointMap` that maps a polygon mesh 
       vertex to `CGAL::Point_3`.
 
       \param traits
-      An instance of the `GeomTraits` class.
+      An instance of `GeomTraits`.
 
       \pre `total_number_of_faces > 0`
       \pre `distance_threshold >= 0`
-      \pre `normal_threshold >= 0 && normal_threshold <= 1`
+      \pre `angle_threshold >= 0 && angle_threshold <= 90`
       \pre `min_region_size > 0`
     */
     Least_squares_plane_fit_region(
@@ -185,18 +182,19 @@ namespace Polygon_mesh {
     /// @{ 
 
     /*!
-      \brief Checks if a face belongs to a region.
+      \brief implements `RegionType::is_part_of_region()`.
 
-      Checks if the face with the index `query_index` belongs to the region
-      that is currently getting developed using the `distance_threshold` and
-      `normal_threshold` values.
+      This function controls if a face with the index `query_index` is within
+      the `distance_threshold` from the corresponding plane and if the angle
+      between its normal and the plane's normal is within the `angle_threshold`.
+      If both conditions are satisfied, it returns `true`, otherwise `false`.
 
       \param query_index
-      Index of the query face.
+      %Index of the query face.
 
       The second parameter is not used in this implementation.
 
-      Implements the function `RegionGrowingPropagationConditions::belongs_to_region()`.
+      \return boolean `true` or `false`.
 
       \pre `query_index >= 0 && query_index < total_number_of_faces`
     */
@@ -223,31 +221,27 @@ namespace Polygon_mesh {
     }
 
     /*!
-      \brief Validates the final `region`.
+      \brief implements `RegionType::is_valid_region()`.
 
-      Controls if the `region` that has been created contains at least 
-      `min_region_size` faces.
+      This function controls if the `region` contains at least `min_region_size` faces.
 
       \param region
-      Stores indices of all faces that belong to the region.
+      Indices of faces included in the region.
 
-      Implements the function `RegionGrowingPropagationConditions::is_valid_region()`.
+      \return boolean `true` or `false`.
     */
     inline bool is_valid_region(const std::vector<std::size_t>& region) const {
       return ( region.size() >= m_min_region_size );
     }
 
     /*!
-      \brief Recomputes the least squares plane.
+      \brief implements `RegionType::update()`.
 
-      Recomputes the internal least squares plane that represents the `region`
-      currently being developed. The plane is fitted to the polygon mesh
-      vertices of all faces, which have been added to the `region` so far.
+      This function fits the least squares plane to all vertices of the faces 
+      from the `region`.
 
       \param region
-      Stores indices of all faces that belong to the region.
-
-      Implements the function `RegionGrowingPropagationConditions::update()`.
+      Indices of faces included in the region.
 
       \pre `region.size() > 0`
     */

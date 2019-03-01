@@ -46,28 +46,23 @@ namespace Point_set {
   /*! 
     \ingroup PkgShapeDetectionRGOnPoints
 
-    \brief Best least squares plane fit sorting of 3D points.
+    \brief Sorting of 3D points with respect to the local plane fit quality.
 
-    This class allows to sort indices of 3D points, where the sorting is
-    based on the quality of the local best least squares plane fit. 
-    The plane is fitted to each point and its neighbors found via the 
-    `Connectivity` class. The points are sorted in the decreasing quality order,
-    that is the first index - the best quality.
+    Indices of 3D input points are sorted with respect to the quality of the 
+    least squares plane fit applied to the neighboring points of each point.
 
     \tparam GeomTraits 
     is a model of `Kernel`.
 
     \tparam InputRange 
-    is a model of `ConstRange`. Its iterator type is `RandomAccessIterator`. 
-    Its value type depends on the item type used in Region Growing, 
-    for example it can be `std::pair<CGAL::Point_3, int>` 
-    or any user-defined type.
+    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
 
-    \tparam Connectivity 
-    is a model of `RegionGrowingConnectivity`.
+    \tparam NeighborQuery 
+    is a model of `NeighborQuery`.
 
     \tparam PointMap 
-    is an `LvaluePropertyMap` that maps to `CGAL::Point_3`.
+    is an `LvaluePropertyMap` whose key type is `InputRange::value_type` and
+    value type is `CGAL::Point_3`.
   */
   template<
   typename GeomTraits,
@@ -90,7 +85,7 @@ namespace Point_set {
     /// \endcond
     
     #ifdef DOXYGEN_RUNNING
-      /// Property map that returns the quality ordered seed indices of the points.
+      /// Property map that provides an access to the ordered indices of input points.
       typedef unspecified_type Seed_map;
     #endif
 
@@ -100,17 +95,17 @@ namespace Point_set {
     /// @{
 
     /*!
-      \brief Initializes all internal data structures.
+      \brief initializes all internal data structures.
 
       \param input_range 
-      An instance of an `InputRange` container with 3D points.
+      An instance of `InputRange` with 3D points.
 
       \param neighbor_query 
-      An instance of the `Connectivity` class that is used
-      internally to access point neighbors.
+      An instance of `NeighborQuery` that is used internally to 
+      access point's neighbors.
 
       \param point_map
-      An instance of an `LvaluePropertyMap` that maps an item from `input_range` 
+      An instance of `PointMap` that maps an item from `input_range` 
       to `CGAL::Point_3`.
 
       \pre `input_range.size() > 0`
@@ -137,7 +132,7 @@ namespace Point_set {
     /// @{
 
     /*!
-      \brief Sorts point indices.
+      \brief sorts indices of input points.
     */
     void sort() {
       
@@ -154,8 +149,8 @@ namespace Point_set {
     /// @{
 
     /*!
-      \brief Returns the `Seed_map` that allows to access 
-      the ordered point indices.
+      \brief returns an instance of `Seed_map` to access the ordered indices
+      of input points.
     */
     Seed_map seed_map() {
       return Seed_map(m_order);

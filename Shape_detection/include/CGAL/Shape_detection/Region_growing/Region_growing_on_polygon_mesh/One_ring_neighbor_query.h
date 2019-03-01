@@ -49,14 +49,15 @@ namespace Polygon_mesh {
 
     \brief Edge-adjacent faces connectivity in a polygon mesh.
 
-    This class returns all faces, which are edge-adjacent to a given face in a 
+    This class returns all faces, which are edge-adjacent to a query face in a 
     polygon mesh being a `FaceListGraph`.
 
     \tparam FaceListGraph 
     is a model of `FaceListGraph`.
 
     \tparam FaceRange 
-    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+    is a model of `ConstRange` whose iterator type is `RandomAccessIterator` and 
+    value type is the face type of a polygon mesh.
 
     \cgalModels `NeighborQuery`
   */
@@ -101,9 +102,9 @@ namespace Polygon_mesh {
     /// @{ 
 
     /*!
-      \brief fills `neighbors` of the face with the index `query_index`.
+      \brief implements `NeighborQuery::operator()()`.
 
-      This function returns indices of all faces, 
+      This operator retrieves indices of all faces, 
       which are edge-adjacent to the face with the index `query_index`. 
       These indices are returned in `neighbors`.
 
@@ -112,8 +113,6 @@ namespace Polygon_mesh {
 
       \param neighbors
       Indices of faces, which are neighbors of the query face.
-
-      Implements `NeighborQuery::operator()()`.
 
       \pre `query_index >= 0 && query_index < total_number_of_faces`
     */

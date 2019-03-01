@@ -63,7 +63,8 @@ namespace Point_set {
     is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
 
     \tparam PointMap 
-    is an `LvaluePropertyMap` whose value type is `CGAL::Point_2` or `CGAL::Point_3`.
+    is an `LvaluePropertyMap` whose key type is `InputRange::value_type` and
+    value type is `CGAL::Point_2` or `CGAL::Point_3`.
 
     \cgalModels `NeighborQuery`
   */
@@ -124,7 +125,7 @@ namespace Point_set {
 
       \param sphere_radius 
       The fixed radius of the fuzzy sphere used for searching neighbors 
-      of a query point. The default is 1.
+      of a query point. %Default is 1.
 
       \param point_map
       An instance of `PointMap` that maps an item from `input_range` 
@@ -159,9 +160,9 @@ namespace Point_set {
     /// @{ 
 
     /*!
-      \brief fills `neighbors` of the point with the index `query_index`.
+      \brief implements `NeighborQuery::operator()()`.
 
-      This function finds indices of all points, which fall in a sphere
+      This operator finds indices of all points, which fall in a sphere
       of the fixed radius `sphere_radius` centered at the query point with
       the index `query_index`. These neighbors are returned in `neighbors`.
 
@@ -170,8 +171,6 @@ namespace Point_set {
 
       \param neighbors
       Indices of points, which are neighbors of the query point.
-
-      Implements `NeighborQuery::operator()()`.
 
       \pre `query_index >= 0 && query_index < total_number_of_points`
     */

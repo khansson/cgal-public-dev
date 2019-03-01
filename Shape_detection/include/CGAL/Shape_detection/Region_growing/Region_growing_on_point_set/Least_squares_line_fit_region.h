@@ -45,28 +45,28 @@ namespace Point_set {
   /*! 
     \ingroup PkgShapeDetectionRGOnPoints
 
-    \brief Best least squares line fit conditions on 2D points.
+    \brief Region type based on the quality of the least squares line 
+    fit applied to 2D points.
 
-    This class implements propagation conditions for detecting lines 
-    on 2D points via the `Shape_detection::Region_growing` approach, 
-    where quality of detected lines is based on a local least squares line fit.
+    This class fits a line to chunks of points in a 2D point set and controls 
+    the quality of this fit. If all quality conditions are satisfied, the chunk
+    is accepted as a valid region, otherwise rejected.
 
     \tparam GeomTraits 
     is a model of `Kernel`.
 
     \tparam InputRange 
-    is a model of `ConstRange`. Its iterator type is `RandomAccessIterator`. 
-    Its value type depends on the item type used in Region Growing, 
-    for example it can be `std::pair<CGAL::Point_2, int>` 
-    or any user-defined type.
+    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
 
     \tparam PointMap 
-    is an `LvaluePropertyMap` that maps to `CGAL::Point_2`.
+    is an `LvaluePropertyMap` whose key type is `InputRange::value_type` and
+    value type is `CGAL::Point_2`.
 
     \tparam NormalMap 
-    is an `LvaluePropertyMap` that maps to `CGAL::Vector_2`.
+    is an `LvaluePropertyMap` whose key type is `InputRange::value_type` and
+    value type is `CGAL::Vector_2`.
     
-    \cgalModels `RegionGrowingPropagationConditions`
+    \cgalModels `RegionType`
   */
   template<
   typename GeomTraits, 
@@ -90,16 +90,11 @@ namespace Point_set {
     /// Number type.
     typedef typename GeomTraits::FT FT;
 
-    /// Point type.
-    typedef typename GeomTraits::Point_2 Point_2;
-
-    /// Vector type.
-    typedef typename GeomTraits::Vector_2 Vector_2;
-
-    /// Type of the line.
-    typedef typename GeomTraits::Line_2 Line_2;
-
     /// \cond SKIP_IN_MANUAL
+    using Point_2 = typename GeomTraits::Point_2;
+    using Vector_2 = typename GeomTraits::Vector_2;
+    using Line_2 = typename GeomTraits::Line_2;
+
     using Local_traits = Exact_predicates_inexact_constructions_kernel;
     using Local_point_2 = typename Local_traits::Point_2;
     using Local_line_2 = typename Local_traits::Line_2;
@@ -119,38 +114,36 @@ namespace Point_set {
     /// @{
 
     /*!
-      \brief Initializes all internal data structures.
+      \brief initializes all internal data structures.
 
       \param input_range 
-      An instance of an `InputRange` container with 2D points and 
-      2D associated normal vectors.
+      An instance of `InputRange` with 2D points and 
+      corresponding 2D normal vectors.
 
       \param distance_threshold 
-      Maximum distance from a point to the region represented by a line of 
-      the type `CGAL::Line_2`.
+      The maximum distance from a point to a line. %Default is 1.
 
       \param angle_threshold 
-      Minimum dot product between the normal assigned to the point and 
-      the normal assigned to the region represented by a line 
-      of the type `CGAL::Line_2`.
+      The maximum accepted angle in degrees between the normal of a point and 
+      the normal of a line. %Default is 25 degrees.
 
       \param min_region_size 
-      The minimum number of 2D points a region must have.
+      The minimum number of 2D points a region must have. %Default is 2.
 
       \param point_map
-      An instance of an `LvaluePropertyMap` that maps an item from `input_range` 
+      An instance of `PointMap` that maps an item from `input_range` 
       to `CGAL::Point_2`.
 
       \param normal_map
-      An instance of an `LvaluePropertyMap` that maps an item from `input_range` 
+      An instance of `NormalMap` that maps an item from `input_range` 
       to `CGAL::Vector_2`.
 
       \param traits
-      An instance of the `GeomTraits` class.
+      An instance of `GeomTraits`.
 
       \pre `input_range.size() > 0`
       \pre `distance_threshold >= 0`
-      \pre `normal_threshold >= 0 && normal_threshold <= 1`
+      \pre `angle_threshold >= 0 && angle_threshold <= 90`
       \pre `min_region_size > 0`
     */
     Least_squares_line_fit_region(
@@ -188,17 +181,19 @@ namespace Point_set {
     /// @{ 
 
     /*!
-      \brief Checks if a point belongs to a region.
+      \brief implements `RegionType::is_part_of_region()`.
 
-      developed using the `distance_threshold` and
-      `normal_threshold` values.
+      This function controls if a point with the index `query_index` is within
+      the `distance_threshold` from the corresponding line and if the angle
+      between its normal and the line's normal is within the `angle_threshold`.
+      If both conditions are satisfied, it returns `true`, otherwise `false`.
 
       \param query_index
-      Index of the query point.
+      %Index of the query point.
 
       The second parameter is not used in this implementation.
 
-      Implements the function `RegionGrowingPropagationConditions::belongs_to_region()`.
+      \return boolean `true` or `false`.
 
       \pre `query_index >= 0 && query_index < total_number_of_points`
     */
@@ -228,31 +223,26 @@ namespace Point_set {
     }
 
     /*!
-      \brief Validates the final `region`.
+      \brief implements `RegionType::is_valid_region()`.
 
-      Controls if the `region` that has been created contains at least 
-      `min_region_size` points.
+      This function controls if the `region` contains at least `min_region_size` points.
 
       \param region
-      Stores indices of all points that belong to the region.
+      Indices of points included in the region.
 
-      Implements the function `RegionGrowingPropagationConditions::is_valid_region()`.
+      \return boolean `true` or `false`.
     */
     inline bool is_valid_region(const std::vector<std::size_t>& region) const {
       return ( region.size() >= m_min_region_size );
     }
 
     /*!
-      \brief Recomputes the least squares line.
+      \brief implements `RegionType::update()`.
 
-      Recomputes the internal least squares line that represents the `region`
-      currently being developed. The line is fitted to all points, 
-      which have been added to the `region` so far.
+      This function fits the least squares line to all points from the `region`.
 
       \param region
-      Stores indices of all points that belong to the region.
-
-      Implements the function `RegionGrowingPropagationConditions::update()`.
+      Indices of points included in the region.
 
       \pre `region.size() > 0`
     */
