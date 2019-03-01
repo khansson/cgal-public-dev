@@ -1,20 +1,12 @@
-# Created by the script cgal_create_cmake_script This is the CMake script for
-# compiling a CGAL application.
+# Created by the script cgal_create_cmake_script.
+# This is the CMake script for compiling a CGAL application.
 
-project(Efficient_RANSAC_Examples)
+project(Shape_detection_Examples)
 
-cmake_minimum_required(VERSION 3.1)
-if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
-  if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}"
-     VERSION_GREATER 2.8.3)
-    cmake_policy(VERSION 2.8.4)
-  else()
-    cmake_policy(VERSION 2.6)
-  endif()
-endif()
+cmake_minimum_required(VERSION 2.8.10)
+set(CMAKE_CXX_STANDARD 11)
 
-find_package(CGAL QUIET)
-
+find_package(CGAL QUIET COMPONENTS Core)
 if(CGAL_FOUND)
 
   include(${CGAL_USE_FILE})
@@ -39,7 +31,16 @@ if(CGAL_FOUND)
   create_single_source_cgal_program(
     "example_efficient_RANSAC_with_point_access.cpp")
 
+  create_single_source_cgal_program(
+    "example_region_growing_on_point_set_2.cpp")
+  create_single_source_cgal_program(
+    "example_region_growing_on_point_set_3.cpp")
+  create_single_source_cgal_program(
+    "example_region_growing_on_polygon_mesh.cpp")
+  create_single_source_cgal_program(
+    "example_region_growing_with_custom_classes.cpp")
+
 else()
-  message(
-    STATUS "This program requires the CGAL library, and will not be compiled.")
+  message(WARNING 
+  "This program requires the CGAL library, and will not be compiled.")
 endif()
