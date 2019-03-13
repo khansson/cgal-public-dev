@@ -4,17 +4,16 @@
 /// \ingroup PkgBarycentric_coordinates_2
 
 /*!
-
 \addtogroup PkgBarycentric_coordinates_2
 \cgalPkgDescriptionBegin{2D Generalized Barycentric Coordinates, PkgBarycentric_coordinates_2Summary}
 \cgalPkgPicture{barcoord_thumb.png}
 \cgalPkgSummaryBegin
-\cgalPkgAuthors{Dmitry Anisimov, David Bommes, Kai Hormann, Pierre Alliez, and Keyu Chen}
+\cgalPkgAuthors{Dmitry Anisimov, David Bommes, Kai Hormann, and Pierre Alliez}
 \cgalPkgDesc{The package 2D Generalized Barycentric Coordinates offers an efficient and 
 robust implementation of two-dimensional generalized barycentric coordinates defined 
 for simple two-dimensional polygons. If coordinates with respect to multivariate 
 scattered points instead of a polygon are required, please refer to natural-neighbor coordinates 
-from the Package \ref PkgInterpolation2Summary.}
+from the Package \ref PkgInterpolation2Ref.}
 \cgalPkgManuals{Chapter_2D_Generalized_Barycentric_Coordinates, PkgBarycentric_coordinates_2}
 \cgalPkgSummaryEnd
 \cgalPkgShortInfoBegin

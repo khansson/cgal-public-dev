@@ -6,13 +6,13 @@ namespace CGAL {
 \anchor Chapter_2D_Generalized_Barycentric_Coordinates
 \cgalAutoToc
 
-\authors Dmitry Anisimov, David Bommes, Kai Hormann, Pierre Alliez, and Keyu Chen
+\authors Dmitry Anisimov, David Bommes, Kai Hormann, and Pierre Alliez
 
 \section gbc_introduction Introduction
 
-The package <em>2D Generalized Barycentric Coordinates</em> offers an efficient and robust implementation of two-dimensional closed-form generalized barycentric coordinates defined for simple two-dimensional polygons. If coordinates with respect to multivariate scattered points instead of a polygon are required, please refer to natural neighbour coordinates from the package \ref PkgInterpolation2Summary "2D and Surface Function Interpolation".
+The package <em>2D Generalized Barycentric Coordinates</em> offers an efficient and robust implementation of two-dimensional closed-form generalized barycentric coordinates defined for simple two-dimensional polygons. If coordinates with respect to multivariate scattered points instead of a polygon are required, please refer to natural neighbour coordinates from the package \ref chapinterpolation "2D and Surface Function Interpolation".
 
-In particular, the package includes an implementation of \ref wp_example "Wachspress", \ref mv_example "mean value", \ref dh_example "discrete harmonic", \ref mec_example "maximum entropy" and \ref hm_example "harmonic" coordinates and provides some extra functions to compute barycentric coordinates with respect to segments (\ref seg_example "segment coordinates") and triangles (\ref tri_example "triangle coordinates"). The section \ref gbc_theory gives a short introduction to the topic of barycentric coordinates.
+In particular, the package includes an implementation of \ref wp_example "Wachspress", \ref mv_example "mean value", and \ref dh_example "discrete harmonic" provides some extra functions to compute barycentric coordinates with respect to segments (\ref seg_example "segment coordinates") and triangles (\ref tri_example "triangle coordinates"). The section \ref gbc_theory gives a short introduction to the topic of barycentric coordinates.
 
 \section gbc_interface Interface
 
@@ -35,84 +35,66 @@ The output of the computation is a set of coordinate values at the current query
 \section gbc_examples Examples
 
 \subsection seg_example Segment Coordinates
-This is a simple example to show the use of the global function \ref seg_coord_global "CGAL::Barycentric_coordinates::compute_segment_coordinates_2()". We compute coordinates at three green points along the segment \f$[v_0, v_1]\f$ and at two blue points outside this segment but along its supporting line. We use the exact kernel and return coordinates as an array of two values. Again, the symmetry of the query points helps us to recognize errors that may have occured during the computation.
+This is a simple example to show the use of the global function "CGAL::Barycentric_coordinates::compute_segment_coordinates_2()". We compute coordinates at three green points along the segment \f$[v_0, v_1]\f$ and at two blue points outside this segment but along its supporting line. We use the exact kernel and return coordinates as an array of two values. Again, the symmetry of the query points helps us to recognize errors that may have occured during the computation.
 
 \anchor seg_coord_example
-\cgalFigureBegin{seg__example,segment_coordinates_example.png}
+\cgalFigureBegin{seg_example,seg_coord_example.png}
 Example's point pattern.
 \cgalFigureEnd
 
-\cgalExample{Barycentric_coordinates_2/Segment_coordinates_example.cpp}
+\cgalExample{Barycentric_coordinates_2/example_segment_coordinates.cpp}
 
 \subsection tri_example Triangle Coordinates
 In this example we show how to use the class `CGAL::Barycentric_coordinates::Triangle_coordinates_2` with the `Simple_cartesian` kernel for double type. We compute coordinates for three sets of points: interior (green), boundary (red), and exterior (blue). Note that some of the coordinate values for the exterior points are negative. We use a standard container of the type <a href="http://en.cppreference.com/w/cpp/container/vector">`std::vector`</a> and <a href="http://en.cppreference.com/w/cpp/iterator/insert_iterator">`std::insert_iterator`</a> to access and store the resulting coordinate values.
 
 \anchor tri_coord_example
-\cgalFigureBegin{tri__example,triangle_coordinates_example.png}
+\cgalFigureBegin{tri_example,tri_coord_example.png}
 Example's point pattern.
 \cgalFigureEnd
 
-\cgalExample{Barycentric_coordinates_2/Triangle_coordinates_example.cpp}
+\cgalExample{Barycentric_coordinates_2/example_triangle_coordinates.cpp}
 
 \subsection wp_example Wachspress Coordinates
 In the following example we create 1000 random points, then we take the convex hull of this set of points as our polygon, and compute Wachspress coordinates at all the defined points. We use the `Simple_cartesian` kernel with double type as a traits class and store obtained coordinate values in a container of the type <a href="http://en.cppreference.com/w/cpp/container/vector">`std::vector`</a>. The output iterator is <a href="http://en.cppreference.com/w/cpp/iterator/back_insert_iterator">`std::back_insert_iterator`</a>.
 
-\cgalExample{Barycentric_coordinates_2/Wachspress_coordinates_example.cpp}
+\cgalExample{Barycentric_coordinates_2/example_Wachspress_coordinates.cpp}
 
 \subsection dh_example Discrete Harmonic Coordinates
 In this example we compute discrete harmonic coordinates for a set of green (interior), red (boundary), and blue (exterior) points with respect to a unit square. We also show how to specify the location of a query point using additional function parameters. The used kernel is exact, and we use an output container of the type <a href="http://en.cppreference.com/w/cpp/container/vector">`std::vector`</a>. Since all the points are symmetric, it is easy to debug the correctness of the obtained coordinate values. The output iterator is <a href="http://en.cppreference.com/w/cpp/iterator/back_insert_iterator">`std::back_insert_iterator`</a>.
 
 \anchor dh_coord_example
-\cgalFigureBegin{dh__example,discrete_harmonic_coordinates_example.png}
+\cgalFigureBegin{dh_example,dh_coord_example.png}
 Example's point pattern.
 \cgalFigureEnd
 
-\cgalExample{Barycentric_coordinates_2/Discrete_harmonic_coordinates_example.cpp}
+\cgalExample{Barycentric_coordinates_2/example_discrete_harmonic_coordinates.cpp}
 
 \subsection mv_example Mean Value Coordinates
 This is an example that shows how to compute mean value coordinates for a set of green points in a star-shaped polygon. We note that this type of coordinates is well-defined for such a concave polygon while Wachspress and discrete harmonic coordinates are not. However, it may give negative coordinate values for points outside <a href="https://en.wikipedia.org/wiki/Star-shaped_polygon">the polygon's kernel</a> (shown in red). We use an inexact data type, an output container of the type <a href="http://en.cppreference.com/w/cpp/container/vector">`std::vector`</a>, and an output iterator of the type <a href="http://en.cppreference.com/w/cpp/iterator/back_insert_iterator">std::back_insert_iterator</a> to compute, access, and store the resulting coordinate values. We also show how to choose different algorithms to compute generalized barycentric coordinates (one is more precise while the other is faster).
 
 \anchor mv_coord_example
-\cgalFigureBegin{mv__example,mean_value_coordinates_example.png}
+\cgalFigureBegin{mv_example,mv_coord_example.png}
 Example's point pattern.
 \cgalFigureEnd
 
-\cgalExample{Barycentric_coordinates_2/Mean_value_coordinates_example.cpp}
+\cgalExample{Barycentric_coordinates_2/example_mean_value_coordinates.cpp}
 
-\subsection mec_example Maximum Entropy Coordinates
-This is an example that shows how to compute maximum entropy coordinates for a set of green points in a concave polygon. We note that this type of coordinates is well-defined for such an arbitrary concave polygon while Wachspress, Discrete Harmonic and Mean Value coordinates are not. We use an inexact data type, an output container of the type <a href="http://en.cppreference.com/w/cpp/container/vector">`std::vector`</a>, and an output iterator of the type <a href="http://en.cppreference.com/w/cpp/iterator/back_insert_iterator">std::back_insert_iterator</a> to compute, access, and store the resulting coordinate values.
-
-\anchor mec_coord_example
-\cgalFigureBegin{mec__example,maximum_entropy_coordinates_example.png}
-Example's point pattern.
-\cgalFigureEnd
-
-\cgalExample{Barycentric_coordinates_2/Maximum_entropy_coordinates_example.cpp}
-
-\subsection hm_example Harmonic Coordinates
-
-Note: This part (Harmonic coordinates) is unfinished yet.
-
-This is an example that shows how to compute harmonic coordinates for a set of green points in an arbitrary polygon. We use an inexact data type, an output container of the type <a href="http://en.cppreference.com/w/cpp/container/vector">`std::vector`</a>, and an output iterator of the type <a href="http://en.cppreference.com/w/cpp/iterator/back_insert_iterator">std::back_insert_iterator</a> to compute, access, and store the resulting coordinate values.
-
-
-\cgalExample{Barycentric_coordinates_2/Harmonic_coordinates_example.cpp}
 
 \subsection height_inter_example Height Interpolation for Terrain Modeling
 
 This is an advanced example that shows how to use generalized barycentric coordinates for height interpolation with applications to terrain modelling. It also shows how to use a non-default traits class with our package instead of a `Kernel` traits class. Suppose we know the boundary of three-dimensional piece of terrain that can be represented as a polygon with several three-dimensional vertices, where the third dimension gives the corresponding height. The task is to propagate the height from the known sample points on the boundary to the polygon's interior. This gives an approximate estimation of the terrain's surface in this region.
 
-\cgalFigureBegin{terrain__example,terrain.png}
+\cgalFigureBegin{terrain_example,terrain.png}
 A 2D polygon with 50 vertices representing a piece of terrain with convex and concave parts. The height is not shown.
 \cgalFigureEnd
 
-In this example we project a three-dimensional polygon orthogonally onto the two-dimensional plane using the class `CGAL::Projection_traits_xy_3`, triangulate its interior using the class `CGAL::Delaunay_mesher_2`, and compute mean value coordinates for all the obtained points with respect to all the polygon's vertices. Finally, we interpolate the height data from the polygon's boundary to its interior using the computed coordinates and the global interpolation function from the package \ref PkgInterpolation2Summary "2D and Surface Function Interpolation".
+In this example we project a three-dimensional polygon orthogonally onto the two-dimensional plane using the class `CGAL::Projection_traits_xy_3`, triangulate its interior using the class `CGAL::Delaunay_mesher_2`, and compute mean value coordinates for all the obtained points with respect to all the polygon's vertices. Finally, we interpolate the height data from the polygon's boundary to its interior using the computed coordinates and the global interpolation function from the package \ref chapinterpolation "2D and Surface Function Interpolation".
 
-\cgalExample{Barycentric_coordinates_2/Terrain_height_modeling.cpp}
+\cgalExample{Barycentric_coordinates_2/example_terrain_height_modeling.cpp}
 
 As a result we get a smooth function inside the polygon that approximates the underlying terrain's surface.
 
-\cgalFigureBegin{terrain__inter__example,terrain_interpolated.png}
+\cgalFigureBegin{terrain_inter_example,terrain_interpolated.png}
 The interpolated data. The colour bar represents the corresponding height.
 \cgalFigureEnd
 
@@ -140,11 +122,11 @@ These coordinates can be computed exactly if an exact data type is chosen, for a
 Wachspress coordinates are well-defined in the closure of any <em>strictly convex polygon</em>. Therefore, for any query point from the polygon's closure with an exact data type, these coordinates are computed exactly and no false result is expected. For inexact data types, the resulting precision of the computation is due to the involved algorithm and chosen data type. In the following paragraph we discuss two available algorithms for computing Wachspress coordinates. One of them is `CGAL::Barycentric_coordinates::PRECISE`, the other is `CGAL::Barycentric_coordinates::FAST`.
 
 \anchor wp_polygon
-\cgalFigureBegin{wp__notations,wp_notations.png}
+\cgalFigureBegin{wp_notations,wp_notations.png}
 Notation for Wachspress coordinates.
 \cgalFigureEnd
 
-To compute Wachspress weights, we follow \cite cgal:bc:fhk-gcbcocp-06 and use the formula
+To compute Wachspress weights, we follow \cgalCite{cgal:bc:fhk-gcbcocp-06} and use the formula
 
 <center>\f$w_i = \frac{C_i}{A_{i-1}A_i}\f$</center>
 
@@ -160,7 +142,7 @@ After the normalization as above, this gives us the precise algorithm to compute
 
 It is known that for strictly convex polygons the denominator's zero set of the Wachspress coordinates (\f$W^{wp} = 0~\f$) is a curve, which (in many cases) lies quite far away from the polygon. Speaking precisely, it interpolates the intersection points of the continuations of the polygon's edges. Therefore, the computation of Wachspress coordinates outside the polygon is possible only at points that do not belong to this curve.
 
-\cgalFigureBegin{zero__set,zero_set.png}
+\cgalFigureBegin{zero_set,zero_set.png}
 Zero set (red) of the Wachspress coordinates' denominator \f$W^{wp}\f$ for a non-regular hexagon.
 \cgalFigureEnd
 
@@ -171,11 +153,11 @@ Zero set (red) of the Wachspress coordinates' denominator \f$W^{wp}\f$ for a non
 Discrete harmonic coordinates have the same requirements as Wachspress coordinates. They are well-defined in the closure of any <em>strictly convex polygon</em> and, if an exact data type is chosen, they are computed exactly. But, unlike Wachspress basis functions, these coordinates are not necessarily positive. In particular, the weight \f$w_i\f$ is positive if and only if \f$\alpha+\beta < \pi\f$ (see the figure below for notation). For inexact data types, the precision of the computation is due to the involved algorithm and chosen data type. Again, we describe two algorithms to compute the coordinates: one is precise and one is fast.
 
 \anchor dh_polygon
-\cgalFigureBegin{dh__notations,dh_notations.png}
+\cgalFigureBegin{dh_notations,dh_notations.png}
 Notation for discrete harmonic coordinates.
 \cgalFigureEnd
 
-To compute discrete harmonic weights, we follow \cite cgal:bc:fhk-gcbcocp-06 and use the formula
+To compute discrete harmonic weights, we follow \cgalCite{cgal:bc:fhk-gcbcocp-06} and use the formula
 
 <center>\f$w_i = \frac{r_{i+1}^2A_{i-1}-r_i^2B_i+r_{i-1}^2A_i}{A_{i-1}A_i}\f$</center>
 
@@ -196,17 +178,17 @@ After the normalization as above, this gives the precise algorithm to compute di
 Unlike the previous coordinates, mean value coordinates cannot be computed exactly due to an inevitable square root operation. Although, if an exact data type is used, the default precision of the computation depends only on two \cgal functions: `CGAL::to_double()` and `CGAL::sqrt()`. On the other hand, mean value coordinates are well-defined everywhere in the plane for any simple polygon. In addition, if your traits class provides a more precise version of the square root function, the final precision of the computation with exact data types will depend only on the precision of that function.
 
 \anchor mv_polygon
-\cgalFigureBegin{mv__notations,mv_notations.png}
+\cgalFigureBegin{mv_notations,mv_notations.png}
 Notation for mean value coordinates.
 \cgalFigureEnd
 
-For these coordinates we also have two algorithms: one is precise and one is fast. The first one works everywhere in the plane, and the precision of the computation depends only on the chosen data type, including the remarks above. This algorithm is based on the following weight formula from \cite cgal:bc:f-wmvc-14
+For these coordinates we also have two algorithms: one is precise and one is fast. The first one works everywhere in the plane, and the precision of the computation depends only on the chosen data type, including the remarks above. This algorithm is based on the following weight formula from \cgalCite{cgal:bc:f-wmvc-14}
 
 <center>\f$w_i = \sigma_i\bar{w}_i\qquad\f$ with \f$\qquad\bar{w}_i = (r_{i-1}r_{i+1}-d_{i-1}d_{i+1})^{1/2}\prod_{j\not= i-1,i}(r_jr_{j+1} + d_jd_{j+1})^{1/2}\qquad\f$ where \f$\qquad r_i = \|d_i\|.\f$</center>
 
 Since \f$\bar{w}_i\f$ is always positive, we have to append to it the proper sign \f$\sigma_i\f$ of the signed mean value weight, which can be found efficiently (see the figures below). Basically, this weight is always positive to the left of the red piecewise linear curve, and it is negative to the right of this curve, moving in anticlockwise direction.
 
-\cgalFigureBegin{mv__weight__signs,mv_weight_signs_convex.png,mv_weight_signs_concave.png}
+\cgalFigureBegin{mv_weight_signs,mv_weight_signs_convex.png,mv_weight_signs_concave.png}
 Signs of the mean value weight \f$w_i\f$ depending on the region with respect to a convex polygon \f$P\f$ and a concave polygon \f$P'\f$.
 \cgalFigureEnd
 
@@ -220,50 +202,11 @@ we obtain the precise \f$O(n^2)\f$ algorithm. The fast O(n) algorithm computes t
 
 are also normalized. Note that they are unstable if a query point is closer than \f$\approx 1.0e-10\f$ to the polygon's boundary, similarly to Wachspress and discrete harmonic coordinates.
 
-\subsection gbc_deg_maximum_entropy_coordinates Maximum Entropy Coordinates
-
-Maximum entropy coordinates allow an arbitrary simple polygon as input. Because these coordinates compute an approximate result using newton solver, the precision and speed performance strictly depends on maximum number of iterations and defined tolerance. By default, we set up the PRECISE mode with 1000 iterations and 1e-12 tolerance, and FAST mode with 500 iteration steps and 1e-6 tolerance. Both parameters can be modified by the user with a new template class. Note that if an exact data type is used, default precision of the computation depend on the precision of the functions CGAL::to_double() and CGAL::sqrt(), similarly to Mean value coordinates.
-
-Maximum entropy coordinates class can also be parametrized by a prior distribution that possesses the desired boundary properties. By default we implemented two different distributions and simply named them as Maximum_entropy_prior_function_type_one and Maximum_entropy_prior_function_type_two.
-
-\anchor mec_polygon
-\cgalFigureBegin{mec__notations,mec_notations.png}
-Notation for maximum entropy coordinates.
-\cgalFigureEnd
-
-This algorithm is based on the following constrained optimization problem from \cite cgal:bc:hs-mecap-08
-
-<center>\f$\max \limits_{b(v)} H(b,m)=-\sum_{i=1}^{n}b_i(v)ln(\frac{b_i(v)}{m_i(v)})\qquad\f$ subject to the linear precision conditions \f$\qquad\sum_{i=1}^{n}b_i(v)=1, \qquad\sum_{i=1}^{n}b_i(v)(v_i-v)=0\f$</center>
-
-For any polygon interior point \f$v\f$, \f$m_i\f$ is a prior estimate for coordinates \f$b_i\f$. To obtain non-negative coordinates for an arbitrary polygon, we first construct non-negative priors \f$m_i\f$. To this end, we derive such formula from \cite cgal:bc:hs-mecap-08
-
-<center>\f$m_i(v)=\frac{\tilde{\pi_i}(v)}{\sum_{j=1}^{n}\tilde{\pi_j}(v)}\qquad\f$ with \f$\qquad\tilde{\pi_i}(v)=\frac{1}{\rho_{i-1}(v)\rho_i(v)}\f$ </center>
-
-In this case, \f$\rho_i(v)\f$ is an alternative edge weight function. Let \f$e_i\f$ be the edge connecting \f$v_i\f$ and \f$v_{i+1}\f$, maximum entropy coordinates would work for any choice of edge weight function \f$\rho_i(v)\f$ as long as it is non-negative and vanishes along \f$e_i\f$. We obtain two different choices for \f$\rho_i(v)\f$
-
- Maximum_entropy_prior_function_type_one
-
-<center>\f$\rho_i(v)=\|v-v_i\|+\|v-v_{i+1}\|-\|v_{i+1}-v_i\|\qquad\qquad\f$</center>
-
- Maximum_entropy_prior_function_type_two
-
-<center>\f$\rho_i(v)=\|v-v_i\|\cdot\|v-v_{i+1}\|+(v-v_i)(v-v_{i+1})\qquad\qquad\f$</center>
-
-We implemented a solver from \cite cgal:bc:hs-mecap-08 to solve this constrained optimization problem.
-
-\subsection gbc_deg_harmonic_coordinates Harmonic Coordinates
-
-Note: This part (Harmonic coordinates) is unfinished yet, we will add specific introductions and pictures about Harmonic coordinates later.
-
 \section gbc_performance Performance
 
 Apart from the most important requirement on barycentric coordinates to be as precise as possible, it is very important for them to be as fast as possible to evaluate. These coordinates are used in many applications where they must be computed for millions of points and, thus, the real time usage of coordinates is crucial. When writing the code, we tried to fulfil this important requirement, and in this section we present a few results about the computation times of the implemented coordinates.
 
 The structure of the speed test that we ran for all functions consists of computing coordinate values (or weights) at >= 1 million strictly interior points with respect to some polygon (or triangle, or segment). At each iteration of the loop we create a query point, pass it to the function, and compute all the related coordinates. We run this loop 10 times in a row, and the time presented in the log-log scale plot at the end of the section is the arithmetic mean of all trials.
-
-A typical example of this performance test for triangle coordinates with reduced number of query points can be found below. This example also illustrates how to construct an iterator and pass it to the class. In this example we create an iterator that writes coordinate values for each new query point over coordinate values of the previous point in the fixed-size standard C++ array, so that memory is allocated only once.
-
-\cgalExample{Barycentric_coordinates_2/Triangle_coordinates_speed_test.cpp}
 
 The time to compute coordinates depends on many factors such as memory allocation, input kernel, output container, number of points, etc. In our tests we used the most standard C++ and \cgal features with minimum memory allocation. Therefore, the final time presented is the average time that can be expected without deep optimization but still with efficient memory allocation. It also means that it may vary depending on the usage of the package.
 
@@ -276,12 +219,6 @@ Time in seconds to compute \f$n\f$ coordinate values for a polygon with \f$n\f$ 
 From the figure above it is easy to see that the \f$O(n^2)\f$ algorithm is as fast as the \f$O(n)\f$ algorithm if we have a polygon with a small number of vertices. But as the number of vertices is increased, the linear algorithm outperforms the squared one, as expected. One of the reasons for this behaviour is that for a small number of vertices the multiplications for \f$n-2\f$ elements inside the \f$O(n^2)\f$ algorithm with the fast \f$O(n)\f$ algorithms (dashed) and the slow \f$O(n^2)\f$ algorithms (solid) take almost the same time as the corresponding division in the \f$O(n)\f$ algorithm. For a polygon with many vertices this multiplication is much slower.
 
 When we try to extend this package with maximum entropy coordinates and harmonic coordinates, we noticed that it is impossible to test both of them as same as all the coordinates above. In general, maximum entropy coordinates is computed with an iterative numerical newton solver, and harmonic coordinates computation performances depend on the partition or mesh vertices numbers. To test both coordinates indepently, we created such tests to show the precision and time performances in both precise and fast modes.
-
-For maximum entropy coordinates, the precision and speed performances depend on many factors. The two main factors are number of iterations and convergence tolerance of the solver. By default, we set up fast mode with 500 as max iteration steps and 1e-6 as tolerance and precise mode with 1000 and 1e-12.
-
-\cgalFigureBegin{mec_performance],me_timing_tolerance.png}
-Time in seconds (y-axes) to compute maximum entropy coordinates for a square at 100 thousands points with big iteration number (\f$10^{10}\f$) and different tolerances (x-axes).
-\cgalFigureEnd
 
 From the figure above, it is easy to find that the smaller the tolerance value, the slower the maximum entropy coordinates algorithm. In general, like the parameters we set up for precise and fast modes, maximum entropy coordinates converge after 2/3 iterations and it would even be faster if tolerance becomes bigger.
 
@@ -303,66 +240,52 @@ The package is implemented in a way that later, if needed, other two-dimensional
 
 \section gbc_theory Theory of 2D Generalized Barycentric Coordinates
 
-In 1827, the German mathematician and theoretical astronomer <a href="http://en.wikipedia.org/wiki/August_Ferdinand_Möbius">August Ferdinand Möbius</a> (1790--1868) proposed a method \cite cgal:bc:m-dbc-27  to find coordinates of a point in the plane with respect to the vertices of a triangle. These coordinates are called <a href="http://mathworld.wolfram.com/BarycentricCoordinates.html">triangle barycentric coordinates</a> (sometimes <a href="http://en.wikipedia.org/wiki/Barycentric_coordinate_system">area coordinates</a>), and they are widely used in a variety of applications. Some of these applications are linear interpolation over a triangle and a triangle inclusion test. The first one is used for so-called <a href="http://en.wikipedia.org/wiki/Shading">shading</a>, and the second one arises in the <a href="http://en.wikipedia.org/wiki/Rasterization">rasterization</a> step when an image in vector graphics format needs to be converted into a raster image.
+In 1827, the German mathematician and theoretical astronomer <a href="http://en.wikipedia.org/wiki/August_Ferdinand_Möbius">August Ferdinand Möbius</a> (1790--1868) proposed a method \cgalCite{cgal:bc:m-dbc-27}  to find coordinates of a point in the plane with respect to the vertices of a triangle. These coordinates are called <a href="http://mathworld.wolfram.com/BarycentricCoordinates.html">triangle barycentric coordinates</a> (sometimes <a href="http://en.wikipedia.org/wiki/Barycentric_coordinate_system">area coordinates</a>), and they are widely used in a variety of applications. Some of these applications are linear interpolation over a triangle and a triangle inclusion test. The first one is used for so-called <a href="http://en.wikipedia.org/wiki/Shading">shading</a>, and the second one arises in the <a href="http://en.wikipedia.org/wiki/Rasterization">rasterization</a> step when an image in vector graphics format needs to be converted into a raster image.
 
 Triangle barycentric coordinates have many important properties, including \em constant and <em>linear precision</em>, <em> the Lagrange property</em>, and <em>positivity inside a triangle</em>. These properties make these coordinates a unique tool in many scientific fields. If we restrict triangle coordinates to one of the edges of a triangle and its supporting line, we get barycentric coordinates with respect to a segment and call them \ref compute_seg_coord "segment coordinates".
 
-Let us show a couple of plots for the coordinates described above. To plot segment coordinates, we take a line \f$y = 0.4\f$ and define \ref fig__seg__example "a segment" \f$[v_0, v_1]\f$ on this line. Then we sample this segment and compute segment coordinates for all the sample points. If we plot the segment coordinate function at all the defined points with respect to the vertex \f$v_1\f$, we get the blue line depicted in the figure below. It grows from zero at the vertex \f$v_0\f$ to one at the vertex \f$v_1\f$.
+Let us show a couple of plots for the coordinates described above. To plot segment coordinates, we take a line \f$y = 0.4\f$ and define \ref seg_example "a segment" \f$[v_0, v_1]\f$ on this line. Then we sample this segment and compute segment coordinates for all the sample points. If we plot the segment coordinate function at all the defined points with respect to the vertex \f$v_1\f$, we get the blue line depicted in the figure below. It grows from zero at the vertex \f$v_0\f$ to one at the vertex \f$v_1\f$.
 
-\cgalFigureBegin{seg__coord__interp,seg__coord__interp.png}
+\cgalFigureBegin{seg_coord_interp,seg_coord_interp.png}
 Segment coordinates (blue) for all the segment points (green) with respect to the vertex \f$v_1 = (2.0,\ 0.4)\f$.
 \cgalFigureEnd
 
-If we want to plot triangle coordinates, we follow a similar approach. We take \ref fig__tri__example "a triangle" \f$[v_0, v_1, v_2]\f$ in the plane and sample its interior and boundary with a number of points. Once we have this sampling, we plot one of the triangle coordinate functions (here with respect to the third vertex of the triangle) at all the defined sample points. Likewise, we can plot the coordinate function with respect to the first or second vertex. The resulting function is linear (shown in the figure below) that grows from zero along the first edge \f$[v_0, v_1]\f$ to one at the chosen vertex \f$v_2\f$.
+If we want to plot triangle coordinates, we follow a similar approach. We take \ref tri_example "a triangle" \f$[v_0, v_1, v_2]\f$ in the plane and sample its interior and boundary with a number of points. Once we have this sampling, we plot one of the triangle coordinate functions (here with respect to the third vertex of the triangle) at all the defined sample points. Likewise, we can plot the coordinate function with respect to the first or second vertex. The resulting function is linear (shown in the figure below) that grows from zero along the first edge \f$[v_0, v_1]\f$ to one at the chosen vertex \f$v_2\f$.
 
-\cgalFigureBegin{tri__coord__interp,tri__coord__interp.png}
+\cgalFigureBegin{tri_coord_interp,tri_coord_interp.png}
 Triangle coordinates with respect to \f$v_2 = (1.0,\ 2.0)\f$. The colour bar indicates the range of values for the chosen coordinate.
 \cgalFigureEnd
 
-Since many applications require to work with more complex planar geometric shapes than segments and triangles, it seems natural to investigate a generalized version of triangle coordinates with respect to arbitrary polygons. The first attempt was taken in 1975 by E. L. Wachspress \cite cgal:bc:w-rfeb-75, and the resulting generalized barycentric coordinates are now called Wachspress coordinates \cite cgal:bc:mlbd-gbcip-02. \ref gbc_deg_wachspress_coordinates "These coordinates" are well-defined for arbitrary <em>strictly convex polygons</em> and have all the properties of triangle coordinates \cite cgal:bc:fhk-gcbcocp-06. Unfortunately, they are not well-defined for weakly convex and concave polygons.
+Since many applications require to work with more complex planar geometric shapes than segments and triangles, it seems natural to investigate a generalized version of triangle coordinates with respect to arbitrary polygons. The first attempt was taken in 1975 by E. L. Wachspress \cgalCite{cgal:bc:w-rfeb-75}, and the resulting generalized barycentric coordinates are now called Wachspress coordinates \cgalCite{cgal:bc:mlbd-gbcip-02}. \ref gbc_deg_wachspress_coordinates "These coordinates" are well-defined for arbitrary <em>strictly convex polygons</em> and have all the properties of triangle coordinates \cgalCite{cgal:bc:fhk-gcbcocp-06}. Unfortunately, they are not well-defined for weakly convex and concave polygons.
 
 Analogously to the previous cases, we want to plot the Wachspress coordinates and see how they look like. Let us choose a \ref wp_polygon "non-regular hexagon", slightly rotate it, and move one of its vertices towards the line through its two adjacent neighbours. We sample the interior and the boundary of this polygon as before and plot the coordinate function with respect to the vertex that we moved at all the sample points. We see that we get a smooth function, which is linear along all edges and grows from zero to one, as the colour bar indicates.
 
 \anchor wp_plot
-\cgalFigureBegin{wp__coord__interp,wp__coord__interp.png}
+\cgalFigureBegin{wp_coord_interp,wp_coord_interp.png}
 The Wachspress coordinate function with respect to the indicated vertex with values from zero to one as the colour bar indicates.
 \cgalFigureEnd
 
-Another type of generalized barycentric coordinates goes back to Pinkall and Polthier in 1993 \cite cgal:pp-cdmsc-93 and Eck et al. in 1995 \cite cgal:bc:eddhls-maam-95 in the context of \ref PkgSurfaceParameterizationSummary "triangle mesh parameterization". They are called discrete harmonic coordinates. \ref gbc_deg_discrete_harmonic_coordinates "These coordinates" are well-defined, similarly to Wachspress coordinates, for arbitrary <em>strictly convex polygons</em> and inherit all the properties of triangle coordinates <em>apart from the positivity inside a polygon</em> because they can take on negative values \ref gbc_deg_discrete_harmonic_coordinates "for some polygons". Another interesting property of these coordinate functions is that they coincide with Wachspress coordinates for any polygon whose vertices lie on a common circle.
+Another type of generalized barycentric coordinates goes back to Pinkall and Polthier in 1993 \cgalCite{cgal:pp-cdmsc-93} and Eck et al. in 1995 \cgalCite{cgal:bc:eddhls-maam-95} in the context of \ref chapsurface_mesh_parameterization "triangle mesh parameterization". They are called discrete harmonic coordinates. \ref gbc_deg_discrete_harmonic_coordinates "These coordinates" are well-defined, similarly to Wachspress coordinates, for arbitrary <em>strictly convex polygons</em> and inherit all the properties of triangle coordinates <em>apart from the positivity inside a polygon</em> because they can take on negative values \ref gbc_deg_discrete_harmonic_coordinates "for some polygons". Another interesting property of these coordinate functions is that they coincide with Wachspress coordinates for any polygon whose vertices lie on a common circle.
 
 To plot discrete harmonic coordinates we take \ref wp_plot "the same polygon" as for Wachspress coordinates and plot the coordinate function with respect to the same vertex. Again, we get a smooth function, which is linear along all edges and grows from zero to one. Isolines in the plot show the difference between discrete harmonic and Wachspress coordinates for the chosen polygon and vertex.
 
 \anchor dh_plot
-\cgalFigureBegin{dh__coord__interp,dh__coord__interp.png}
+\cgalFigureBegin{dh_coord_interp,dh_coord_interp.png}
 The discrete harmonic coordinate function with respect to the indicated vertex with values from zero to one as the colour bar indicates.
 \cgalFigureEnd
 
-One of the other type of generalized barycentric coordinates that we discuss are mean value coordinates \cite cgal:f-mvc-03 proposed by M. Floater in 2003. Based on the <a href="http://en.wikipedia.org/wiki/Mean_value_theorem">mean value theorem</a>, \ref gbc_deg_mean_value_coordinates "these coordinates", unlike Wachspress and discrete harmonic coordinates, are well-defined for arbitrary <em>simple polygons</em>, inherit all the properties of triangle coordinates for any convex polygon, and <em>lack only the positivity property for general concave polygons</em>. Hormann and Floater prove in \cite cgal:bc:hf-mvcapp-06 that these coordinates are positive inside the kernel of a <a href="https://en.wikipedia.org/wiki/Star-shaped_polygon">star-shaped polygon</a>. They are also positive in the closure of any quadrilateral. Like discrete harmonic weights, mean value weights are often used in the context of \ref PkgSurfaceParameterizationSummary "triangle mesh parameterization."
+One of the other type of generalized barycentric coordinates that we discuss are mean value coordinates \cgalCite{cgal:f-mvc-03} proposed by M. Floater in 2003. Based on the <a href="http://en.wikipedia.org/wiki/Mean_value_theorem">mean value theorem</a>, \ref gbc_deg_mean_value_coordinates "these coordinates", unlike Wachspress and discrete harmonic coordinates, are well-defined for arbitrary <em>simple polygons</em>, inherit all the properties of triangle coordinates for any convex polygon, and <em>lack only the positivity property for general concave polygons</em>. Hormann and Floater prove in \cgalCite{cgal:bc:hf-mvcapp-06} that these coordinates are positive inside the kernel of a <a href="https://en.wikipedia.org/wiki/Star-shaped_polygon">star-shaped polygon</a>. They are also positive in the closure of any quadrilateral. Like discrete harmonic weights, mean value weights are often used in the context of \ref chapsurface_mesh_parameterization "triangle mesh parameterization."
 
-In order to show the particular behaviour of mean value coordinates with an application to concave polygons, we take \ref fig__mv__example "a star-shaped polygon" with ten vertices \f$[v_0, \dots, v_9]\f$, sample its interior and boundary, and plot the coordinate function with respect to the fourth vertex \f$v_3\f$. As the colour bar indicates, the obtained function grows from a slightly negative value to one at the chosen vertex. It is also smooth inside the polygon and linear along all edges.
+In order to show the particular behaviour of mean value coordinates with an application to concave polygons, we take \ref mv_example "a star-shaped polygon" with ten vertices \f$[v_0, \dots, v_9]\f$, sample its interior and boundary, and plot the coordinate function with respect to the fourth vertex \f$v_3\f$. As the colour bar indicates, the obtained function grows from a slightly negative value to one at the chosen vertex. It is also smooth inside the polygon and linear along all edges.
 
 \anchor mv_plot
-\cgalFigureBegin{mv__coord__interp,mv__coord__interp.png}
+\cgalFigureBegin{mv_coord_interp,mv_coord_interp.png}
 Mean value coordinates with respect to \f$v_3\f$. The colour bar indicates the range of values for the chosen coordinate function.
 \cgalFigureEnd
 
-<b>Interesting fact</b>: all the coordinates discussed above come from one and the same family of generalized barycentric coordinates named <em>3-point family of coordinates</em> \cite cgal:bc:fhk-gcbcocp-06 .
+<b>Interesting fact</b>: all the coordinates discussed above come from one and the same family of generalized barycentric coordinates named <em>3-point family of coordinates</em> \cgalCite{cgal:bc:fhk-gcbcocp-06}.
 
 Apart from three coordinates mentioned above, many other generalized barycentric coordinates were proposed to fulfill some other properties or requirements e.g. well-defined for arbitrary polygons.
-
-Sukumar in 2004 \cite cgal:bc:s-cpimea-04 and Arroyo and Ortiz in 2005 \cite cgal:bc:ao-lmeas-05 show independently that generalized barycentric coordinates can be obtained as the solution of a constrained optimization problem based on the principle of maximum entropy \cite cgal:bc:jt-itsm-57. These maximum entropy coordinates are non-negative, but the Lagrange property holds only for strictly convex polygons. It was later realized by Sukumar and Wright in 2007 \cite cgal:bc:sw-ocmbf-07 that, using prior distributions, the constrained optimization can be modified to be
-
-<center>\f$\max \limits_{b(p)} H(b,m)=-\sum_{i=1}^{n}b_i(p)ln(\frac{b_i(p)}{\omega_i(p)})\f$</center>
-
-where \f$\omega_i\f$ is a prior estimate for \f$b_i\f$, which can also be viewed as a weight function.
-
-Hormann and Sukumar in 2008 \cite cgal:bc:hs-mecap-08 show how to construct \f$\omega_i\f$ such that maximum entropy coordinates satisfy all properties mentioned above except smoothness, for any simple polygon. Maximum entropy coordinates could be evaluated at any interior points using Newton’s method that converges quadratically. And this approximate method is the reason why they can not be computed exactly.
-
-Harmonic coordinates is another generalized barycentric coordinates that allow arbitrary simple polygons as input. As observed by Floater et al. in 2006 \cite cgal:bc:fhk-gcbcocp-06, one way of acquiring generalized barycentric coordinates with respect to any simple polygon is by solving the Laplace equation:
-
-<center>\f$\Delta b=0\f$</center>
-
-The classical way \cite cgal:bc:jmdgs-hcca-07 to approximate these coordinates is by discretizing over the space of piecewise linear functions with respect to a triangulation of the input polygon.
 
 \section gbc_acknowledgments Acknowledgments
 The authors wish to thank <a href="http://www.inf.usi.ch/phd/schneider/">Teseo Schneider</a> and <a href="http://search.usi.ch/people/5ae37d3d990b431a02b95b0b606da2e6/Schaerfig-Randolf">Randolf Schaerfig</a> for helpful comments and discussions. We also appreciate the great effort invested in this package by our reviewers <a href="http://geometryfactory.com/who-we-are/">Andreas Fabri and Sébastien Loriot</a>. Finally, to create pictures for this manual, we used two programs: <a href="http://www.geogebra.org/cms/en/">Geogebra</a> and <a href="http://www.mathworks.com/products/matlab/">Matlab</a>.

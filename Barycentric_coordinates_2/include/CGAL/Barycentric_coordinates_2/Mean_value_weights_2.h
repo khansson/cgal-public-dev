@@ -20,17 +20,17 @@
 // Author(s)     : Dmitry Anisimov, David Bommes, Kai Hormann, Pierre Alliez
 //
 
-#ifndef CGAL_BARYCENTRIC_COORDINATES_2_H
-#define CGAL_BARYCENTRIC_COORDINATES_2_H
+#ifndef CGAL_BARYCENTRIC_COORDINATES_MEAN_VALUE_WEIGHTS_2_H
+#define CGAL_BARYCENTRIC_COORDINATES_MEAN_VALUE_WEIGHTS_2_H
 
 #include <CGAL/license/Barycentric_coordinates_2.h>
 
-#include <CGAL/Barycentric_coordinates_2/barycentric_enum_2.h>
-#include <CGAL/Barycentric_coordinates_2/pointwise_coordinates_2.h>
-#include <CGAL/Barycentric_coordinates_2/Harmonic_coordinates_2.h>
+namespace CGAL {
+namespace Barycentric_coordinates {
 
-#include <CGAL/Barycentric_coordinates_2/Wachspress_weights_2.h>
-#include <CGAL/Barycentric_coordinates_2/Mean_value_weights_2.h>
-#include <CGAL/Barycentric_coordinates_2/Discrete_harmonic_weights_2.h>
 
-#endif // CGAL_BARYCENTRIC_COORDINATES_2_H
+
+} // namespace Barycentric_coordinates
+} // namespace CGAL
+
+#endif // CGAL_BARYCENTRIC_COORDINATES_MEAN_VALUE_WEIGHTS_2_H
