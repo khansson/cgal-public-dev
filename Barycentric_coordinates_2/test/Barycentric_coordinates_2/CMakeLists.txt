@@ -1,24 +1,18 @@
-# Created by the script cgal_create_cmake_script
+# Created by the script cgal_create_cmake_script.
 # This is the CMake script for compiling a CGAL application.
 
+project(Barycentric_coordinates_2_Tests)
 
-project( Barycentric_coordinates_2_Tests )
+cmake_minimum_required(VERSION 2.8.10)
+set(CMAKE_CXX_STANDARD 11)
 
-cmake_minimum_required(VERSION 3.1)
+find_package(CGAL QUIET COMPONENTS Core)
+if(CGAL_FOUND)
 
-find_package(CGAL QUIET)
-
-if ( CGAL_FOUND )
-
-  # create a target per cppfile
-  file(GLOB cppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
-  foreach(cppfile ${cppfiles})
-    create_single_source_cgal_program( "${cppfile}" )
-  endforeach()
+  include(${CGAL_USE_FILE})
+  include(CGAL_CreateSingleSourceCGALProgram)
 
 else()
-  
-    message(STATUS "This program requires the CGAL library, and will not be compiled.")
-  
+  message(WARNING 
+  "This program requires the CGAL library, and will not be compiled.")
 endif()
-
