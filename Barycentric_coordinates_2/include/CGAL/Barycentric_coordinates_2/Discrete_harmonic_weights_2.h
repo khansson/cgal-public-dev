@@ -28,7 +28,40 @@
 namespace CGAL {
 namespace Barycentric_coordinates {
 
+  template<
+  typename VertexRange,
+  typename GeomTraits,
+  typename VertexMap = CGAL::Identity_property_map<typename GeomTraits::Point_2> >
+  class Discrete_harmonic_weights_2 {
 
+    public:
+      using Vertex_range = VertexRange;
+      using Traits = GeomTraits;
+      using Vertex_map = VertexMap;
+      
+      using Point_2 = typename GeomTraits::Point_2;
+
+      Discrete_harmonic_weights_2() {
+        
+      }
+
+      template<typename OutputIterator>
+      boost::optional<OutputIterator> operator()(
+        const Point_2& p, 
+        OutputIterator weights) const {
+
+      }
+
+      bool is_valid_point(const Point_2& query) const {
+
+      }
+
+      bool is_boundary_point(const Point_2& query) const {
+
+      }
+
+    private:
+  };
 
 } // namespace Barycentric_coordinates
 } // namespace CGAL

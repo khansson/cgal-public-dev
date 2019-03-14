@@ -25,10 +25,74 @@
 
 #include <CGAL/license/Barycentric_coordinates_2.h>
 
+// Internal includes.
+#include <CGAL/Barycentric_coordinates_2/Discrete_harmonic_weights_2.h>
+
 namespace CGAL {
 namespace Barycentric_coordinates {
 
+  template<
+  typename VertexRange,
+  typename GeomTraits,
+  typename InputDomain,
+  typename InputSolver,
+  typename VertexMap = CGAL::Identity_property_map<typename GeomTraits::Point_2> >
+  class Harmonic_coordinates_2 : public Discrete_harmonic_weights_2<VertexRange, GeomTraits, VertexMap> {
 
+    public:
+      using Base = Discrete_harmonic_weights_2<VertexRange, GeomTraits, VertexMap>;
+
+      using Vertex_range = VertexRange;
+      using Traits = GeomTraits;
+      using Domain = InputDomain;
+      using Solver = InputSolver;
+      using Vertex_map = VertexMap;
+      
+      using Point_2 = typename GeomTraits::Point_2;
+
+      Harmonic_coordinates_2() {
+
+      }
+
+      template<typename OutputIterator>
+      boost::optional<OutputIterator> operator()(
+        const Point_2& p, 
+        OutputIterator weights) const {
+
+        // evaluate
+      }
+
+      bool is_valid_point(const Point_2& query) const {
+
+        // override
+      }
+
+      void compute() {
+
+      }
+
+      template<typename OutputIterator>
+      boost::optional<OutputIterator> coordinates(OutputIterator output) {
+
+      }
+
+      template<typename OutputIterator>
+      boost::optional<OutputIterator> coordinates(
+        const std::size_t vertex_index, 
+        OutputIterator output) {
+
+      }
+
+      void clear() {
+
+      }
+
+      void release_memory() {
+
+      }
+
+    private:
+  };
 
 } // namespace Barycentric_coordinates
 } // namespace CGAL

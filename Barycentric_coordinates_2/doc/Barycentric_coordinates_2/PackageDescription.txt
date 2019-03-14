@@ -3,6 +3,13 @@
 /// \defgroup PkgBarycentric_coordinates_2Concepts Concepts
 /// \ingroup PkgBarycentric_coordinates_2
 
+Concepts, which are used to parameterize barycentric coordinate classes.
+
+/// \defgroup PkgBarycentric_coordinates_2WAC Weights And Coordinates
+/// \ingroup PkgBarycentric_coordinates_2
+
+Generalized barycentric weight and coordinate functions.
+
 /*!
 \addtogroup PkgBarycentric_coordinates_2
 \cgalPkgDescriptionBegin{2D Generalized Barycentric Coordinates, PkgBarycentric_coordinates_2Summary}
@@ -26,11 +33,17 @@ from the Package \ref PkgInterpolation2Ref.}
 \cgalClassifedRefPages
 
 ## Concepts ##
+- `PointwiseWeights2`
+- `HarmonicCoordinatesSolver`
+- `HarmonicCoordinatesDomain`
+
+## Weights And Coordinates ##
+- `CGAL::Barycentric_coordinates::Wachspress_weights_2`
+- `CGAL::Barycentric_coordinates::Mean_value_weights_2`
+- `CGAL::Barycentric_coordinates::Discrete_harmonic_weights_2`
+- `CGAL::Barycentric_coordinates::Harmonic_coordinates_2`
 
 ## Enumerations ##
-
-## Classes ##
-
-## Functions ##
-
+- `CGAL::Barycentric_coordinates::Query_point_location`
+- `CGAL::Barycentric_coordinates::Algorithm_type`
 */
