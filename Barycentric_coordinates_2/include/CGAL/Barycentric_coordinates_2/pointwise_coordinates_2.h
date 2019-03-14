@@ -36,19 +36,23 @@
 #include <CGAL/assertions.h>
 #include <CGAL/property_map.h>
 
+// Internal includes.
+#include <CGAL/Barycentric_coordinates_2/internal/utils_2.h>
+#include <CGAL/Barycentric_coordinates_2/barycentric_enum_2.h>
+
 namespace CGAL {
 namespace Barycentric_coordinates {
 
   /*!
     This function takes the `source` and `target` vertices of a segment and computes 
-    segment coordinates at a given `query` point with respect to these vertices.
-    The coordinates are returned in `output`.
-
-    \tparam GeomTraits 
-    is a model of `Kernel`.
+    the segment coordinates at a given `query` point with respect to these vertices.
+    The coordinates are returned in `coordinates`.
 
     \tparam OutputIterator
     is an output iterator whose value type is `GeomTraits::FT`.
+
+    \tparam GeomTraits 
+    is a model of `Kernel`.
 
     \param source
     The source vertex of a segment.
@@ -105,15 +109,15 @@ namespace Barycentric_coordinates {
   }
 
   /*!
-    This function takes the three vertices of a triangle and computes 
+    This function takes the three vertices of a triangle and computes the
     triangle coordinates at a given `query` point with respect to these vertices.
-    The coordinates are returned in `output`.
-
-    \tparam GeomTraits 
-    is a model of `Kernel`.
+    The coordinates are returned in `coordinates`.
 
     \tparam OutputIterator
     is an output iterator whose value type is `GeomTraits::FT`.
+
+    \tparam GeomTraits 
+    is a model of `Kernel`.
 
     \param p1
     The first vertex of a triangle.
@@ -138,13 +142,13 @@ namespace Barycentric_coordinates {
     \return an optional output iterator.
   */
   template<
-  typename GeomTraits,
-  typename OutputIterator>
+  typename OutputIterator,
+  typename GeomTraits>
   boost::optional<OutputIterator> triangle_coordinates_2(
-    const typename Traits::Point_2& p1, 
-    const typename Traits::Point_2& p2, 
-    const typename Traits::Point_2& p3, 
-    const typename Traits::Point_2& query,
+    const typename GeomTraits::Point_2& p1, 
+    const typename GeomTraits::Point_2& p2, 
+    const typename GeomTraits::Point_2& p3, 
+    const typename GeomTraits::Point_2& query,
     OutputIterator coordinates,
     const GeomTraits traits = GeomTraits()) {
     
@@ -178,12 +182,109 @@ namespace Barycentric_coordinates {
   }
 
   /*!
-    This function takes a range of query points and computes the chosen 
-    barycentric weights at each point. These weights are then normalized 
-    and returned in `output`.
+    This function takes a query point and computes the boundary barycentric
+    coordinates at this point with respect to the vertices of a given polygon. 
+    These coordinates are then returned in `coordinates`.
+
+    These coordinates can be computed if and only if query point is at the vertex 
+    of the polygon or belongs to one of its edges, otherwise all coordinates are
+    set to zero.
+
+    \tparam Polygon
+    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+
+    \tparam OutputIterator
+    is an output iterator whose value type is `GeomTraits::FT`.
 
     \tparam GeomTraits 
     is a model of `Kernel`.
+
+    \tparam VertexMap
+    is an `LvaluePropertyMap` whose key type is `Polygon::value_type` and
+    value type is `GeomTraits::Point_2`. %Default is `CGAL::Identity_property_map`.
+
+    \param polygon
+    An instance of `Polygon` with vertices of a 2D polygon.
+
+    \param query
+    A query point.
+
+    \param location
+    A query point location with respect to the polygon.
+
+    \param index
+    An index of the polygon vertex or edge to which the 
+    query point belongs.
+
+    \param coordinates 
+    An output iterator that stores the computed coordinates.
+
+    \param traits
+    An instance of `GeomTraits`.
+
+    \param vertex_map
+    An instance of `VertexMap` that maps a vertex from `polygon` 
+    to `GeomTraits::Point_2`.
+
+    \return an optional output iterator.
+  */
+  template<
+  typename Polygon,
+  typename OutputIterator,
+  typename GeomTraits,
+  typename VertexMap = CGAL::Identity_property_map<typename GeomTraits::Point_2> >
+  boost::optional<OutputIterator> boundary_coordinates_2(
+    const Polygon& polygon,
+    const typename GeomTraits::Point_2& query,
+    const Query_point_location location,
+    const std::size_t index,
+    OutputIterator coordinates,
+    const GeomTraits traits = GeomTraits(),
+    const VertexMap vertex_map = VertexMap()) {
+
+    // Compute coordinates with respect to the query point location.
+    switch (location) {
+      
+      case Query_point_location::VERTEX: {
+        for (std::size_t i = 0; i < polygon.size(); ++i)
+          if (i == index) 
+            *(coordinates++) = FT(1);
+          else
+            *(coordinates++) = FT(0);
+        break;
+      }
+      
+      case Query_point_location::EDGE: {  
+        const std::size_t indexp = (index + 1) % polygon.size();
+
+        const Point_2& source = get(vertex_map, *(polygon.begin() + index));
+        const Point_2& target = get(vertex_map, *(polygon.begin() + indexp));
+
+        for (std::size_t i = 0; i < polygon.size(); ++i)
+          if (i == index)
+            segment_coordinates_2(source, target, query, coordinates, traits);
+          else
+            *(coordinates++) = FT(0);
+        break;
+      }
+
+      default: {
+        internal::get_default(polygon.size(), coordinates);
+        break;
+      }
+    }
+    return boost::optional<OutputIterator>(coordinates);
+  }
+
+  /*!
+    This function takes a range of query points and computes the boundary barycentric
+    coordinates at each point with respect to the vertices of a given polygon. 
+    These coordinates are then returned in `coordinates`.
+
+    This function is using internally the function above.
+
+    \tparam Polygon
+    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
 
     \tparam QueryRange
     is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
@@ -191,12 +292,217 @@ namespace Barycentric_coordinates {
     \tparam OutputIterator
     is an output iterator whose value type is `std::vector<GeomTraits::FT>`.
 
-    \tparam Weights
-    is a model of `Pointwise_weights_2`.
+    \tparam GeomTraits 
+    is a model of `Kernel`.
+
+    \tparam VertexMap
+    is an `LvaluePropertyMap` whose key type is `Polygon::value_type` and
+    value type is `GeomTraits::Point_2`. %Default is `CGAL::Identity_property_map`.
 
     \tparam PointMap
     is an `LvaluePropertyMap` whose key type is `QueryRange::value_type` and
     value type is `GeomTraits::Point_2`. %Default is `CGAL::Identity_property_map`.
+
+    \param polygon
+    An instance of `Polygon` with vertices of a 2D polygon.
+
+    \param queries
+    An instance of `QueryRange` with 2D query points.
+
+    \param coordinates 
+    An output iterator that stores the computed coordinates.
+
+    \param traits
+    An instance of `GeomTraits`.
+
+    \param vertex_map
+    An instance of `VertexMap` that maps a vertex from `polygon` 
+    to `GeomTraits::Point_2`.
+
+    \param point_map
+    An instance of `PointMap` that maps an item from `queries` 
+    to `GeomTraits::Point_2`.
+
+    \return an optional output iterator.
+  */
+  template<
+  typename Polygon,
+  typename QueryRange,
+  typename OutputIterator,
+  typename GeomTraits,
+  typename VertexMap = CGAL::Identity_property_map<typename GeomTraits::Point_2>,
+  typename PointMap = CGAL::Identity_property_map<typename GeomTraits::Point_2> >
+  boost::optional<OutputIterator> boundary_coordinates_2(
+    const Polygon& polygon,
+    const QueryRange& queries,
+    OutputIterator coordinates,
+    const GeomTraits traits = GeomTraits(),
+    const VertexMap vertex_map = VertexMap(),
+    const PointMap point_map = PointMap()) {
+
+    // Typedefs.
+    using FT = typename GeomTraits::FT;
+    using Point_2 = typename GeomTraits::Point_2;
+
+    // Compute coordinates for all query points.
+    std::vector<FT> b;
+    b.reserve(polygon.size());
+
+    for (auto it = queries.begin(); it != queries.end(); ++it) {
+      const Point_2& query = get(point_map, *it); b.clear();
+
+      // Get boundary point location and compute coordinates.
+      const auto result = 
+      internal::is_boundary_point(polygon, query, vertex_map);
+      
+      boundary_coordinates_2(
+        polygon, query,
+        (*result).first, 
+        (*result).second,
+        std::back_inserter(b),
+        traits, vertex_map);
+      
+      *(coordinates++) = b;
+    }
+    return boost::optional<OutputIterator>(coordinates);
+  }
+
+  /*!
+    This function takes a range of query points and computes the chosen 
+    barycentric weights at each point with respect to the vertices of a given polygon. 
+    These weights are then returned in `output`.
+
+    These weights can be computed if and only if query point is not on the 
+    polygon's boundary, otherwise all weights are set to zero.
+
+    \tparam Polygon
+    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+
+    \tparam QueryRange
+    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+
+    \tparam Weights
+    is a model of `Pointwise_weights_2`.
+
+    \tparam OutputIterator
+    is an output iterator whose value type is `std::vector<GeomTraits::FT>`.
+
+    \tparam GeomTraits 
+    is a model of `Kernel`.
+
+    \tparam VertexMap
+    is an `LvaluePropertyMap` whose key type is `Polygon::value_type` and
+    value type is `GeomTraits::Point_2`. %Default is `CGAL::Identity_property_map`.
+
+    \tparam PointMap
+    is an `LvaluePropertyMap` whose key type is `QueryRange::value_type` and
+    value type is `GeomTraits::Point_2`. %Default is `CGAL::Identity_property_map`.
+
+    \param polygon
+    An instance of `Polygon` with vertices of a 2D polygon.
+
+    \param queries
+    An instance of `QueryRange` with 2D query points.
+
+    \param weights
+    An instance of `Weights` that computes the corresponding 
+    barycentric weights.
+
+    \param output 
+    An output iterator that stores the computed weights.
+
+    \param traits
+    An instance of `GeomTraits`.
+
+    \param vertex_map
+    An instance of `VertexMap` that maps a vertex from `polygon` 
+    to `GeomTraits::Point_2`.
+
+    \param point_map
+    An instance of `PointMap` that maps an item from `queries` 
+    to `GeomTraits::Point_2`.
+
+    \return an optional output iterator.
+  */
+  template<
+  typename Polygon,
+  typename QueryRange,
+  typename Weights,
+  typename OutputIterator,
+  typename GeomTraits,
+  typename VertexMap = CGAL::Identity_property_map<typename GeomTraits::Point_2>,
+  typename PointMap = CGAL::Identity_property_map<typename GeomTraits::Point_2> >
+  boost::optional<OutputIterator> pointwise_weights_2(
+    const Polygon& polygon,
+    const QueryRange& queries,
+    const Weights& weights,
+    OutputIterator output,
+    const GeomTraits traits = GeomTraits(),
+    const VertexMap vertex_map = VertexMap(),
+    const PointMap point_map = PointMap()) {
+
+    // Typedefs.
+    using FT = typename GeomTraits::FT;
+    using Point_2 = typename GeomTraits::Point_2;
+
+    // Compute weights for all query points.
+    std::vector<FT> w;
+    w.reserve(polygon.size());
+
+    for (auto it = queries.begin(); it != queries.end(); ++it) {
+      const Point_2& query = get(point_map, *it); w.clear();
+
+      // If point is not valid, skip it.
+      if (!weights.is_valid_point(query)) {
+        internal::get_default(polygon.size(), std::back_inserter(w));
+        *(output++) = w;
+        continue;
+      }
+
+      // If point is on the boundary, skip it.
+      const auto result = weights.is_boundary_point(query);
+      if (result) 
+        internal::get_default(polygon.size(), std::back_inserter(w));
+      else {
+        weights(
+          query, 
+          std::back_inserter(w));
+      }
+      *(output++) = w;
+    }
+    return boost::optional<OutputIterator>(output);
+  }
+
+  /*!
+    This function takes a range of query points and computes the chosen 
+    barycentric weights at each point with respect to the vertices of a given polygon. 
+    These weights are then normalized and returned in `coordinates`.
+
+    \tparam Polygon
+    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+
+    \tparam QueryRange
+    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+
+    \tparam Weights
+    is a model of `Pointwise_weights_2`.
+
+    \tparam OutputIterator
+    is an output iterator whose value type is `std::vector<GeomTraits::FT>`.
+
+    \tparam GeomTraits 
+    is a model of `Kernel`.
+
+    \tparam VertexMap
+    is an `LvaluePropertyMap` whose key type is `Polygon::value_type` and
+    value type is `GeomTraits::Point_2`. %Default is `CGAL::Identity_property_map`.
+
+    \tparam PointMap
+    is an `LvaluePropertyMap` whose key type is `QueryRange::value_type` and
+    value type is `GeomTraits::Point_2`. %Default is `CGAL::Identity_property_map`.
+
+    \param polygon
+    An instance of `Polygon` with vertices of a 2D polygon.
 
     \param queries
     An instance of `QueryRange` with 2D query points.
@@ -208,6 +514,13 @@ namespace Barycentric_coordinates {
     \param coordinates 
     An output iterator that stores the computed coordinates.
 
+    \param traits
+    An instance of `GeomTraits`.
+
+    \param vertex_map
+    An instance of `VertexMap` that maps a vertex from `polygon` 
+    to `GeomTraits::Point_2`.
+
     \param point_map
     An instance of `PointMap` that maps an item from `queries` 
     to `GeomTraits::Point_2`.
@@ -215,46 +528,142 @@ namespace Barycentric_coordinates {
     \return an optional output iterator.
   */
   template<
-  typename GeomTraits,
+  typename Polygon,
   typename QueryRange,
-  typename OutputIterator,
   typename Weights,
+  typename OutputIterator,
+  typename GeomTraits,
+  typename VertexMap = CGAL::Identity_property_map<typename GeomTraits::Point_2>,
   typename PointMap = CGAL::Identity_property_map<typename GeomTraits::Point_2> >
   boost::optional<OutputIterator> pointwise_coordinates_2(
+    const Polygon& polygon,
     const QueryRange& queries,
     const Weights& weights,
     OutputIterator coordinates,
+    const GeomTraits traits = GeomTraits(),
+    const VertexMap vertex_map = VertexMap(),
     const PointMap point_map = PointMap()) {
 
-    // Number type.
+    // Typedefs.
     using FT = typename GeomTraits::FT;
     using Point_2 = typename GeomTraits::Point_2;
 
+    // Compute coordinates for all query points.
     std::vector<FT> b;
+    b.reserve(polygon.size());
+
     for (auto it = queries.begin(); it != queries.end(); ++it) {
-      const Point_2& query = get(point_map, *it);
+      const Point_2& query = get(point_map, *it); b.clear();
 
-      if (!weights.is_valid_point(query))
+      // If point is not valid, skip it.
+      if (!weights.is_valid_point(query)) {
+        internal::get_default(polygon.size(), std::back_inserter(b));
+        *(coordinates++) = b;
         continue;
+      }
 
-      b.clear();
-      if (weights.is_boundary_point(query)) {
-        
+      // Otherwise compute either boundary or normalized coordinates.
+      const auto result = weights.is_boundary_point(query);
+      if (result) { 
         boundary_coordinates_2(
-          weights.polygon().begin(),
-          weights.polygon().end(),
-          query,
-          std::back_inserter(b));
-
+          polygon, query,
+          (*result).first, 
+          (*result).second,
+          std::back_inserter(b),
+          traits, vertex_map);
       } else {
-        
         weights(
           query, 
           std::back_inserter(b));
         internal::normalize(b);
-        
       }
       *(coordinates++) = b;
+    }
+    return boost::optional<OutputIterator>(coordinates);
+  }
+
+  /*!
+    This function takes a query point and computes the chosen barycentric
+    weights at this point with respect to the vertices of a given polygon. 
+    These weights are then normalized and returned in `coordinates`.
+
+    \tparam Polygon
+    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+
+    \tparam Weights
+    is a model of `Pointwise_weights_2`.
+
+    \tparam OutputIterator
+    is an output iterator whose value type is `GeomTraits::FT`.
+
+    \tparam GeomTraits 
+    is a model of `Kernel`.
+
+    \tparam VertexMap
+    is an `LvaluePropertyMap` whose key type is `Polygon::value_type` and
+    value type is `GeomTraits::Point_2`. %Default is `CGAL::Identity_property_map`.
+
+    \param polygon
+    An instance of `Polygon` with vertices of a 2D polygon.
+
+    \param query
+    A query point.
+
+    \param coordinates 
+    An output iterator that stores the computed coordinates.
+
+    \param traits
+    An instance of `GeomTraits`.
+
+    \param vertex_map
+    An instance of `VertexMap` that maps a vertex from `polygon` 
+    to `GeomTraits::Point_2`.
+
+    \return an optional output iterator.
+  */
+  template<
+  typename Polygon,
+  typename Weights,
+  typename OutputIterator,
+  typename GeomTraits,
+  typename VertexMap = CGAL::Identity_property_map<typename GeomTraits::Point_2> >
+  boost::optional<OutputIterator> pointwise_coordinates_2(
+    const Polygon& polygon,
+    const typename GeomTraits::Point_2& query,
+    const Weights& weights,
+    OutputIterator coordinates,
+    const GeomTraits traits = GeomTraits(),
+    const VertexMap vertex_map = VertexMap()) {
+
+    // Number type.
+    using FT = typename GeomTraits::FT;
+
+    // If point is not valid, skip it.
+    if (!weights.is_valid_point(query)) {
+      internal::get_default(polygon.size(), coordinates);
+      return boost::optional<OutputIterator>(coordinates);
+    }
+    
+    // Otherwise compute either boundary or normalized coordinates.
+    const auto result = weights.is_boundary_point(query);
+    if (result) {
+      boundary_coordinates_2(
+        polygon, query,
+        (*result).first, 
+        (*result).second,
+        coordinates,
+        traits, vertex_map);
+    } else {
+      std::vector<FT> b;
+      b.reserve(polygon.size());
+
+      weights(
+        query, 
+        std::back_inserter(b));
+      
+      internal::normalize(b);
+      for (const auto& value : b)
+        *(coordinates++) = value;
     }
     return boost::optional<OutputIterator>(coordinates);
   }

@@ -43,13 +43,13 @@ namespace Barycentric_coordinates {
 enum class Query_point_location {
     
     /// Location is not known apriori and defined automatically by the algorithm.
-    UNSPECIFIED_LOCATION = 0,
+    UNSPECIFIED = 0,
 
-    /// Query point is located at one of the polygon's vertices.
+    /// Query point is located at the vertex of the polygon.
     ON_VERTEX = 1,
 
-    /// Query point is located on the boundary of the polygon.
-    ON_BOUNDARY = 2,
+    /// Query point is located on the edge of the polygon.
+    ON_EDGE = 2,
 
     /// Query point is located inside the polygon, excluding the boundary.
     ON_BOUNDED_SIDE = 3,
