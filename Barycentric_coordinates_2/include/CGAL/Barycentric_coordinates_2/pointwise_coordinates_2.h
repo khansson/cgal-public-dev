@@ -351,9 +351,9 @@ namespace Barycentric_coordinates {
     for (auto it = queries.begin(); it != queries.end(); ++it) {
       const Point_2& query = get(point_map, *it); b.clear();
 
-      // Get boundary point location and compute coordinates.
+      // Get point location and compute coordinates.
       const auto result = 
-      internal::is_boundary_point(polygon, query, vertex_map);
+      internal::locate_wrt_polygon(polygon, query, vertex_map, traits);
       
       boundary_coordinates_2(
         polygon, query,

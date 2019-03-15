@@ -33,7 +33,7 @@ from the Package \ref PkgInterpolation2Ref.}
 \cgalClassifedRefPages
 
 ## Concepts ##
-- `PointwiseWeights2`
+- `PointwiseWeights_2`
 - `HarmonicCoordinatesSolver`
 - `HarmonicCoordinatesDomain`
 
