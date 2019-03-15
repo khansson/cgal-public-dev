@@ -25,6 +25,10 @@
 
 #include <CGAL/license/Barycentric_coordinates_2.h>
 
+// STL includes.
+#include <vector>
+#include <utility>
+
 // Boost headers.
 #include <boost/mpl/has_xxx.hpp>
 #include <boost/optional/optional.hpp>
@@ -32,6 +36,7 @@
 // CGAL includes.
 #include <CGAL/assertions.h>
 #include <CGAL/number_utils.h>
+#include <CGAL/Polygon_2_algorithms.h>
 
 namespace CGAL {
 namespace Barycentric_coordinates {
@@ -110,7 +115,44 @@ namespace internal {
     const VertexMap& vertex_map,
     const GeomTraits& traits) {
 
-    
+    using Collinear_2 = typename GeomTraits::Collinear_2;
+    const Collinear_2 collinear_2 = traits.collinear_2_object();
+
+    CGAL_precondition(polygon.size() >= 3);
+
+    std::vector<Point_2> vertices;
+    vertices.reserve(polygon.size());
+    for (const auto& item : polygon)
+      vertices.push_back(get(vertex_map, item));
+    CGAL_assertion(vertices.size() == polygon.size());
+
+    const auto type = CGAL::bounded_side_2(
+      vertices.begin(), vertices.end(), query, traits);
+
+    switch (type) {
+      case CGAL::ON_BOUNDED_SIDE:
+        return std::make_pair(Query_point_location::ON_BOUNDED_SIDE, std::size_t(-1));
+      case CGAL::ON_UNBOUNDED_SIDE:
+        return std::make_pair(Query_point_location::ON_UNBOUNDED_SIDE, std::size_t(-1));
+      case CGAL::ON_BOUNDARY: {
+
+        for (std::size_t i = 0; i < vertices.size(); ++i)
+          if (vertices[i] == query)
+            return std::make_pair(Query_point_location::ON_VERTEX, i);
+
+        for (std::size_t i = 0; i < vertices.size(); ++i) {
+          const std::size_t ip = (i + 1) % vertices.size();
+
+          if (collinear_2(
+                vertices[i], vertices[ip], query) && 
+              collinear_are_ordered_along_line_2(
+                vertices[i], query, vertices[ip]))
+            return std::make_pair(Query_point_location::ON_EDGE, i); 
+        }
+      }
+      default: 
+        return std::make_pair(Query_point_location::UNSPECIFIED, std::size_t(-1));
+    }
   }
 
   enum class Polygon_type {

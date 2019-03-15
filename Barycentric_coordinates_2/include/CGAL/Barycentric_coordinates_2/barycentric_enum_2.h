@@ -42,17 +42,20 @@ namespace Barycentric_coordinates {
 */
 enum class Query_point_location {
 
-    /// Query point is located at the vertex of the polygon.
-    ON_VERTEX = 0,
+  /// Query point is located at the vertex of the polygon.
+  ON_VERTEX = 0,
 
-    /// Query point is located on the edge of the polygon.
-    ON_EDGE = 1,
+  /// Query point is located on the edge of the polygon.
+  ON_EDGE = 1,
 
-    /// Query point is located inside the polygon, excluding the boundary.
-    ON_BOUNDED_SIDE = 2,
+  /// Query point is located inside the polygon, excluding the boundary.
+  ON_BOUNDED_SIDE = 2,
 
-    /// Query point is located outside the polygon, excluding the boundary.
-    ON_UNBOUNDED_SIDE = 3
+  /// Query point is located outside the polygon, excluding the boundary.
+  ON_UNBOUNDED_SIDE = 3,
+
+  /// Location is not known apriori and is defined automatically by the algorithm.
+  UNSPECIFIED = 4
 };
 
 /// @}
@@ -66,11 +69,11 @@ enum class Query_point_location {
 */
 enum class Algorithm_type {
     
-    /// A default slow version of the algorithm, but very precise.
-    MAX_PRECISION = 0,
+  /// A default slow version of the algorithm, but very precise.
+  MAX_PRECISION = 0,
 
-    /// A fast version of the algorithm, which is less precise but much faster.
-    MAX_SPEED = 1
+  /// A fast version of the algorithm, which is less precise but much faster.
+  MAX_SPEED = 1
 };
 
 /// @}

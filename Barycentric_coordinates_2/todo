@@ -1,3 +1,5 @@
 1. Should we merge natural-neighbor coordinates and barycentric coordinates?
 2. Should I skip all non-valid points or fill output iterator with -1 values?
 Or maybe return a vector with the corresponding point index?
+3. Should I create a wrapper for the HarmonicCoordinatesDomain concept or any
+Triangulation_2-based types are fine?

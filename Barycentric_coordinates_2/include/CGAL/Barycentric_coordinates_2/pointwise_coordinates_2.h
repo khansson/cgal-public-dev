@@ -27,6 +27,7 @@
 
 // STL headers.
 #include <vector>
+#include <utility>
 #include <iterator>
 
 // Boost headers.
@@ -608,6 +609,10 @@ namespace Barycentric_coordinates {
 
     \param query
     A query point.
+
+    \param weights
+    An instance of `Weights` that computes the corresponding 
+    barycentric weights.
 
     \param coordinates 
     An output iterator that stores the computed coordinates.

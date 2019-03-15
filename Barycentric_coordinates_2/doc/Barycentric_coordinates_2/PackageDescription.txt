@@ -35,7 +35,6 @@ from the Package \ref PkgInterpolation2Ref.}
 ## Concepts ##
 - `PointwiseWeights_2`
 - `HarmonicCoordinatesSolver`
-- `HarmonicCoordinatesDomain`
 
 ## Weights And Coordinates ##
 - `CGAL::Barycentric_coordinates::Wachspress_weights_2`
