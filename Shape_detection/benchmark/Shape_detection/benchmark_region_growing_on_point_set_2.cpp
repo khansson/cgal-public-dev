@@ -70,7 +70,7 @@ void benchmark_region_growing_on_point_set_2(
     number_of_assigned_points += region.size();
 
   std::vector<std::size_t> unassigned_points;
-  region_growing.output_unassigned_items(std::back_inserter(unassigned_points));
+  region_growing.unassigned_items(std::back_inserter(unassigned_points));
 
   // Print statistics.
   std::cout << "Test #"                          << test_count                << std::endl;

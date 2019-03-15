@@ -271,10 +271,10 @@ The concept `RegionType` provides the means for validating regions. In fact, a m
 of this concept maintains a description of the region type that is used in region growing.
 To create a model that respect this concept, three functions have to be defined:
 
-- `RegionType::is_part_of_region()` This function verifies if an item satisfies
+- `RegionType::is_part_of_region()` This function checks if an item satisfies
 all necessary region requirements and can be added to a region. It is called per item.
 
-- `RegionType::is_valid_region()` This function verifies if a region satisfies 
+- `RegionType::is_valid_region()` This function checks if a region satisfies 
 all necessary region requirements. It is called per region.
 
 - `RegionType::update()` This utility function  allows to update any information, 

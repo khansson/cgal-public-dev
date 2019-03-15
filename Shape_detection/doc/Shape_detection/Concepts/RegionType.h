@@ -8,6 +8,9 @@ to maintain a region.
 A region is represented by a set of indices of the items, which are included in 
 this region. These indices are stored in `region`.
 
+Note that you cannot modify `region` since it is constructed inside
+`CGAL::Shape_detection::Region_growing`. It is provided only to access its items.
+
 \cgalHasModel 
 - `CGAL::Shape_detection::Point_set::Least_squares_line_fit_region`, 
 - `CGAL::Shape_detection::Point_set::Least_squares_plane_fit_region`, 
@@ -19,7 +22,7 @@ class RegionType {
 public:
 
   /*!  
-    verifies if the item with the index `query_index` can be added to the `region`.
+    checks if the item with the index `query_index` can be added to the `region`.
 
     This function is called each time when trying to add a new item to a region.
     If it returns `true`, the `query_index` is pushed to the `region`, otherwise 
@@ -32,7 +35,7 @@ public:
   }
 
   /*!  
-    verifies if the `region` satisfies all necessary conditions.
+    checks if the `region` satisfies all necessary conditions.
     
     This function is called at the end of each propagation phase. If it returns `true`, 
     the `region` is accepted, otherwise rejected. If the `region` is rejected,

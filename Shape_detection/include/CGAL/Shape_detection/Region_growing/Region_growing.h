@@ -186,7 +186,7 @@ namespace Shape_detection {
       \return an optional output iterator.
     */
     template<typename OutputIterator>
-    boost::optional<OutputIterator> output_unassigned_items(OutputIterator output) const {
+    boost::optional<OutputIterator> unassigned_items(OutputIterator output) const {
       
       // Return indices of all unassigned items.
       for (std::size_t i = 0; i < m_input_range.size(); ++i) {

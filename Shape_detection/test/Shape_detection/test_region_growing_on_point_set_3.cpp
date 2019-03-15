@@ -81,7 +81,7 @@ bool test_region_growing_on_point_set_3(int argc, char *argv[]) {
       return false;
 
   std::vector<std::size_t> unassigned_points;
-  region_growing.output_unassigned_items(std::back_inserter(unassigned_points));
+  region_growing.unassigned_items(std::back_inserter(unassigned_points));
 
   CGAL_assertion(unassigned_points.size() >= 13457 && unassigned_points.size() <= 13477);
   if (unassigned_points.size() < 13457 || unassigned_points.size() > 13477) 

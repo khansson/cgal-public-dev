@@ -77,7 +77,7 @@ bool test_region_growing_on_polygon_mesh(int argc, char *argv[]) {
       return false;
 
   std::vector<std::size_t> unassigned_faces;
-  region_growing.output_unassigned_items(std::back_inserter(unassigned_faces));
+  region_growing.unassigned_items(std::back_inserter(unassigned_faces));
 
   CGAL_assertion(unassigned_faces.size() >= 869 && unassigned_faces.size() <= 889);
   if (unassigned_faces.size() < 869 || unassigned_faces.size() > 889) 
