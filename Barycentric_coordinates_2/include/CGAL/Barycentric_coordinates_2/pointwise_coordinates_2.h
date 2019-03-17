@@ -183,11 +183,12 @@ namespace Barycentric_coordinates {
   }
 
   /*!
-    This function takes a query point and computes the boundary barycentric
-    coordinates at this point with respect to the vertices of a given polygon. 
-    These coordinates are then returned in `coordinates`.
+    This function takes a `query` point and computes the boundary barycentric
+    coordinates at this point with respect to the vertices of a given `polygon` 
+    provided its `location` and vertex/edge `index`. These coordinates are then 
+    returned in `coordinates`.
 
-    These coordinates can be computed if and only if query point is at the vertex 
+    These coordinates can be computed if and only if the query point is at the vertex 
     of the polygon or belongs to one of its edges, otherwise all coordinates are
     set to zero.
 
@@ -278,8 +279,8 @@ namespace Barycentric_coordinates {
   }
 
   /*!
-    This function takes a range of query points and computes the boundary barycentric
-    coordinates at each point with respect to the vertices of a given polygon. 
+    This function takes a range of `query` points and computes the boundary barycentric
+    coordinates at each point with respect to the vertices of a given `polygon`. 
     These coordinates are then returned in `coordinates`.
 
     This function is using internally the function above.
@@ -369,12 +370,12 @@ namespace Barycentric_coordinates {
   }
 
   /*!
-    This function takes a range of query points and computes the chosen 
-    barycentric weights at each point with respect to the vertices of a given polygon. 
+    This function takes a range of `query` points and computes the chosen 
+    barycentric `weights` at each point with respect to the vertices of a given `polygon`. 
     These weights are then returned in `output`.
 
-    These weights can be computed if and only if query point is not on the 
-    polygon's boundary, otherwise all weights are set to zero.
+    These weights can be computed for any query point that is not on the 
+    polygon's boundary, otherwise all weights are set to zero for this point.
 
     \tparam Polygon
     is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
@@ -475,8 +476,8 @@ namespace Barycentric_coordinates {
   }
 
   /*!
-    This function takes a range of query points and computes the chosen 
-    barycentric weights at each point with respect to the vertices of a given polygon. 
+    This function takes a range of `query` points and computes the chosen 
+    barycentric `weights` at each point with respect to the vertices of a given `polygon`. 
     These weights are then normalized and returned in `coordinates`.
 
     \tparam Polygon
@@ -584,8 +585,8 @@ namespace Barycentric_coordinates {
   }
 
   /*!
-    This function takes a query point and computes the chosen barycentric
-    weights at this point with respect to the vertices of a given polygon. 
+    This function takes a `query` point and computes the chosen barycentric
+    `weights` at this point with respect to the vertices of a given `polygon`. 
     These weights are then normalized and returned in `coordinates`.
 
     \tparam Polygon

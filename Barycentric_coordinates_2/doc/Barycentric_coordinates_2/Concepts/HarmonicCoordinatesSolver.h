@@ -3,7 +3,7 @@
 \cgalConcept
 
 A concept that describes the set of methods that should be defined for all
-solvers that can be used to solve the Laplace equation for harmonic coordinates.
+solvers that can be used to solve the Laplace equation for `CGAL::Barycentric_coordinates::Harmonic_coordinates_2`.
 */
 
 class HarmonicCoordinatesSolver {

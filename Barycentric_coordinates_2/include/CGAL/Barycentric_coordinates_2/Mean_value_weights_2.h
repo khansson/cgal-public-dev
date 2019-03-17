@@ -56,7 +56,7 @@ namespace Barycentric_coordinates {
   /*! 
     \ingroup PkgBarycentric_coordinates_2WAC
 
-    \brief Generalized mean value weights.
+    \brief Mean value weights.
 
     This class implements 2D mean value weights ( \cite cgal:bc:fhk-gcbcocp-06, 
     \cite cgal:pp-cdmsc-93, \cite cgal:bc:eddhls-maam-95 ) and can be used in conjunction
@@ -116,7 +116,7 @@ namespace Barycentric_coordinates {
       \brief initializes all internal data structures.
 
       This class implements the behavior of mean value weights 
-      for a 2D query point.
+      for 2D query points.
 
       \param polygon
       An instance of `Polygon` with vertices of a 2D polygon.
@@ -168,7 +168,7 @@ namespace Barycentric_coordinates {
     /*!
       \brief implements `PointwiseWeights_2::operator()()`.
         
-      This function fills `weights` with generalized mean value weights 
+      This function fills `weights` with mean value weights 
       computed at the point `query` with respect to the vertices of the polygon.
 
       This function can be called for any 2D point.
@@ -238,10 +238,10 @@ namespace Barycentric_coordinates {
       \param query
       A query point.
 
-      \return an `std::pair`, where the first item in the pair is location
-      of the point `query` with respect to the polygon and second item is
-      the index of the polygon vertex or edge if `query` belongs to the
-      polygon's boundary. It is std::size_t(-1) if it does not.
+      \return an optional pair. The first item in the pair is location
+      of the `query` point with respect to the polygon. The second item is
+      the index of the polygon's vertex or edge if the `query` point belongs to the
+      polygon's boundary. It is std::size_t(-1), if it does not.
     */
     boost::optional< std::pair<Query_point_location, std::size_t> > 
     is_boundary_point(const Point_2& query) const {

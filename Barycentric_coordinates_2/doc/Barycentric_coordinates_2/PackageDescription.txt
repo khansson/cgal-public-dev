@@ -1,28 +1,31 @@
-/// \defgroup PkgBarycentric_coordinates_2 2D Generalized Barycentric Coordinates Reference
+/*!
+\defgroup PkgBarycentric_coordinates_2 2D Generalized Barycentric Coordinates Reference
 
-/// \defgroup PkgBarycentric_coordinates_2Concepts Concepts
-/// \ingroup PkgBarycentric_coordinates_2
+\defgroup PkgBarycentric_coordinates_2Concepts Concepts
+\ingroup PkgBarycentric_coordinates_2
 
 Concepts, which are used to parameterize barycentric coordinate classes.
 
-/// \defgroup PkgBarycentric_coordinates_2WAC Weights And Coordinates
-/// \ingroup PkgBarycentric_coordinates_2
+\defgroup PkgBarycentric_coordinates_2WAC Classes
+\ingroup PkgBarycentric_coordinates_2
 
 Generalized barycentric weight and coordinate functions.
 
-/*!
 \addtogroup PkgBarycentric_coordinates_2
+
 \cgalPkgDescriptionBegin{2D Generalized Barycentric Coordinates, PkgBarycentric_coordinates_2Summary}
 \cgalPkgPicture{barcoord_thumb.png}
+
 \cgalPkgSummaryBegin
 \cgalPkgAuthors{Dmitry Anisimov, David Bommes, Kai Hormann, and Pierre Alliez}
-\cgalPkgDesc{The package 2D Generalized Barycentric Coordinates offers an efficient and 
+\cgalPkgDesc{This package offers an efficient and 
 robust implementation of two-dimensional generalized barycentric coordinates defined 
 for simple two-dimensional polygons. If coordinates with respect to multivariate 
-scattered points instead of a polygon are required, please refer to natural-neighbor coordinates 
+scattered points instead of a polygon are required, please refer to natural neighbor coordinates 
 from the Package \ref PkgInterpolation2Ref.}
 \cgalPkgManuals{Chapter_2D_Generalized_Barycentric_Coordinates, PkgBarycentric_coordinates_2}
 \cgalPkgSummaryEnd
+
 \cgalPkgShortInfoBegin
 \cgalPkgSince{4.6}
 \cgalPkgBib{cgal:abha-gbc}
@@ -36,13 +39,20 @@ from the Package \ref PkgInterpolation2Ref.}
 - `PointwiseWeights_2`
 - `HarmonicCoordinatesSolver`
 
-## Weights And Coordinates ##
-- `CGAL::Barycentric_coordinates::Wachspress_weights_2`
-- `CGAL::Barycentric_coordinates::Mean_value_weights_2`
-- `CGAL::Barycentric_coordinates::Discrete_harmonic_weights_2`
-- `CGAL::Barycentric_coordinates::Harmonic_coordinates_2`
+## Classes ##
+- `CGAL::Barycentric_coordinates::Wachspress_weights_2<Polygon, GeomTraits, VertexMap>`
+- `CGAL::Barycentric_coordinates::Mean_value_weights_2<Polygon, GeomTraits, VertexMap>`
+- `CGAL::Barycentric_coordinates::Discrete_harmonic_weights_2<Polygon, GeomTraits, VertexMap>`
+- `CGAL::Barycentric_coordinates::Harmonic_coordinates_2<Polygon, Triangulation, Solver, GeomTraits, VertexMap>`
 
 ## Enumerations ##
 - `CGAL::Barycentric_coordinates::Query_point_location`
 - `CGAL::Barycentric_coordinates::Algorithm_type`
+
+## Functions ##
+- `CGAL::Barycentric_coordinates::segment_coordinates_2()`
+- `CGAL::Barycentric_coordinates::triangle_coordinates_2()`
+- `CGAL::Barycentric_coordinates::boundary_coordinates_2()`
+- `CGAL::Barycentric_coordinates::pointwise_weights_2()`
+- `CGAL::Barycentric_coordinates::pointwise_coordinates_2()`
 */

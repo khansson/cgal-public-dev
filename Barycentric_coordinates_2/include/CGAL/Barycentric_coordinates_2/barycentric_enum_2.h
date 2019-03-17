@@ -37,7 +37,7 @@ namespace Barycentric_coordinates {
 /// @{
 
 /*!
-  Query_point_location defines different possible locations 
+  `Query_point_location` defines different possible locations 
   of a query point.
 */
 enum class Query_point_location {
@@ -54,7 +54,7 @@ enum class Query_point_location {
   /// Query point is located outside the polygon, excluding the boundary.
   ON_UNBOUNDED_SIDE = 3,
 
-  /// Location is not known apriori and is defined automatically by the algorithm.
+  /// Location is unspecified. Leads to all coordinates being set to zero.
   UNSPECIFIED = 4
 };
 
@@ -64,7 +64,7 @@ enum class Query_point_location {
 /// @{
 
 /*!
-  Algorithm_type provides a way to choose a type of the algorithm 
+  `Algorithm_type` provides a way to choose a type of the algorithm 
   to compute pointwise barycentric weights.
 */
 enum class Algorithm_type {

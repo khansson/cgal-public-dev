@@ -52,7 +52,7 @@ namespace Barycentric_coordinates {
   /*! 
     \ingroup PkgBarycentric_coordinates_2WAC
 
-    \brief Generalized Wachspress weights.
+    \brief Wachspress weights.
 
     This class implements 2D Wachspress weights ( \cite cgal:bc:fhk-gcbcocp-06, 
     \cite cgal:bc:mlbd-gbcip-02, \cite cgal:bc:w-rfeb-75 ) and can be used in conjunction
@@ -108,7 +108,7 @@ namespace Barycentric_coordinates {
       \brief initializes all internal data structures.
 
       This class implements the behavior of Wachspress weights 
-      for a 2D query point.
+      for 2D query points.
 
       \param polygon
       An instance of `Polygon` with vertices of a 2D polygon.
@@ -152,7 +152,7 @@ namespace Barycentric_coordinates {
     /*!
       \brief implements `PointwiseWeights_2::operator()()`.
         
-      This function fills `weights` with generalized Wachspress weights 
+      This function fills `weights` with Wachspress weights 
       computed at the point `query` with respect to the vertices of the polygon.
 
       This function can be called for any 2D point.
@@ -201,8 +201,7 @@ namespace Barycentric_coordinates {
       It returns `true` if and only if `query` is in the polygon's closure.
       In fact, Wachspress weights are well-defined everywhere in the plane, but normalized
       weights after applying the function `CGAL::Barycentric_coordinates::pointwise_coordinates_2()`
-      are not well-defined outside the polygon. Thus this function is used to control the validity
-      of the query point location.
+      are not well-defined outside the polygon, which is the reason for this function's output.
 
       \param query
       A query point.
@@ -242,10 +241,10 @@ namespace Barycentric_coordinates {
       \param query
       A query point.
 
-      \return an `std::pair`, where the first item in the pair is location
-      of the point `query` with respect to the polygon and second item is
-      the index of the polygon vertex or edge if `query` belongs to the
-      polygon's boundary. It is std::size_t(-1) if it does not.
+      \return an optional pair. The first item in the pair is location
+      of the `query` point with respect to the polygon. The second item is
+      the index of the polygon's vertex or edge if the `query` point belongs to the
+      polygon's boundary. It is std::size_t(-1), if it does not.
     */
     boost::optional< std::pair<Query_point_location, std::size_t> > 
     is_boundary_point(const Point_2& query) const {

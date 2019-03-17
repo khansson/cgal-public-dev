@@ -52,7 +52,7 @@ namespace Barycentric_coordinates {
   /*! 
     \ingroup PkgBarycentric_coordinates_2WAC
 
-    \brief Generalized discrete harmonic weights.
+    \brief Discrete harmonic weights.
 
     This class implements 2D discrete harmonic weights ( \cite cgal:bc:fhk-gcbcocp-06, 
     \cite cgal:pp-cdmsc-93, \cite cgal:bc:eddhls-maam-95 ) and can be used in conjunction
@@ -109,7 +109,7 @@ namespace Barycentric_coordinates {
       \brief initializes all internal data structures.
 
       This class implements the behavior of discrete harmonic weights 
-      for a 2D query point.
+      for 2D query points.
 
       \param polygon
       An instance of `Polygon` with vertices of a 2D polygon.
@@ -155,7 +155,7 @@ namespace Barycentric_coordinates {
     /*!
       \brief implements `PointwiseWeights_2::operator()()`.
         
-      This function fills `weights` with generalized discrete harmonic weights 
+      This function fills `weights` with discrete harmonic weights 
       computed at the point `query` with respect to the vertices of the polygon.
 
       This function can be called for any 2D point.
@@ -204,8 +204,7 @@ namespace Barycentric_coordinates {
       It returns `true` if and only if `query` is in the polygon's closure.
       In fact, discrete harmonic weights are well-defined everywhere in the plane, but normalized
       weights after applying the function `CGAL::Barycentric_coordinates::pointwise_coordinates_2()`
-      are not well-defined outside the polygon. Thus this function is used to control the validity
-      of the query point location.
+      are not well-defined outside the polygon, which is the reason for this function's output.
 
       \param query
       A query point.
@@ -245,10 +244,10 @@ namespace Barycentric_coordinates {
       \param query
       A query point.
 
-      \return an `std::pair`, where the first item in the pair is location
-      of the point `query` with respect to the polygon and second item is
-      the index of the polygon vertex or edge if `query` belongs to the
-      polygon's boundary. It is std::size_t(-1) if it does not.
+      \return an optional pair. The first item in the pair is location
+      of the `query` point with respect to the polygon. The second item is
+      the index of the polygon's vertex or edge if the `query` point belongs to the
+      polygon's boundary. It is std::size_t(-1), if it does not.
     */
     boost::optional< std::pair<Query_point_location, std::size_t> > 
     is_boundary_point(const Point_2& query) const {
@@ -283,6 +282,49 @@ namespace Barycentric_coordinates {
       const Point_2& query,
       OutputIterator weights) {
 
+      // Get the number of vertices in the polygon.
+      const std::size_t n = m_polygon.size();
+
+      // Compute areas A, B, and distances r following the notation from [1]. 
+      // Split the loop to make this computation faster.
+      r[0] = m_squared_distance_2(m_polygon[0], query);
+      A[0] = m_area_2(m_polygon[0], m_polygon[1], query);
+      B[0] = m_area_2(m_polygon[n-1], m_polygon[1], query);
+
+      for (std::size_t i = 1; i < n-1; ++i) {
+        r[i] = m_squared_distance_2(m_polygon[i], query);
+        A[i] = m_area_2(m_polygon[i], m_polygon[i+1], query);
+        B[i] = m_area_2(m_polygon[i-1], m_polygon[i+1], query);
+      }
+
+      r[n-1] = m_squared_distance_2(m_polygon[n-1], query);
+      A[n-1] = m_area_2(m_polygon[n-1], m_polygon[0], query);
+      B[n-1] = m_area_2(m_polygon[n-2], m_polygon[0], query);
+
+      // Initialize weights with the numerator of the formula (25) with p = 2 from [1].
+      // Then we multiply them by areas A as in the formula (5) in [1]. We also split the loop.
+      w[0] = r[1] * A[n-1] - r[0] * B[0] + r[n-1] * A[0];
+      for (std::size_t j = 1; j < n - 1; ++j) 
+        w[0] *= A[j];
+
+      for (std::size_t i = 1; i < n-1; ++i) {
+        w[i] = r[i+1] * A[i-1] - r[i] * B[i] + r[i-1] * A[i];
+      
+        for (std::size_t j = 0; j < i-1; ++j) 
+          w[i] *= A[j];
+        for (std::size_t j = i+1; j < n; ++j) 
+          w[i] *= A[j];
+      }
+
+      w[n-1] = r[0] * A[n-2] - r[n-1] * B[n-1] + r[n-2] * A[n-1];
+      for (std::size_t j = 0; j < n-2; ++j) 
+        w[n-1] *= A[j];
+
+      // Return weights.
+      for (std::size_t i = 0; i < n; ++i)
+        *(weights++) = w[i];
+
+      return boost::optional<OutputIterator>(weights);
     }
 
     template<typename OutputIterator>

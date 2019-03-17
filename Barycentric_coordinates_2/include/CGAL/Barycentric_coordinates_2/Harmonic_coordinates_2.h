@@ -56,9 +56,9 @@ namespace Barycentric_coordinates {
 
     \brief Harmonic coordinates.
 
-    This class implements 2D harmonic coordinates (  ) and can be used in conjunction
-    with `CGAL::Barycentric_coordinates::pointwise_coordinates_2()` to compute
-    evaluate harmonic coordinate functions at any point inside a polygon.
+    This class implements 2D harmonic coordinates and can be used in conjunction
+    with `CGAL::Barycentric_coordinates::pointwise_coordinates_2()` to evaluate 
+    harmonic coordinate functions at any point inside a polygon.
     
     Harmonic coordinates are well-defined and non-negative in the closure 
     of any simple polygon.
@@ -101,8 +101,6 @@ namespace Barycentric_coordinates {
     using Solver_ = Solver;
     using Traits = GeomTraits;
     using Vertex_map = VertexMap;
-
-    using Vertex_handle = typename Triangulation::Vertex_handle;
     using Face_handle = typename Triangulation::Face_handle;
     /// \endcond
       
@@ -111,6 +109,9 @@ namespace Barycentric_coordinates {
 
     /// Point type.
     typedef typename GeomTraits::Point_2 Point_2;
+
+    /// Vertex handle type.
+    typedef typename Triangulation::Vertex_handle Vertex_handle;
 
     /// @}
 
@@ -121,7 +122,7 @@ namespace Barycentric_coordinates {
       \brief initializes all internal data structures.
 
       This class implements the behavior of harmonic coordinates 
-      for a 2D query point.
+      for 2D query points.
 
       \param polygon
       An instance of `Polygon` with vertices of a 2D polygon.
@@ -131,7 +132,7 @@ namespace Barycentric_coordinates {
       interior domain.
 
       \param solver
-      An instance of `Solver` that computes the LP factorization 
+      An instance of `Solver` that computes the factorization 
       of a sparse matrix.
 
       \param vertex_map
@@ -169,12 +170,12 @@ namespace Barycentric_coordinates {
       This function fills `coordinates` with harmonic coordinates 
       evaluated at the point `query` with respect to the vertices of the polygon.
       Evaluation is performed by locating a triangle in the `triangulation` and then
-      applying `CGAL::Barycentric_coordinates::triangles_coordinates_2()` to
+      applying `CGAL::Barycentric_coordinates::triangle_coordinates_2()` to
       harmonic coordinates associated with the vertices of this triangle.
 
       This function can be called for any 2D point inside the polygon.
 
-      The number of computed weights is equal to the `polygon.size()`.
+      The number of computed coordinates is equal to the `polygon.size()`.
         
       \tparam OutputIterator
       is an output iterator whose value type is `FT`.
@@ -221,6 +222,49 @@ namespace Barycentric_coordinates {
       return boost::optional<OutputIterator>(coordinates);
     }
 
+    /*!
+      \brief returns harmonic coordinates computed at the given triangulation vertex.
+        
+      This function fills `coordinates` with harmonic coordinates 
+      computed at the vertex `vh` of the input triangulation.
+
+      The number of computed coordinates is equal to the `polygon.size()`.
+        
+      \tparam OutputIterator
+      is an output iterator whose value type is `FT`.
+
+      \param vh
+      A vertex handle.
+
+      \param coordinates
+      An output iterator that stores the computed coordinates.
+    */
+    template<typename OutputIterator>
+    boost::optional<OutputIterator> coordinates(
+      const Vertex_handle vh, 
+      OutputIterator coordinates) const {
+
+
+    }
+
+    /*!
+      \brief returns harmonic coordinates computed at all triangulation vertices.
+        
+      This function fills `coordinates` with harmonic coordinates 
+      computed at all vertices of the input triangulation.
+        
+      \tparam OutputIterator
+      is an output iterator whose value type is `std::vector<FT>`.
+
+      \param coordinates
+      An output iterator that stores the computed coordinates.
+    */
+    template<typename OutputIterator>
+    boost::optional<OutputIterator> coordinates(OutputIterator coordinates) const {
+
+        
+    }
+
     /// @}
 
     /// \name Verifications
@@ -257,7 +301,7 @@ namespace Barycentric_coordinates {
     /// @{
 
     /*!
-      computes harmonic coordinates at all vertices of the triangulation.
+      computes harmonic coordinates at all vertices of the input triangulation.
     */
     void compute() {
 
