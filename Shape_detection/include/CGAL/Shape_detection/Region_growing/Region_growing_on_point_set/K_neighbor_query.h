@@ -56,13 +56,13 @@ namespace Point_set {
     This class returns the K nearest neighbors of a query point in a point set.
 
     \tparam GeomTraits 
-    is a model of `Kernel`.
+    must be a model of `Kernel`.
 
     \tparam InputRange 
-    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+    must be a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
 
     \tparam PointMap 
-    is an `LvaluePropertyMap` whose key type is `InputRange::value_type` and
+    must be an `LvaluePropertyMap` whose key type is `InputRange::value_type` and
     value type is `CGAL::Point_2` or `CGAL::Point_3`.
 
     \cgalModels `NeighborQuery`
@@ -123,14 +123,14 @@ namespace Point_set {
       \brief initializes a Kd-tree with input points.
 
       \param input_range 
-      An instance of `InputRange` with 2D or 3D points.
+      an instance of `InputRange` with 2D or 3D points
 
       \param k 
-      The number of returned neighbors per each query point. %Default is 12.
+      the number of returned neighbors per each query point. %Default is 12.
 
       \param point_map
-      An instance of `PointMap` that maps an item from `input_range` 
-      to `CGAL::Point_2` or to `CGAL::Point_3`.
+      an instance of `PointMap` that maps an item from `input_range` 
+      to `CGAL::Point_2` or to `CGAL::Point_3`
 
       \pre `input_range.size() > 0`
       \pre `k >= 0`
@@ -168,12 +168,12 @@ namespace Point_set {
       the index `query_index` using a Kd-tree. These indices are returned in `neighbors`.
 
       \param query_index
-      %Index of the query point.
+      index of the query point
 
       \param neighbors
-      Indices of points, which are neighbors of the query point.
+      indices of points, which are neighbors of the query point
 
-      \pre `query_index >= 0 && query_index < total_number_of_points`
+      \pre `query_index >= 0 && query_index < input_range.size()`
     */
     void operator()(
       const std::size_t query_index, 

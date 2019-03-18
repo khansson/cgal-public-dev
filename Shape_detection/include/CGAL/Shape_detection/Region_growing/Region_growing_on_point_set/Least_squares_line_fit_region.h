@@ -53,17 +53,17 @@ namespace Point_set {
     is accepted as a valid region, otherwise rejected.
 
     \tparam GeomTraits 
-    is a model of `Kernel`.
+    must be a model of `Kernel`.
 
     \tparam InputRange 
-    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+    must be a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
 
     \tparam PointMap 
-    is an `LvaluePropertyMap` whose key type is `InputRange::value_type` and
+    must be an `LvaluePropertyMap` whose key type is `InputRange::value_type` and
     value type is `CGAL::Point_2`.
 
     \tparam NormalMap 
-    is an `LvaluePropertyMap` whose key type is `InputRange::value_type` and
+    must be an `LvaluePropertyMap` whose key type is `InputRange::value_type` and
     value type is `CGAL::Vector_2`.
     
     \cgalModels `RegionType`
@@ -117,29 +117,29 @@ namespace Point_set {
       \brief initializes all internal data structures.
 
       \param input_range 
-      An instance of `InputRange` with 2D points and 
-      corresponding 2D normal vectors.
+      an instance of `InputRange` with 2D points and 
+      corresponding 2D normal vectors
 
       \param distance_threshold 
-      The maximum distance from a point to a line. %Default is 1.
+      the maximum distance from a point to a line. %Default is 1.
 
       \param angle_threshold 
-      The maximum accepted angle in degrees between the normal of a point and 
+      the maximum accepted angle in degrees between the normal of a point and 
       the normal of a line. %Default is 25 degrees.
 
       \param min_region_size 
-      The minimum number of 2D points a region must have. %Default is 2.
+      the minimum number of 2D points a region must have. %Default is 2.
 
       \param point_map
-      An instance of `PointMap` that maps an item from `input_range` 
-      to `CGAL::Point_2`.
+      an instance of `PointMap` that maps an item from `input_range` 
+      to `CGAL::Point_2`
 
       \param normal_map
-      An instance of `NormalMap` that maps an item from `input_range` 
-      to `CGAL::Vector_2`.
+      an instance of `NormalMap` that maps an item from `input_range` 
+      to `CGAL::Vector_2`
 
       \param traits
-      An instance of `GeomTraits`.
+      an instance of `GeomTraits`
 
       \pre `input_range.size() > 0`
       \pre `distance_threshold >= 0`
@@ -189,13 +189,13 @@ namespace Point_set {
       If both conditions are satisfied, it returns `true`, otherwise `false`.
 
       \param query_index
-      %Index of the query point.
+      index of the query point
 
       The second parameter is not used in this implementation.
 
-      \return boolean `true` or `false`.
+      \return Boolean `true` or `false`
 
-      \pre `query_index >= 0 && query_index < total_number_of_points`
+      \pre `query_index >= 0 && query_index < input_range.size()`
     */
     bool is_part_of_region(
       const std::size_t query_index, 
@@ -228,9 +228,9 @@ namespace Point_set {
       This function controls if the `region` contains at least `min_region_size` points.
 
       \param region
-      Indices of points included in the region.
+      indices of points included in the region
 
-      \return boolean `true` or `false`.
+      \return Boolean `true` or `false`
     */
     inline bool is_valid_region(const std::vector<std::size_t>& region) const {
       return ( region.size() >= m_min_region_size );
@@ -242,7 +242,7 @@ namespace Point_set {
       This function fits the least squares line to all points from the `region`.
 
       \param region
-      Indices of points included in the region.
+      indices of points included in the region
 
       \pre `region.size() > 0`
     */

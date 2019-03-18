@@ -52,16 +52,16 @@ namespace Point_set {
     least squares plane fit applied to the neighboring points of each point.
 
     \tparam GeomTraits 
-    is a model of `Kernel`.
+    must be a model of `Kernel`.
 
     \tparam InputRange 
-    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+    must be a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
 
     \tparam NeighborQuery 
-    is a model of `NeighborQuery`.
+    must be a model of `NeighborQuery`.
 
     \tparam PointMap 
-    is an `LvaluePropertyMap` whose key type is `InputRange::value_type` and
+    must be an `LvaluePropertyMap` whose key type is `InputRange::value_type` and
     value type is `CGAL::Point_3`.
   */
   template<
@@ -98,15 +98,15 @@ namespace Point_set {
       \brief initializes all internal data structures.
 
       \param input_range 
-      An instance of `InputRange` with 3D points.
+      an instance of `InputRange` with 3D points
 
       \param neighbor_query 
-      An instance of `NeighborQuery` that is used internally to 
-      access point's neighbors.
+      an instance of `NeighborQuery` that is used internally to 
+      access point's neighbors
 
       \param point_map
-      An instance of `PointMap` that maps an item from `input_range` 
-      to `CGAL::Point_3`.
+      an instance of `PointMap` that maps an item from `input_range` 
+      to `CGAL::Point_3`
 
       \pre `input_range.size() > 0`
     */

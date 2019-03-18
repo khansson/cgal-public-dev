@@ -37,7 +37,7 @@ namespace CGAL {
     by the axis, that is a point and direction, and the radius. The cylinder is
     unbounded, thus caps are not modeled.
     
-    \tparam Traits is a model of `EfficientRANSACTraits` with the additional 
+    \tparam Traits must be a model of `EfficientRANSACTraits` with the additional 
     requirement for cylinders (see `EfficientRANSACTraits` documentation).
     
     \ingroup PkgShapeDetectionRANSACShapes

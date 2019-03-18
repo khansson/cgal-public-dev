@@ -29,9 +29,6 @@
 #include <queue>
 #include <vector>
 
-// Boost headers.
-#include <boost/optional/optional.hpp>
-
 // CGAL includes.
 #include <CGAL/assertions.h>
 
@@ -46,23 +43,23 @@ namespace Shape_detection {
     
     \brief Main class/entry point for running the region growing algorithm.
 
-    This version of the region growing algorithm allows to detect regions in a set
+    This version of the region growing algorithm enables to detect regions in a set
     of user-defined items 
     - given a way to access neighbors of each item via the `NeighborQuery` parameter class and 
     - control if items form a valid region type via the `RegionType` parameter class,
-    - the `SeedMap` property map allows to define the seeding order of items and skip unnecessary items.
+    - the `SeedMap` property map enables to define the seeding order of items and skip unnecessary items.
     
     \tparam InputRange 
-    is a model of `ConstRange`.
+    must be a model of `ConstRange`.
 
     \tparam NeighborQuery 
-    is a model of `NeighborQuery`.
+    must be a model of `NeighborQuery`.
 
     \tparam RegionType
-    is a model of `RegionType`.
+    must be a model of `RegionType`.
 
     \tparam SeedMap
-    is an `LvaluePropertyMap` whose key and value types are `std::size_t`.
+    must be an `LvaluePropertyMap` whose key and value types are `std::size_t`.
   */
   template<
   typename InputRange, 
@@ -91,18 +88,18 @@ namespace Shape_detection {
       \brief initializes the region growing algorithm.
       
       \param input_range 
-      A range of input items for region growing.
+      a range of input items for region growing
 
       \param neighbor_query 
-      An instance of `NeighborQuery` that is used internally to 
-      access item's neighbors.
+      an instance of `NeighborQuery` that is used internally to 
+      access item's neighbors
 
       \param region_type 
-      An instance of `RegionType` that is used internally to 
-      control if items form a valid region type.
+      an instance of `RegionType` that is used internally to 
+      control if items form a valid region type
 
       \param seed_map 
-      An instance of `SeedMap` property map that is used internally to 
+      an instance of `SeedMap` property map that is used internally to 
       set the order of items in the region growing processing queue. If it maps 
       to `std::size_t(-1)`, the corresponding item is skipped.
 
@@ -119,6 +116,7 @@ namespace Shape_detection {
     m_seed_map(seed_map) { 
 
       CGAL_precondition(input_range.size() > 0);
+      clear();
     }
 
     /// @}
@@ -131,16 +129,16 @@ namespace Shape_detection {
       with the found regions.
 
       \tparam OutputIterator 
-      is an output iterator whose value type is `std::vector<std::size_t>`.
+      must be an output iterator whose value type is `std::vector<std::size_t>`.
 
       \param regions
-      An output iterator that stores regions, where each region is returned
-      as a vector of indices of the items, which belong to this region.
+      an output iterator that stores regions, where each region is returned
+      as a vector of indices of the items, which belong to this region
 
-      \return an optional output iterator.
+      \return past-the-end position in the output sequence
     */
     template<typename OutputIterator>
-    boost::optional<OutputIterator> detect(OutputIterator regions) {
+    OutputIterator detect(OutputIterator regions) {
 
       clear();
       Indices region;
@@ -153,6 +151,9 @@ namespace Shape_detection {
         if (seed_index == std::size_t(-1))
           continue;
 
+        CGAL_precondition(
+          seed_index >= 0 && seed_index < m_input_range.size());
+
         // Try to grow a new region from the index of the seed item.
         if (!m_visited[seed_index]) {
           propagate(seed_index, region);
@@ -164,8 +165,7 @@ namespace Shape_detection {
             *(regions++) = region;
         }
       }
-
-      return boost::optional<OutputIterator>(regions);
+      return regions;
     }
 
     /// @}
@@ -177,16 +177,16 @@ namespace Shape_detection {
       \brief fills an output iterator with indices of all unassigned items.
       
       \tparam OutputIterator 
-      is an output iterator whose value type is `std::size_t`.
+      must be an output iterator whose value type is `std::size_t`.
 
       \param output 
-      An output iterator that stores indices of all items, which are not assigned
-      to any region.
+      an output iterator that stores indices of all items, which are not assigned
+      to any region
 
-      \return an optional output iterator.
+      \return past-the-end position in the output sequence
     */
     template<typename OutputIterator>
-    boost::optional<OutputIterator> unassigned_items(OutputIterator output) const {
+    OutputIterator unassigned_items(OutputIterator output) const {
       
       // Return indices of all unassigned items.
       for (std::size_t i = 0; i < m_input_range.size(); ++i) {
@@ -196,37 +196,30 @@ namespace Shape_detection {
         if (seed_index == std::size_t(-1))
           continue;
 
+        CGAL_precondition(
+          seed_index >= 0 && seed_index < m_input_range.size());
+
         if (!m_visited[seed_index]) 
           *(output++) = seed_index;
       }
-
-      return boost::optional<OutputIterator>(output);
+      return output;
     }
 
     /// @}
 
-    /// \name Memory Management
-    /// @{
-
-    /*!
-      clears all internal data structures.
-    */
+    /// \cond SKIP_IN_MANUAL
     void clear() {
                 
       m_visited.clear();
       m_visited.resize(m_input_range.size(), false);
     }
 
-    /*!
-      releases all memory that is used internally.
-    */
     void release_memory() {
 
       m_visited.clear();
       m_visited.shrink_to_fit();
     }
-
-    /// @}
+    /// \endcond
 
   private:
 
@@ -266,6 +259,9 @@ namespace Shape_detection {
           // Skip items that user does not want to use.
           if (neighbor_index == std::size_t(-1))
             continue;
+
+          CGAL_precondition(
+            neighbor_index >= 0 && neighbor_index < m_input_range.size());
 
           if (!m_visited[neighbor_index] && 
             m_region_type.is_part_of_region(neighbor_index, region)) {

@@ -34,14 +34,14 @@ namespace CGAL {
     
     \cgalModels `EfficientRANSACTraits`
 
-    \tparam Gt is a model of the concept `Kernel` with `Gt::FT` being `float` or `double`.
+    \tparam Gt must be a model of the concept `Kernel` with `Gt::FT` being `float` or `double`.
 
-    \tparam InputRange is a model of `Range` with random access iterators, 
+    \tparam InputRange must be a model of `Range` with random access iterators, 
     providing input points and normals through the following property maps.
 
-    \tparam InputPointMap is a model of `ReadablePropertyMap` with `std::iterator_traits<Input_range::iterator>::%value_type` as key type and `Geom_traits::Point_3` as value type.
+    \tparam InputPointMap must be a model of `ReadablePropertyMap` with `std::iterator_traits<Input_range::iterator>::%value_type` as key type and `Geom_traits::Point_3` as value type.
 
-    \tparam InputNormalMap is a model of `ReadablePropertyMap` with `std::iterator_traits<Input_range::iterator>::%value_type` as key type and `Geom_traits::Vector_3` as value type.
+    \tparam InputNormalMap must be a model of `ReadablePropertyMap` with `std::iterator_traits<Input_range::iterator>::%value_type` as key type and `Geom_traits::Vector_3` as value type.
   */
   template <class Gt,
             class InputRange,

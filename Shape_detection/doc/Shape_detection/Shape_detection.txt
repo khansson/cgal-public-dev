@@ -66,7 +66,7 @@ The parameter `epsilon` defines the absolute maximum tolerance Euclidean distanc
 A high value of `epsilon` leads to the detection of fewer large shapes and hence a less detailed detection. 
 A low value of `epsilon` yields a more detailed detection, but may lead to either lower coverage or over-segmentation. 
 Over-segmentation translates into detection of fragmented shapes when `epsilon` is within or below the noise level. 
-When the input point set is made of free-form parts, a higher tolerance `epsilon` allows for detecting more primitive shapes that approximate some of the free-form surfaces. 
+When the input point set is made of free-form parts, a higher tolerance `epsilon` enables to detect more primitive shapes that approximate some of the free-form surfaces. 
 The impact of this parameter is depicted by Figure \cgalFigureRef{Efficient_RANSAC_parameter_epsilon_variation}. Its impact on performance is evaluated in Section \ref Shape_detection_RANSACPerformance.
 
 \cgalFigureBegin{Efficient_RANSAC_parameter_epsilon_variation, Efficient_RANSAC/epsilon_variation2.png}
@@ -277,13 +277,13 @@ all necessary region requirements and can be added to a region. It is called per
 - `RegionType::is_valid_region()` This function checks if a region satisfies 
 all necessary region requirements. It is called per region.
 
-- `RegionType::update()` This utility function  allows to update any information, 
+- `RegionType::update()` This utility function  enables to update any information, 
 which is maintained with the region.
 
 
 \subsubsection Shape_detection_RegionGrowingFramework_seeding Seeding
 
-The `SeedMap` property map, provided as an optional parameter to the main class, allows
+The `SeedMap` property map, provided as an optional parameter to the main class, enables
 to define the seeding order of items that is which items are used first to grow regions from.
 Such items are referred to as *seed* items. The `SeedMap` maps the index of an item to its order 
 number in the overall region growing processing queue. The default map is the identity one 

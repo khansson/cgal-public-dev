@@ -1,6 +1,5 @@
 // STL includes.
 #include <map>
-#include <list>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -18,15 +17,15 @@ namespace Custom {
   };
 
   // A range of objects.
-  using Objects = std::list<Object>;
+  using Objects = std::vector<Object>;
 
-  // The Neighbor_query functor that accesses indices of all neighbors 
-  // stored in the object struct above.
+  // The Neighbor_query functor that accesses neighbors stored in 
+  // the object struct above.
   class Neighbor_query {
     const Objects& m_objects;
 
   public:
-    Neighbor_query(Objects& objects) : 
+    Neighbor_query(const Objects& objects) : 
     m_objects(objects) 
     { }
 
@@ -118,7 +117,7 @@ using Region_type    = Custom::Region_type;
 using Seed_map       = Custom::Seed_map;
 
 using Region  = std::vector<std::size_t>;
-using Regions = std::list<Region>;
+using Regions = std::vector<Region>;
 
 using Region_growing = 
 CGAL::Shape_detection::Region_growing<Objects, Neighbor_query, Region_type, Seed_map>;
@@ -131,7 +130,8 @@ int main(int argc, char *argv[]) {
 
   // Define a range of objects, where the first two objects form
   // the first region, while the third object forms the second region.
-  // Note that Objects is not a random access here and may be slow.
+  // Note that Objects is a random access container here, however the
+  // same algorithm/example can work with other containers, e.g. std::list.
   Objects objects;
 
   // Region 1.
@@ -175,9 +175,6 @@ int main(int argc, char *argv[]) {
   std::cout << "* " << regions.size() << 
     " regions have been found among " << objects.size() <<  " objects" 
   << std::endl;
-  
-  // Release all internal memory.
-  region_growing.release_memory();
 
   std::cout << std::endl << 
     "region_growing_with_custom_classes example finished" 

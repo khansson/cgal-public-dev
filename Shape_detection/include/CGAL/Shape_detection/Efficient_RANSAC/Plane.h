@@ -35,7 +35,7 @@ namespace CGAL {
     
     \brief Plane implements Shape_base. The plane is represented by the normal vector and the distance to the origin.
     
-    \tparam Traits is a model of `EfficientRANSACTraits` with the additional 
+    \tparam Traits must be a model of `EfficientRANSACTraits` with the additional 
     requirement for planes (see `EfficientRANSACTraits` documentation).
   */
   template <class Traits>

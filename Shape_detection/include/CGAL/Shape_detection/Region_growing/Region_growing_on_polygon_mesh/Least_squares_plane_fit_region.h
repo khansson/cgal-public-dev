@@ -62,17 +62,17 @@ namespace Polygon_mesh {
     is accepted as a valid region, otherwise rejected.
 
     \tparam GeomTraits 
-    is a model of `Kernel`.
+    must be a model of `Kernel`.
 
     \tparam FaceListGraph 
-    is a model of `FaceListGraph`.
+    must be a model of `FaceListGraph`.
 
     \tparam FaceRange 
-    is a model of `ConstRange` whose iterator type is `RandomAccessIterator` and 
+    must be a model of `ConstRange` whose iterator type is `RandomAccessIterator` and 
     value type is the face type of a polygon mesh.
 
     \tparam VertexToPointMap 
-    is an `LvaluePropertyMap` whose key type is the vertex type of a polygon mesh and
+    must be an `LvaluePropertyMap` whose key type is the vertex type of a polygon mesh and
     value type is `CGAL::Point_3`.
     
     \cgalModels `RegionType`
@@ -123,39 +123,39 @@ namespace Polygon_mesh {
     /*!
       \brief initializes all internal data structures.
 
-      \param polygon_mesh 
-      An instance of `FaceListGraph` that represents a polygon mesh.
+      \param pmesh 
+      an instance of `FaceListGraph` that represents a polygon mesh
 
       \param distance_threshold 
-      The maximum distance from the furthest vertex of a face to a plane. %Default is 1.
+      the maximum distance from the furthest vertex of a face to a plane. %Default is 1.
 
       \param angle_threshold 
-      The maximum accepted angle in degrees between the normal of a face and 
+      the maximum accepted angle in degrees between the normal of a face and 
       the normal of a plane. %Default is 25 degrees.
 
       \param min_region_size 
-      The minimum number of faces a region must have. %Default is 1.
+      the minimum number of faces a region must have. %Default is 1.
       
       \param vertex_to_point_map 
-      An instance of `VertexToPointMap` that maps a polygon mesh 
-      vertex to `CGAL::Point_3`.
+      an instance of `VertexToPointMap` that maps a polygon mesh 
+      vertex to `CGAL::Point_3`
 
       \param traits
-      An instance of `GeomTraits`.
+      an instance of `GeomTraits`
 
-      \pre `total_number_of_faces > 0`
+      \pre `CGAL::faces(pmesh).size() > 0`
       \pre `distance_threshold >= 0`
       \pre `angle_threshold >= 0 && angle_threshold <= 90`
       \pre `min_region_size > 0`
     */
     Least_squares_plane_fit_region(
-      const FaceListGraph& polygon_mesh,
+      const FaceListGraph& pmesh,
       const FT distance_threshold = FT(1), 
       const FT angle_threshold = FT(25), 
       const std::size_t min_region_size = 1, 
       const VertexToPointMap vertex_to_point_map = VertexToPointMap(), 
       const GeomTraits traits = GeomTraits()) :
-    m_face_graph(polygon_mesh),
+    m_face_graph(pmesh),
     m_face_range(CGAL::faces(m_face_graph)),
     m_distance_threshold(distance_threshold),
     m_normal_threshold(static_cast<FT>(
@@ -190,13 +190,13 @@ namespace Polygon_mesh {
       If both conditions are satisfied, it returns `true`, otherwise `false`.
 
       \param query_index
-      %Index of the query face.
+      index of the query face
 
       The second parameter is not used in this implementation.
 
-      \return boolean `true` or `false`.
+      \return Boolean `true` or `false`
 
-      \pre `query_index >= 0 && query_index < total_number_of_faces`
+      \pre `query_index >= 0 && query_index < CGAL::faces(pmesh).size()`
     */
     bool is_part_of_region(
       const std::size_t query_index, 
@@ -226,9 +226,9 @@ namespace Polygon_mesh {
       This function controls if the `region` contains at least `min_region_size` faces.
 
       \param region
-      Indices of faces included in the region.
+      indices of faces included in the region
 
-      \return boolean `true` or `false`.
+      \return Boolean `true` or `false`
     */
     inline bool is_valid_region(const std::vector<std::size_t>& region) const {
       return ( region.size() >= m_min_region_size );
@@ -241,7 +241,7 @@ namespace Polygon_mesh {
       from the `region`.
 
       \param region
-      Indices of faces included in the region.
+      indices of faces included in the region
 
       \pre `region.size() > 0`
     */

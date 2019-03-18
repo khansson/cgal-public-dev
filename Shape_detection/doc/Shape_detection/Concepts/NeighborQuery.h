@@ -10,7 +10,6 @@ to access neighbors of an item.
 - `CGAL::Shape_detection::Point_set::Sphere_neighbor_query`, 
 - `CGAL::Shape_detection::Polygon_mesh::One_ring_neighbor_query`
 */
-
 class NeighborQuery {
 
 public:
@@ -19,7 +18,8 @@ public:
     fills `neighbors` with the indices of all items, which are connected to the 
     item with the index `query_index`.
 
-    This function is called each time when a new query item is selected.
+    `CGAL::Shape_detection::Region_growing` calls this function each time when 
+    a new query item is selected.
   */
   void operator()(
     const std::size_t query_index, 

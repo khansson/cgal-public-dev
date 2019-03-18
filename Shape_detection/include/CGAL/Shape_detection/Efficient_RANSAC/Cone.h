@@ -37,7 +37,7 @@ namespace CGAL {
     The cone is represented by its apex, the axis, and the opening angle.
     This representation models an open infinite single-cone.
     
-    \tparam Traits is a model of `EfficientRANSACTraits`.
+    \tparam Traits must be a model of `EfficientRANSACTraits`.
     
     \ingroup PkgShapeDetectionRANSACShapes
   */

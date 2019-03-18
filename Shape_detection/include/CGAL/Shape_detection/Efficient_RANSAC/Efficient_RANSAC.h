@@ -63,7 +63,7 @@ namespace CGAL {
   Each input point is assigned to either none or at most one detected primitive
   shape. The implementation follows \cgalCite{schnabel2007efficient}.
 
-  \tparam Traits is a model of `EfficientRANSACTraits`.
+  \tparam Traits must be a model of `EfficientRANSACTraits`.
 */
   template <class Traits>
   class Efficient_RANSAC {
@@ -424,9 +424,9 @@ namespace CGAL {
       Performs the shape detection. Shape types considered during the detection
       are those registered using `add_shape_factory()`.
 
-      \param options Parameters for shape detection.
+      \param options parameters for shape detection
 
-      \param callback Can be omitted if the algorithm should be run
+      \param callback can be omitted if the algorithm should be run
       without any callback. It is called regularly when the algorithm
       is running: the current advancement (between 0.0 and 1.0) is
       passed as parameter. If it returns `true`, then the algorithm

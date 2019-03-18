@@ -27,7 +27,6 @@
 
 // Boost headers.
 #include <boost/mpl/has_xxx.hpp>
-#include <boost/optional/optional.hpp>
 
 // CGAL includes.
 #include <CGAL/assertions.h>

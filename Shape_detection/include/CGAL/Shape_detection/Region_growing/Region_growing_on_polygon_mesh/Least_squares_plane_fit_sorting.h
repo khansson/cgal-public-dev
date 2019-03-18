@@ -60,20 +60,20 @@ namespace Polygon_mesh {
     least squares plane fit applied to the vertices of neighboring faces of each face.
 
     \tparam GeomTraits 
-    is a model of `Kernel`.
+    must be a model of `Kernel`.
 
     \tparam FaceListGraph 
-    is a model of `FaceListGraph`.
+    must be a model of `FaceListGraph`.
 
     \tparam NeighborQuery 
-    is a model of `NeighborQuery`.
+    must be a model of `NeighborQuery`.
 
     \tparam FaceRange 
-    is a model of `ConstRange` whose iterator type is `RandomAccessIterator` and 
+    must be a model of `ConstRange` whose iterator type is `RandomAccessIterator` and 
     value type is the face type of a polygon mesh.
 
     \tparam VertexToPointMap 
-    is an `LvaluePropertyMap` whose key type is the vertex type of a polygon mesh and
+    must be an `LvaluePropertyMap` whose key type is the vertex type of a polygon mesh and
     value type is `CGAL::Point_3`.
   */
   template<
@@ -111,24 +111,24 @@ namespace Polygon_mesh {
     /*!
       \brief initializes all internal data structures.
 
-      \param polygon_mesh 
-      An instance of `FaceListGraph` that represents a polygon mesh.
+      \param pmesh 
+      an instance of `FaceListGraph` that represents a polygon mesh
 
       \param neighbor_query 
-      An instance of `NeighborQuery` that is used internally to 
-      access face's neighbors.
+      an instance of `NeighborQuery` that is used internally to 
+      access face's neighbors
 
       \param vertex_to_point_map 
-      An instance of `VertexToPointMap` that maps a polygon mesh 
-      vertex to `CGAL::Point_3`.
+      an instance of `VertexToPointMap` that maps a polygon mesh 
+      vertex to `CGAL::Point_3`
 
-      \pre `total_number_of_faces > 0`
+      \pre `CGAL::faces(pmesh).size() > 0`
     */
     Least_squares_plane_fit_sorting(
-      const FaceListGraph& polygon_mesh,
+      const FaceListGraph& pmesh,
       NeighborQuery& neighbor_query,
       const VertexToPointMap vertex_to_point_map = VertexToPointMap()) :
-    m_face_graph(polygon_mesh),
+    m_face_graph(pmesh),
     m_neighbor_query(neighbor_query),
     m_face_range(CGAL::faces(m_face_graph)),
     m_vertex_to_point_map(vertex_to_point_map) {

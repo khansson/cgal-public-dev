@@ -57,7 +57,7 @@ namespace Shape_detection {
 
       \note `shapes` must be a range of shapes detected using `points`.
 
-      \tparam ShapeRange is an `Iterator_range` with a bidirectional
+      \tparam ShapeRange must be an `Iterator_range` with a bidirectional
       constant iterator type with value type
       `boost::shared_ptr<CGAL::Shape_detection::Shape_base<Traits> >`.
      */

@@ -53,10 +53,10 @@ namespace Polygon_mesh {
     polygon mesh being a `FaceListGraph`.
 
     \tparam FaceListGraph 
-    is a model of `FaceListGraph`.
+    must be a model of `FaceListGraph`.
 
     \tparam FaceRange 
-    is a model of `ConstRange` whose iterator type is `RandomAccessIterator` and 
+    must be a model of `ConstRange` whose iterator type is `RandomAccessIterator` and 
     value type is the face type of a polygon mesh.
 
     \cgalModels `NeighborQuery`
@@ -82,14 +82,14 @@ namespace Polygon_mesh {
     /*!
       \brief initializes all internal data structures.
 
-      \param polygon_mesh 
-      An instance of a `FaceListGraph` that represents a polygon mesh.
+      \param pmesh 
+      an instance of a `FaceListGraph` that represents a polygon mesh
 
-      \pre `total_number_of_faces > 0`
+      \pre `CGAL::faces(pmesh).size() > 0`
     */
     One_ring_neighbor_query(
-      const FaceListGraph& polygon_mesh) :
-    m_face_graph(polygon_mesh),
+      const FaceListGraph& pmesh) :
+    m_face_graph(pmesh),
     m_face_range(CGAL::faces(m_face_graph)),
     m_face_to_index_map(m_face_range) { 
 
@@ -109,12 +109,12 @@ namespace Polygon_mesh {
       These indices are returned in `neighbors`.
 
       \param query_index
-      %Index of the query face.
+      index of the query face
 
       \param neighbors
-      Indices of faces, which are neighbors of the query face.
+      indices of faces, which are neighbors of the query face
 
-      \pre `query_index >= 0 && query_index < total_number_of_faces`
+      \pre `query_index >= 0 && query_index < CGAL::faces(pmesh).size()`
     */
     void operator()(
       const std::size_t query_index, 

@@ -168,9 +168,6 @@ int main(int argc, char *argv[]) {
     out.close();
   }
 
-  // Release all internal memory.
-  region_growing.release_memory();
-
   std::cout << std::endl << 
     "region_growing_on_point_set_2 example finished" 
   << std::endl << std::endl;

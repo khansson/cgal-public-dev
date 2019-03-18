@@ -34,7 +34,7 @@ namespace CGAL {
     /*!
      \ingroup PkgShapeDetectionRANSACShapes
      \brief Sphere implements Shape_base. The sphere is represented by its center and the radius.
-     \tparam Traits is a model of `EfficientRANSACTraits` with the additional 
+     \tparam Traits must be a model of `EfficientRANSACTraits` with the additional 
              requirement for spheres (see `EfficientRANSACTraits` documentation).
      */
   template <class Traits>

@@ -168,9 +168,6 @@ int main(int argc, char *argv[]) {
 
   #endif
 
-  // Release all internal memory.
-  region_growing.release_memory();
-
   std::cout << std::endl << 
     "region_growing_on_polygon_mesh example finished" 
   << std::endl << std::endl;

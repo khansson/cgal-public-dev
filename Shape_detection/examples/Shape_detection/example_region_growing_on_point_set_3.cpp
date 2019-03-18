@@ -202,9 +202,6 @@ int main(int argc, char *argv[]) {
     " unassigned points are stored" 
   << std::endl;
 
-  // Release all internal memory.
-  region_growing.release_memory();
-
   std::cout << std::endl << 
     "region_growing_on_point_set_3 example finished" 
   << std::endl << std::endl;

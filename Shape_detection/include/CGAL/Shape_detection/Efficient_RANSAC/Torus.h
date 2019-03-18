@@ -37,7 +37,7 @@ namespace CGAL {
       \ingroup PkgShapeDetectionRANSACShapes
       \brief Torus implements Shape_base. The torus is represented by the
       symmetry axis, its center on the axis, and the major and minor radii.
-     \tparam Traits is a model of `EfficientRANSACTraits` with the additional 
+     \tparam Traits must be a model of `EfficientRANSACTraits` with the additional 
              requirement for tori (see `EfficientRANSACTraits` documentation).
      */
   template <class Traits>
