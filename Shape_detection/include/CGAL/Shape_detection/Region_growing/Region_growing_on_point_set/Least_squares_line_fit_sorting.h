@@ -61,8 +61,8 @@ namespace Point_set {
     must be a model of `NeighborQuery`.
 
     \tparam PointMap 
-    must be an `LvaluePropertyMap` whose key type is `InputRange::value_type` and
-    value type is `CGAL::Point_2`.
+    must be an `LvaluePropertyMap` whose key type is the value type of the input 
+    range and value type is `CGAL::Point_2`.
   */
   template<
   typename GeomTraits,
@@ -194,17 +194,10 @@ namespace Point_set {
         Local_line_2  fitted_line;
         Local_point_2 fitted_centroid;
 
-        #ifndef CGAL_EIGEN2_ENABLED
-          m_scores[i] = linear_least_squares_fitting_2(
-            points.begin(), points.end(), 
-            fitted_line, fitted_centroid, CGAL::Dimension_tag<0>(), 
-            Local_traits(), CGAL::Default_diagonalize_traits<Local_FT, 2>());
-        #else 
-          m_scores[i] = linear_least_squares_fitting_2(
-            points.begin(), points.end(), 
-            fitted_line, fitted_centroid, CGAL::Dimension_tag<0>(), 
-            Local_traits(), CGAL::Eigen_diagonalize_traits<Local_FT, 2>());
-        #endif
+        m_scores[i] = linear_least_squares_fitting_2(
+          points.begin(), points.end(), 
+          fitted_line, fitted_centroid, 
+          CGAL::Dimension_tag<0>());
       }
     }
 

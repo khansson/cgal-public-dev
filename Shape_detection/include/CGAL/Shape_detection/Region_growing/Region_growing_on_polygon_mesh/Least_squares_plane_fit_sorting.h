@@ -122,7 +122,7 @@ namespace Polygon_mesh {
       an instance of `VertexToPointMap` that maps a polygon mesh 
       vertex to `CGAL::Point_3`
 
-      \pre `CGAL::faces(pmesh).size() > 0`
+      \pre `faces(pmesh).size() > 0`
     */
     Least_squares_plane_fit_sorting(
       const PolygonMesh& pmesh,
@@ -130,7 +130,7 @@ namespace Polygon_mesh {
       const VertexToPointMap vertex_to_point_map = VertexToPointMap()) :
     m_face_graph(pmesh),
     m_neighbor_query(neighbor_query),
-    m_face_range(CGAL::faces(m_face_graph)),
+    m_face_range(faces(m_face_graph)),
     m_vertex_to_point_map(vertex_to_point_map) {
 
       CGAL_precondition(m_face_range.size() > 0);
@@ -202,9 +202,9 @@ namespace Polygon_mesh {
           CGAL_precondition(neighbors[j] < m_face_range.size());
 
           const auto& face = *(m_face_range.begin() + neighbors[j]);
-          const auto& halfedge = CGAL::halfedge(face, m_face_graph);
+          const auto& hedge = halfedge(face, m_face_graph);
 
-          const auto& vertices = CGAL::vertices_around_face(halfedge, m_face_graph);
+          const auto& vertices = vertices_around_face(hedge, m_face_graph);
           for (const auto& vertex : vertices) {
                             
             const auto& tmp_point = get(m_vertex_to_point_map, vertex);
@@ -216,17 +216,10 @@ namespace Polygon_mesh {
         Local_plane_3 fitted_plane;
         Local_point_3 fitted_centroid;
 
-        #ifndef CGAL_EIGEN3_ENABLED
-          m_scores[i] = linear_least_squares_fitting_3(
-            points.begin(), points.end(), 
-            fitted_plane, fitted_centroid, CGAL::Dimension_tag<0>(), 
-            Local_traits(), CGAL::Default_diagonalize_traits<Local_FT, 3>());
-        #else 
-          m_scores[i] = linear_least_squares_fitting_3(
-            points.begin(), points.end(), 
-            fitted_plane, fitted_centroid, CGAL::Dimension_tag<0>(), 
-            Local_traits(), CGAL::Eigen_diagonalize_traits<Local_FT, 3>());
-        #endif
+        m_scores[i] = CGAL::linear_least_squares_fitting_3(
+          points.begin(), points.end(), 
+          fitted_plane, fitted_centroid, 
+          CGAL::Dimension_tag<0>());
       }
     }
 

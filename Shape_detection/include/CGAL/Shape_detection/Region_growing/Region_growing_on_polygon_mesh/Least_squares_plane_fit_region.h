@@ -143,7 +143,7 @@ namespace Polygon_mesh {
       \param traits
       an instance of `GeomTraits`
 
-      \pre `CGAL::faces(pmesh).size() > 0`
+      \pre `faces(pmesh).size() > 0`
       \pre `distance_threshold >= 0`
       \pre `angle_threshold >= 0 && angle_threshold <= 90`
       \pre `min_region_size > 0`
@@ -156,7 +156,7 @@ namespace Polygon_mesh {
       const VertexToPointMap vertex_to_point_map = VertexToPointMap(), 
       const GeomTraits traits = GeomTraits()) :
     m_face_graph(pmesh),
-    m_face_range(CGAL::faces(m_face_graph)),
+    m_face_range(faces(m_face_graph)),
     m_distance_threshold(distance_threshold),
     m_normal_threshold(static_cast<FT>(
       std::cos(
@@ -196,7 +196,7 @@ namespace Polygon_mesh {
 
       \return Boolean `true` or `false`
 
-      \pre `query_index >= 0 && query_index < CGAL::faces(pmesh).size()`
+      \pre `query_index >= 0 && query_index < faces(pmesh).size()`
     */
     bool is_part_of_region(
       const std::size_t query_index, 
@@ -273,9 +273,9 @@ namespace Polygon_mesh {
           CGAL_precondition(region[i] < m_face_range.size());
 
           const auto& face = *(m_face_range.begin() + region[i]);
-          const auto& halfedge = CGAL::halfedge(face, m_face_graph);
+          const auto& hedge = halfedge(face, m_face_graph);
 
-          const auto& vertices = CGAL::vertices_around_face(halfedge, m_face_graph);
+          const auto& vertices = vertices_around_face(hedge, m_face_graph);
           for (const auto& vertex : vertices) {
                             
             const Point_3& tmp_point = get(m_vertex_to_point_map, vertex);
@@ -318,8 +318,8 @@ namespace Polygon_mesh {
       const Face& face, 
       Point_3& face_centroid) const {
 
-      const auto& halfedge = CGAL::halfedge(face, m_face_graph);
-      const auto& vertices = CGAL::vertices_around_face(halfedge, m_face_graph);
+      const auto& hedge = halfedge(face, m_face_graph);
+      const auto& vertices = vertices_around_face(hedge, m_face_graph);
 
       // Compute centroid.
       FT sum = FT(0);
@@ -352,8 +352,8 @@ namespace Polygon_mesh {
       Vector_3& face_normal) const {
 
       // Compute normal of the face.
-      const auto& halfedge = CGAL::halfedge(face, m_face_graph);
-      const auto& vertices = CGAL::vertices_around_face(halfedge, m_face_graph);
+      const auto& hedge = halfedge(face, m_face_graph);
+      const auto& vertices = vertices_around_face(hedge, m_face_graph);
 
       CGAL_precondition(vertices.size() >= 3);
 
@@ -373,8 +373,8 @@ namespace Polygon_mesh {
     template<typename Face>
     FT get_max_face_distance(const Face& face) const {
 
-      const auto& halfedge = CGAL::halfedge(face, m_face_graph);
-      const auto& vertices = CGAL::vertices_around_face(halfedge, m_face_graph);
+      const auto& hedge = halfedge(face, m_face_graph);
+      const auto& vertices = vertices_around_face(hedge, m_face_graph);
 
       FT max_face_distance = -FT(1);
       for (const auto& vertex : vertices) {

@@ -59,12 +59,12 @@ namespace Point_set {
     must be a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
 
     \tparam PointMap 
-    must be an `LvaluePropertyMap` whose key type is `InputRange::value_type` and
-    value type is `CGAL::Point_3`.
+    must be an `LvaluePropertyMap` whose key type is the value type of the input 
+    range and value type is `CGAL::Point_3`.
 
     \tparam NormalMap 
-    must be an `LvaluePropertyMap` whose key type is `InputRange::value_type` and
-    value type is `CGAL::Vector_3`.
+    must be an `LvaluePropertyMap` whose key type is the value type of the input 
+    range and value type is `CGAL::Vector_3`.
     
     \cgalModels `RegionType`
   */

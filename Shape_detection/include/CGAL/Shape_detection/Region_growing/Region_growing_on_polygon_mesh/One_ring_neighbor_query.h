@@ -85,12 +85,12 @@ namespace Polygon_mesh {
       \param pmesh 
       an instance of a `PolygonMesh` that represents a polygon mesh
 
-      \pre `CGAL::faces(pmesh).size() > 0`
+      \pre `faces(pmesh).size() > 0`
     */
     One_ring_neighbor_query(
       const PolygonMesh& pmesh) :
     m_face_graph(pmesh),
-    m_face_range(CGAL::faces(m_face_graph)),
+    m_face_range(faces(m_face_graph)),
     m_face_to_index_map(m_face_range) { 
 
       CGAL_precondition(m_face_range.size() > 0);
@@ -114,7 +114,7 @@ namespace Polygon_mesh {
       \param neighbors
       indices of faces, which are neighbors of the query face
 
-      \pre `query_index >= 0 && query_index < CGAL::faces(pmesh).size()`
+      \pre `query_index >= 0 && query_index < faces(pmesh).size()`
     */
     void operator()(
       const std::size_t query_index, 
@@ -124,9 +124,9 @@ namespace Polygon_mesh {
       CGAL_precondition(query_index < m_face_range.size());
 
       const auto& query_face = *(m_face_range.begin() + query_index);
-      const auto& query_halfedge = CGAL::halfedge(query_face, m_face_graph);
+      const auto& query_hedge = halfedge(query_face, m_face_graph);
 
-      const auto& faces = CGAL::faces_around_face(query_halfedge, m_face_graph);
+      const auto& faces = faces_around_face(query_hedge, m_face_graph);
       for (const auto& face : faces) {
         const std::size_t face_index = get(m_face_to_index_map, face);
         
