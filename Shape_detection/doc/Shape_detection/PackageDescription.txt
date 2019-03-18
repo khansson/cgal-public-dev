@@ -117,9 +117,9 @@ on a polygon mesh.}
 - `CGAL::Shape_detection::Point_set::Least_squares_plane_fit_sorting<GeomTraits, InputRange, NeighborQuery, PointMap>`
 
 ### Polygon Mesh ###
-- `CGAL::Shape_detection::Polygon_mesh::One_ring_neighbor_query<FaceListGraph, FaceRange>`
-- `CGAL::Shape_detection::Polygon_mesh::Least_squares_plane_fit_region<GeomTraits, FaceListGraph, FaceRange, VertexToPointMap>`
-- `CGAL::Shape_detection::Polygon_mesh::Least_squares_plane_fit_sorting<GeomTraits, FaceListGraph, NeighborQuery, FaceRange, VertexToPointMap>`
+- `CGAL::Shape_detection::Polygon_mesh::One_ring_neighbor_query<PolygonMesh, FaceRange>`
+- `CGAL::Shape_detection::Polygon_mesh::Least_squares_plane_fit_region<GeomTraits, PolygonMesh, FaceRange, VertexToPointMap>`
+- `CGAL::Shape_detection::Polygon_mesh::Least_squares_plane_fit_sorting<GeomTraits, PolygonMesh, NeighborQuery, FaceRange, VertexToPointMap>`
 
 ## Functions ##
 - `CGAL::regularize_planes()`

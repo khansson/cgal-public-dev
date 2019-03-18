@@ -64,7 +64,7 @@ namespace Polygon_mesh {
     \tparam GeomTraits 
     must be a model of `Kernel`.
 
-    \tparam FaceListGraph 
+    \tparam PolygonMesh 
     must be a model of `FaceListGraph`.
 
     \tparam FaceRange 
@@ -79,16 +79,16 @@ namespace Polygon_mesh {
   */
   template<
   typename GeomTraits, 
-  typename FaceListGraph,
-  typename FaceRange = typename FaceListGraph::Face_range,
-  typename VertexToPointMap = typename boost::property_map<FaceListGraph, CGAL::vertex_point_t>::type>
+  typename PolygonMesh,
+  typename FaceRange = typename PolygonMesh::Face_range,
+  typename VertexToPointMap = typename boost::property_map<PolygonMesh, CGAL::vertex_point_t>::type>
   class Least_squares_plane_fit_region {
 
   public:
 
     /// \cond SKIP_IN_MANUAL
     using Traits = GeomTraits;
-    using Face_graph = FaceListGraph;
+    using Face_graph = PolygonMesh;
     using Face_range = FaceRange;
     using Vertex_to_point_map = VertexToPointMap;
 
@@ -124,7 +124,7 @@ namespace Polygon_mesh {
       \brief initializes all internal data structures.
 
       \param pmesh 
-      an instance of `FaceListGraph` that represents a polygon mesh
+      an instance of `PolygonMesh` that represents a polygon mesh
 
       \param distance_threshold 
       the maximum distance from the furthest vertex of a face to a plane. %Default is 1.
@@ -149,7 +149,7 @@ namespace Polygon_mesh {
       \pre `min_region_size > 0`
     */
     Least_squares_plane_fit_region(
-      const FaceListGraph& pmesh,
+      const PolygonMesh& pmesh,
       const FT distance_threshold = FT(1), 
       const FT angle_threshold = FT(25), 
       const std::size_t min_region_size = 1, 

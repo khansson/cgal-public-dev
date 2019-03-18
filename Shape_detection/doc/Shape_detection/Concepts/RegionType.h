@@ -22,8 +22,8 @@ public:
     represented by `indices`.
 
     `CGAL::Shape_detection::Region_growing` calls this function each time when 
-    trying to add a new item to a region. If this function returns `true`, 
-    `query_index` is added to `indices`, otherwise it is ignored.
+    trying to add a new item to a region. If this function returns `true`, the 
+    query item is added to the region, otherwise ignored.
   */
   bool is_part_of_region(
     const std::size_t query_index, 

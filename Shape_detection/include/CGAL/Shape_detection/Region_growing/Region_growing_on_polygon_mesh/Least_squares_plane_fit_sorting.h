@@ -62,7 +62,7 @@ namespace Polygon_mesh {
     \tparam GeomTraits 
     must be a model of `Kernel`.
 
-    \tparam FaceListGraph 
+    \tparam PolygonMesh 
     must be a model of `FaceListGraph`.
 
     \tparam NeighborQuery 
@@ -78,10 +78,10 @@ namespace Polygon_mesh {
   */
   template<
   typename GeomTraits, 
-  typename FaceListGraph,
+  typename PolygonMesh,
   typename NeighborQuery,
-  typename FaceRange = typename FaceListGraph::Face_range,
-  typename VertexToPointMap = typename boost::property_map<FaceListGraph, CGAL::vertex_point_t>::type>
+  typename FaceRange = typename PolygonMesh::Face_range,
+  typename VertexToPointMap = typename boost::property_map<PolygonMesh, CGAL::vertex_point_t>::type>
   class Least_squares_plane_fit_sorting {
 
   public:
@@ -91,7 +91,7 @@ namespace Polygon_mesh {
 
     /// \cond SKIP_IN_MANUAL
     using Traits = GeomTraits;
-    using Face_graph = FaceListGraph;
+    using Face_graph = PolygonMesh;
     using Neighbor_query = NeighborQuery;
     using Face_range = FaceRange;
     using Vertex_to_point_map = VertexToPointMap;
@@ -112,7 +112,7 @@ namespace Polygon_mesh {
       \brief initializes all internal data structures.
 
       \param pmesh 
-      an instance of `FaceListGraph` that represents a polygon mesh
+      an instance of `PolygonMesh` that represents a polygon mesh
 
       \param neighbor_query 
       an instance of `NeighborQuery` that is used internally to 
@@ -125,7 +125,7 @@ namespace Polygon_mesh {
       \pre `CGAL::faces(pmesh).size() > 0`
     */
     Least_squares_plane_fit_sorting(
-      const FaceListGraph& pmesh,
+      const PolygonMesh& pmesh,
       NeighborQuery& neighbor_query,
       const VertexToPointMap vertex_to_point_map = VertexToPointMap()) :
     m_face_graph(pmesh),

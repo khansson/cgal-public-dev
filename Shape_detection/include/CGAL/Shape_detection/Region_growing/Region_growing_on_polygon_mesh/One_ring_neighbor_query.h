@@ -50,9 +50,9 @@ namespace Polygon_mesh {
     \brief Edge-adjacent faces connectivity in a polygon mesh.
 
     This class returns all faces, which are edge-adjacent to a query face in a 
-    polygon mesh being a `FaceListGraph`.
+    polygon mesh being a `PolygonMesh`.
 
-    \tparam FaceListGraph 
+    \tparam PolygonMesh 
     must be a model of `FaceListGraph`.
 
     \tparam FaceRange 
@@ -62,14 +62,14 @@ namespace Polygon_mesh {
     \cgalModels `NeighborQuery`
   */
   template<
-  typename FaceListGraph, 
-  typename FaceRange = typename FaceListGraph::Face_range>
+  typename PolygonMesh, 
+  typename FaceRange = typename PolygonMesh::Face_range>
   class One_ring_neighbor_query {
 
   public:
 
     /// \cond SKIP_IN_MANUAL
-    using Face_graph = FaceListGraph;
+    using Face_graph = PolygonMesh;
     using Face_range = FaceRange;
 
     using Face_to_index_map 
@@ -83,12 +83,12 @@ namespace Polygon_mesh {
       \brief initializes all internal data structures.
 
       \param pmesh 
-      an instance of a `FaceListGraph` that represents a polygon mesh
+      an instance of a `PolygonMesh` that represents a polygon mesh
 
       \pre `CGAL::faces(pmesh).size() > 0`
     */
     One_ring_neighbor_query(
-      const FaceListGraph& pmesh) :
+      const PolygonMesh& pmesh) :
     m_face_graph(pmesh),
     m_face_range(CGAL::faces(m_face_graph)),
     m_face_to_index_map(m_face_range) { 
