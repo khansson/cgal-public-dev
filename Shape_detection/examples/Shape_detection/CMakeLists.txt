@@ -17,28 +17,28 @@ if(CGAL_FOUND)
   if(EIGEN3_FOUND)
     include(${EIGEN3_USE_FILE})
     create_single_source_cgal_program(
-      "example_efficient_RANSAC_basic.cpp")
+      "efficient_RANSAC_basic.cpp")
     create_single_source_cgal_program(
-      "example_efficient_RANSAC_with_callback.cpp")
+      "efficient_RANSAC_with_callback.cpp")
     create_single_source_cgal_program(
-      "example_efficient_RANSAC_and_plane_regularization.cpp")
+      "efficient_RANSAC_and_plane_regularization.cpp")
   endif()
 
   create_single_source_cgal_program(
-    "example_efficient_RANSAC_with_custom_shape.cpp")
+    "efficient_RANSAC_with_custom_shape.cpp")
   create_single_source_cgal_program(
-    "example_efficient_RANSAC_with_parameters.cpp")
+    "efficient_RANSAC_with_parameters.cpp")
   create_single_source_cgal_program(
-    "example_efficient_RANSAC_with_point_access.cpp")
+    "efficient_RANSAC_with_point_access.cpp")
 
   create_single_source_cgal_program(
-    "example_region_growing_on_point_set_2.cpp")
+    "region_growing_on_point_set_2.cpp")
   create_single_source_cgal_program(
-    "example_region_growing_on_point_set_3.cpp")
+    "region_growing_on_point_set_3.cpp")
   create_single_source_cgal_program(
-    "example_region_growing_on_polygon_mesh.cpp")
+    "region_growing_on_polygon_mesh.cpp")
   create_single_source_cgal_program(
-    "example_region_growing_with_custom_classes.cpp")
+    "region_growing_with_custom_classes.cpp")
 
 else()
   message(WARNING 

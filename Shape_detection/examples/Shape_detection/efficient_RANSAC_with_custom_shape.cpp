@@ -7,7 +7,7 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 
 #include <CGAL/Shape_detection/Efficient_RANSAC.h>
-#include "example_efficient_RANSAC_with_custom_shape.h"
+#include "efficient_RANSAC_with_custom_shape.h"
 
 // Type declarations.
 typedef CGAL::Exact_predicates_inexact_constructions_kernel  Kernel;
