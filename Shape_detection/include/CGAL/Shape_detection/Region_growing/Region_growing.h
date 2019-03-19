@@ -31,6 +31,7 @@
 
 // CGAL includes.
 #include <CGAL/assertions.h>
+#include <CGAL/property_map.h>
 
 // Internal includes.
 #include <CGAL/Shape_detection/Region_growing/internal/property_maps.h>
@@ -60,12 +61,13 @@ namespace Shape_detection {
 
     \tparam SeedMap
     must be an `LvaluePropertyMap` whose key and value types are `std::size_t`.
+    %Default is `CGAL::Identity_property_map`.
   */
   template<
   typename InputRange, 
   typename NeighborQuery, 
   typename RegionType,
-  typename SeedMap = Identity_seed_property_map>
+  typename SeedMap = CGAL::Identity_property_map<std::size_t> >
   class Region_growing {
 
   public:

@@ -85,7 +85,10 @@ namespace Point_set {
     /// \endcond
     
     #ifdef DOXYGEN_RUNNING
-      /// Property map that provides an access to the ordered indices of input points.
+      /*! 
+        an `LvaluePropertyMap` whose key and value type is `std::size_t`.
+        This map provides an access to the ordered indices of input points.
+      */
       typedef unspecified_type Seed_map;
     #endif
 

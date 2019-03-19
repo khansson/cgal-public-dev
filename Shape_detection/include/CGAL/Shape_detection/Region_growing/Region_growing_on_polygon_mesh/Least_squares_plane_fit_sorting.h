@@ -99,7 +99,10 @@ namespace Polygon_mesh {
     /// \endcond
 
     #ifdef DOXYGEN_RUNNING
-      /// Property map that provides an access to the ordered indices of polygon mesh faces.
+      /*! 
+        an `LvaluePropertyMap` whose key and value type is `std::size_t`.
+        This map provides an access to the ordered indices of polygon mesh faces.
+      */
       typedef unspecified_type Seed_map;
     #endif
 
