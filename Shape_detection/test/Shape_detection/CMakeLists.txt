@@ -43,6 +43,8 @@ if(CGAL_FOUND)
     "test_efficient_RANSAC_regularization.cpp")
 
   create_single_source_cgal_program(
+    "test_region_growing_basic.cpp")
+  create_single_source_cgal_program(
     "test_region_growing_on_cube.cpp")
   create_single_source_cgal_program(
     "test_region_growing_on_point_set_2.cpp")

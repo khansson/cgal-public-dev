@@ -36,8 +36,8 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 
 // Internal includes.
-#include <CGAL/Shape_detection/Region_growing/internal/utilities.h>
-#include <CGAL/Shape_detection/Region_growing/internal/property_maps.h>
+#include <CGAL/Shape_detection/Region_growing/internal/utils.h>
+#include <CGAL/Shape_detection/Region_growing/internal/property_map.h>
 
 namespace CGAL {
 namespace Shape_detection {
@@ -62,7 +62,7 @@ namespace Point_set {
 
     \tparam PointMap 
     must be an `LvaluePropertyMap` whose key type is the value type of the input 
-    range and value type is `CGAL::Point_2`.
+    range and value type is `Kernel::Point_2`.
   */
   template<
   typename GeomTraits,
@@ -109,7 +109,7 @@ namespace Point_set {
 
       \param point_map
       an instance of `PointMap` that maps an item from `input_range` 
-      to `CGAL::Point_2`
+      to `Kernel::Point_2`
 
       \pre `input_range.size() > 0`
     */

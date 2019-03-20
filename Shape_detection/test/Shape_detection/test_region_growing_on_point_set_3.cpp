@@ -6,6 +6,7 @@
 #include <iterator>
 
 // CGAL includes.
+#include <CGAL/assertions.h>
 #include <CGAL/property_map.h>
 
 #include <CGAL/Point_set_3.h>

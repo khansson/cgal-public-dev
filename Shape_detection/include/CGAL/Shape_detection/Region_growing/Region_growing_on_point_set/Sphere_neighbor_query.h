@@ -42,7 +42,7 @@
 #include <CGAL/Search_traits_adapter.h>
 
 // Internal includes.
-#include <CGAL/Shape_detection/Region_growing/internal/property_maps.h>
+#include <CGAL/Shape_detection/Region_growing/internal/property_map.h>
 
 namespace CGAL {
 namespace Shape_detection {
@@ -51,7 +51,8 @@ namespace Point_set {
   /*!
     \ingroup PkgShapeDetectionRGOnPoints
 
-    \brief Fuzzy sphere neighbors search in a set of `Point_2` or `Point_3`.
+    \brief Fuzzy sphere neighbors search in a set of `Kernel::Point_2` 
+    or `Kernel::Point_3`.
 
     This class returns all neighbors of a query point, which fall in a sphere of
     the fixed radius centered at this point.
@@ -64,7 +65,7 @@ namespace Point_set {
 
     \tparam PointMap 
     must be an `LvaluePropertyMap` whose key type is the value type of the input 
-    range and value type is `CGAL::Point_2` or `CGAL::Point_3`.
+    range and value type is `Kernel::Point_2` or `Kernel::Point_3`.
 
     \cgalModels `NeighborQuery`
   */
@@ -129,7 +130,7 @@ namespace Point_set {
 
       \param point_map
       an instance of `PointMap` that maps an item from `input_range` 
-      to `CGAL::Point_2` or to `CGAL::Point_3`
+      to `Kernel::Point_2` or to `Kernel::Point_3`
 
       \pre `input_range.size() > 0`
       \pre `sphere_radius >= 0`
@@ -149,9 +150,9 @@ namespace Point_set {
       Search_traits(m_index_to_point_map)) { 
 
       CGAL_precondition(input_range.size() > 0);
+      CGAL_precondition(sphere_radius >= FT(0));
 
       m_tree.build();
-      CGAL_precondition(sphere_radius >= FT(0));
     }
 
     /// @}

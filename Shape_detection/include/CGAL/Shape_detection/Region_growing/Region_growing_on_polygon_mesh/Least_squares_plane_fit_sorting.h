@@ -44,8 +44,8 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 
 // Internal includes.
-#include <CGAL/Shape_detection/Region_growing/internal/utilities.h>
-#include <CGAL/Shape_detection/Region_growing/internal/property_maps.h>
+#include <CGAL/Shape_detection/Region_growing/internal/utils.h>
+#include <CGAL/Shape_detection/Region_growing/internal/property_map.h>
 
 namespace CGAL {
 namespace Shape_detection {
@@ -74,7 +74,7 @@ namespace Polygon_mesh {
 
     \tparam VertexToPointMap 
     must be an `LvaluePropertyMap` whose key type is the vertex type of a polygon mesh and
-    value type is `CGAL::Point_3`.
+    value type is `Kernel::Point_3`.
   */
   template<
   typename GeomTraits, 
@@ -123,7 +123,7 @@ namespace Polygon_mesh {
 
       \param vertex_to_point_map 
       an instance of `VertexToPointMap` that maps a polygon mesh 
-      vertex to `CGAL::Point_3`
+      vertex to `Kernel::Point_3`
 
       \pre `faces(pmesh).size() > 0`
     */

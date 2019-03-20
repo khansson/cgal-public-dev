@@ -36,7 +36,7 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 
 // Internal includes.
-#include <CGAL/Shape_detection/Region_growing/internal/utilities.h>
+#include <CGAL/Shape_detection/Region_growing/internal/utils.h>
 
 namespace CGAL {
 namespace Shape_detection {
@@ -60,11 +60,11 @@ namespace Point_set {
 
     \tparam PointMap 
     must be an `LvaluePropertyMap` whose key type is the value type of the input 
-    range and value type is `CGAL::Point_2`.
+    range and value type is `Kernel::Point_2`.
 
     \tparam NormalMap 
     must be an `LvaluePropertyMap` whose key type is the value type of the input 
-    range and value type is `CGAL::Vector_2`.
+    range and value type is `Kernel::Vector_2`.
     
     \cgalModels `RegionType`
   */
@@ -132,11 +132,11 @@ namespace Point_set {
 
       \param point_map
       an instance of `PointMap` that maps an item from `input_range` 
-      to `CGAL::Point_2`
+      to `Kernel::Point_2`
 
       \param normal_map
       an instance of `NormalMap` that maps an item from `input_range` 
-      to `CGAL::Vector_2`
+      to `Kernel::Vector_2`
 
       \param traits
       an instance of `GeomTraits`
@@ -262,8 +262,8 @@ namespace Point_set {
         const Vector_2& normal = get(m_normal_map, key);
                     
         const FT normal_length = m_sqrt(m_squared_length_2(normal));
+        
         CGAL_precondition(normal_length > FT(0));
-
         m_normal_of_best_fit = 
         normal / normal_length;
         

@@ -6,6 +6,7 @@
 #include <iterator>
 
 // CGAL includes.
+#include <CGAL/assertions.h>
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Iterator_range.h>
 #include <CGAL/HalfedgeDS_vector.h>

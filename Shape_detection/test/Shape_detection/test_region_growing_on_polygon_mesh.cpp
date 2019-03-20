@@ -6,6 +6,7 @@
 #include <iterator>
 
 // CGAL includes.
+#include <CGAL/assertions.h>
 #include <CGAL/Surface_mesh.h>
 
 #include <CGAL/Simple_cartesian.h>

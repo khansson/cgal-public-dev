@@ -20,8 +20,8 @@
 // Author(s)     : Florent Lafarge, Simon Giraudot, Thien Hoang, Dmitry Anisimov
 //
 
-#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_INTERNAL_UTILITIES_H
-#define CGAL_SHAPE_DETECTION_REGION_GROWING_INTERNAL_UTILITIES_H
+#ifndef CGAL_SHAPE_DETECTION_REGION_GROWING_INTERNAL_UTILS_H
+#define CGAL_SHAPE_DETECTION_REGION_GROWING_INTERNAL_UTILS_H
 
 #include <CGAL/license/Shape_detection.h>
 
@@ -101,4 +101,4 @@ namespace internal {
 } // namespace Shape_detection
 } // namespace CGAL
 
-#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_INTERNAL_UTILITIES_H
+#endif // CGAL_SHAPE_DETECTION_REGION_GROWING_INTERNAL_UTILS_H

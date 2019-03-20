@@ -38,7 +38,7 @@
 #include <CGAL/assertions.h>
 
 // Internal includes.
-#include <CGAL/Shape_detection/Region_growing/internal/property_maps.h>
+#include <CGAL/Shape_detection/Region_growing/internal/property_map.h>
 
 namespace CGAL {
 namespace Shape_detection {

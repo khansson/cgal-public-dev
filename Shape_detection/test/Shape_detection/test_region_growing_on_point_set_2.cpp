@@ -7,6 +7,7 @@
 #include <iterator>
 
 // CGAL includes.
+#include <CGAL/assertions.h>
 #include <CGAL/property_map.h>
 
 #include <CGAL/Simple_cartesian.h>
