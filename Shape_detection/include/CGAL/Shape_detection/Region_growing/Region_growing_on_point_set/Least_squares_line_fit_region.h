@@ -91,9 +91,9 @@ namespace Point_set {
     typedef typename GeomTraits::FT FT;
 
     /// \cond SKIP_IN_MANUAL
-    using Point_2 = typename GeomTraits::Point_2;
-    using Vector_2 = typename GeomTraits::Vector_2;
-    using Line_2 = typename GeomTraits::Line_2;
+    using Point_2 = typename Traits::Point_2;
+    using Vector_2 = typename Traits::Vector_2;
+    using Line_2 = typename Traits::Line_2;
 
     using Local_traits = Exact_predicates_inexact_constructions_kernel;
     using Local_point_2 = typename Local_traits::Point_2;
@@ -191,13 +191,14 @@ namespace Point_set {
       \param query_index
       index of the query point
 
-      The second parameter is not used in this implementation.
+      The first and third parameters are not used in this implementation.
 
       \return Boolean `true` or `false`
 
       \pre `query_index >= 0 && query_index < input_range.size()`
     */
     bool is_part_of_region(
+      const std::size_t,
       const std::size_t query_index, 
       const std::vector<std::size_t>&) const {
 

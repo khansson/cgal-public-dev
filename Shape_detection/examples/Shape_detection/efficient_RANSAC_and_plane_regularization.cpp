@@ -29,7 +29,7 @@ typedef CGAL::Shape_detection::Plane<Traits>            Plane;
 int main(int argc, char** argv) {
   
   Pwn_vector points;
-  std::ifstream stream(argc > 1 ? argv[1] : "../data/cube.pwn");
+  std::ifstream stream(argc > 1 ? argv[1] : "data/cube.pwn");
 
   if (!stream || 
     !CGAL::read_xyz_points(

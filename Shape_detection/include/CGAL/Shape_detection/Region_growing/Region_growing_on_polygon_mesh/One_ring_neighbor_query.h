@@ -119,7 +119,9 @@ namespace Polygon_mesh {
     void operator()(
       const std::size_t query_index, 
       std::vector<std::size_t>& neighbors) const {
-                    
+
+      neighbors.clear();
+
       CGAL_precondition(query_index >= 0);
       CGAL_precondition(query_index < m_face_range.size());
 

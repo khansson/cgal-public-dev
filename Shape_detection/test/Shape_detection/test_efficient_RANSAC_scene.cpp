@@ -1,4 +1,4 @@
-#include "test_efficient_RANSAC_generators.h"
+#include "include/test_efficient_RANSAC_generators.h"
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/IO/read_xyz_points.h>

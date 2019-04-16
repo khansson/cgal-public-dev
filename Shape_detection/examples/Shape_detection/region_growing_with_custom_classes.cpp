@@ -56,6 +56,7 @@ namespace Custom {
     Region_type() { }
 
     bool is_part_of_region(
+      const std::size_t,
       const std::size_t query_index,
       const std::vector<std::size_t>& region) const {
 

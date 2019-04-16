@@ -1,2 +1,2 @@
-../data/cube.pwn
--r ../data/cube.pwn
+data/cube.pwn
+-r data/cube.pwn

@@ -58,7 +58,7 @@ namespace internal {
     m_property_map(property_map) 
     { }
 
-    reference operator[](key_type item_index) const { 
+    reference operator[](const key_type item_index) const { 
                 
       CGAL_precondition(item_index >= 0);
       CGAL_precondition(item_index < m_item_range.size());
@@ -69,7 +69,7 @@ namespace internal {
 
     friend inline reference get(
       const Item_property_map& item_map, 
-      key_type key) { 
+      const key_type key) { 
       
       return item_map[key];
     }

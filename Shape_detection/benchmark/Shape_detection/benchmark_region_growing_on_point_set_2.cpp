@@ -89,7 +89,7 @@ void benchmark_region_growing_on_point_set_2(
 int main(int argc, char *argv[]) {
     
   // Load xyz data either from a local folder or a user-provided file.
-  std::ifstream in(argc > 1 ? argv[1] : "../data/point_set_2.xyz");
+  std::ifstream in(argc > 1 ? argv[1] : "data/point_set_2.xyz");
   CGAL::set_ascii_mode(in);
 
   Input_range input_range;
@@ -116,4 +116,6 @@ int main(int argc, char *argv[]) {
 
   benchmark_region_growing_on_point_set_2(4, input_range, FT(9), 
   distance_threshold, angle_threshold, min_region_size);
+
+  return EXIT_SUCCESS;
 }

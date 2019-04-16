@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+#include <cassert>
 
 // CGAL includes.
 #include <CGAL/assertions.h>
@@ -37,7 +38,7 @@ using Region_growing = SD::Region_growing<Input_range, Neighbor_query, Region_ty
 int main(int argc, char *argv[]) {
 
   // Load data.
-  std::ifstream in(argc > 1 ? argv[1] : "../data/point_set_3.xyz");
+  std::ifstream in(argc > 1 ? argv[1] : "data/point_set_3.xyz");
   CGAL::set_ascii_mode(in);
 
   const bool with_normal_map = true;
@@ -79,10 +80,11 @@ int main(int argc, char *argv[]) {
   region_growing.detect(std::back_inserter(regions));
 
   region_growing.release_memory();
-  CGAL_assertion(regions.size() >= 138 && regions.size() <= 142);
+  assert(regions.size() >= 138 && regions.size() <= 142);
 
   const bool exact_inexact_test_success = (regions.size() >= 138 && regions.size() <= 142);
   std::cout << "exact_inexact_test_success: " << exact_inexact_test_success << std::endl;
 
-  return EXIT_SUCCESS;
+  const bool success = exact_inexact_test_success;
+  return (success) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

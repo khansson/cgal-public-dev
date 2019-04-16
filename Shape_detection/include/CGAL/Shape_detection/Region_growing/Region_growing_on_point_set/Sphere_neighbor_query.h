@@ -133,7 +133,7 @@ namespace Point_set {
       to `Kernel::Point_2` or to `Kernel::Point_3`
 
       \pre `input_range.size() > 0`
-      \pre `sphere_radius >= 0`
+      \pre `sphere_radius > 0`
     */
     Sphere_neighbor_query(
       const InputRange& input_range, 
@@ -150,7 +150,7 @@ namespace Point_set {
       Search_traits(m_index_to_point_map)) { 
 
       CGAL_precondition(input_range.size() > 0);
-      CGAL_precondition(sphere_radius >= FT(0));
+      CGAL_precondition(sphere_radius > FT(0));
 
       m_tree.build();
     }
@@ -190,6 +190,7 @@ namespace Point_set {
         FT(0), 
         m_tree.traits());
 
+      neighbors.clear();
       m_tree.search(std::back_inserter(neighbors), sphere);
     }
 

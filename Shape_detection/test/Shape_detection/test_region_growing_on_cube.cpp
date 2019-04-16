@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+#include <cassert>
 
 // CGAL includes.
 #include <CGAL/assertions.h>
@@ -39,7 +40,7 @@ bool test_region_growing_on_cube(int argc, char *argv[]) {
   const std::size_t min_region_size    = 1;
 
   // Load data.
-  std::ifstream in(argc > 1 ? argv[1] : "../data/cube.off");
+  std::ifstream in(argc > 1 ? argv[1] : "data/cube.off");
   CGAL::set_ascii_mode(in);
 
   Polyhedron polyhedron;
@@ -48,7 +49,7 @@ bool test_region_growing_on_cube(int argc, char *argv[]) {
   in.close();
   const Face_range face_range = CGAL::faces(polyhedron);
 
-  CGAL_assertion(face_range.size() == 6);
+  assert(face_range.size() == 6);
   if (face_range.size() != 6) 
     return false;
 
@@ -67,7 +68,7 @@ bool test_region_growing_on_cube(int argc, char *argv[]) {
   region_growing.detect(std::back_inserter(regions));
 
   // Test data.
-  CGAL_assertion(regions.size() == 6);
+  assert(regions.size() == 6);
   
   if (regions.size() != 6) 
     return false;
@@ -79,7 +80,7 @@ bool test_region_growing_on_cube(int argc, char *argv[]) {
   std::vector<std::size_t> unassigned_faces;
   region_growing.unassigned_items(std::back_inserter(unassigned_faces));
 
-  CGAL_assertion(unassigned_faces.size() == 0);
+  assert(unassigned_faces.size() == 0);
 
   if (unassigned_faces.size() != 0) 
     return false;
@@ -96,7 +97,7 @@ int main(int argc, char *argv[]) {
     cartesian_double_test_success = false;
     
   std::cout << "cartesian_double_test_success: " << cartesian_double_test_success << std::endl;
-  CGAL_assertion(cartesian_double_test_success);
+  assert(cartesian_double_test_success);
 
   // ------>
 
@@ -105,7 +106,7 @@ int main(int argc, char *argv[]) {
     exact_inexact_test_success = false;
     
   std::cout << "exact_inexact_test_success: " << exact_inexact_test_success << std::endl;
-  CGAL_assertion(exact_inexact_test_success);
+  assert(exact_inexact_test_success);
 
   // ------>
 
@@ -114,5 +115,8 @@ int main(int argc, char *argv[]) {
     exact_exact_test_success = false;
     
   std::cout << "exact_exact_test_success: " << exact_exact_test_success << std::endl;
-  CGAL_assertion(exact_exact_test_success);
+  assert(exact_exact_test_success);
+
+  const bool success = cartesian_double_test_success && exact_inexact_test_success && exact_exact_test_success;
+  return (success) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

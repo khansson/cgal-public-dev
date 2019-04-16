@@ -92,9 +92,9 @@ namespace Polygon_mesh {
     using Face_range = FaceRange;
     using Vertex_to_point_map = VertexToPointMap;
 
-    using Point_3 = typename GeomTraits::Point_3;
+    using Point_3 = typename Traits::Point_3;
     using Vector_3 = typename Traits::Vector_3;
-    using Plane_3 = typename GeomTraits::Plane_3;
+    using Plane_3 = typename Traits::Plane_3;
 
     using Local_traits = Exact_predicates_inexact_constructions_kernel;
     using Local_point_3 = typename Local_traits::Point_3;
@@ -192,13 +192,14 @@ namespace Polygon_mesh {
       \param query_index
       index of the query face
 
-      The second parameter is not used in this implementation.
+      The first and third parameters are not used in this implementation.
 
       \return Boolean `true` or `false`
 
       \pre `query_index >= 0 && query_index < faces(pmesh).size()`
     */
     bool is_part_of_region(
+      const std::size_t,
       const std::size_t query_index, 
       const std::vector<std::size_t>&) const {
 

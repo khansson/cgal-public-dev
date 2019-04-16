@@ -116,7 +116,7 @@ namespace Point_set {
     Least_squares_line_fit_sorting(
       const InputRange& input_range,
       NeighborQuery& neighbor_query,
-      const PointMap point_map = Point_map()) :
+      const PointMap point_map = PointMap()) :
     m_input_range(input_range),
     m_neighbor_query(neighbor_query),
     m_point_map(point_map) { 

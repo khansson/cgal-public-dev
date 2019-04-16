@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
   Pwn_vector points;
 
   // Load point set from a file.
-  std::ifstream stream((argc > 1) ? argv[1] : "../data/cube.pwn");
+  std::ifstream stream((argc > 1) ? argv[1] : "data/cube.pwn");
 
   if (!stream ||
     !CGAL::read_xyz_points(

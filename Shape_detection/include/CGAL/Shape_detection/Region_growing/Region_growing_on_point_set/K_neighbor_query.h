@@ -134,7 +134,7 @@ namespace Point_set {
       to `Kernel::Point_2` or to `Kernel::Point_3`
 
       \pre `input_range.size() > 0`
-      \pre `k >= 0`
+      \pre `k > 0`
     */
     K_neighbor_query(
       const InputRange& input_range, 
@@ -152,7 +152,7 @@ namespace Point_set {
       Search_traits(m_index_to_point_map)) { 
 
       CGAL_precondition(input_range.size() > 0);
-      CGAL_precondition(k >= 0);
+      CGAL_precondition(k > 0);
 
       m_tree.build();
     }
@@ -191,6 +191,7 @@ namespace Point_set {
         true, 
         m_distance);
 
+      neighbors.clear();
       for (auto it = neighbor_search.begin(); it != neighbor_search.end(); ++it)
         neighbors.push_back(it->first);
     }

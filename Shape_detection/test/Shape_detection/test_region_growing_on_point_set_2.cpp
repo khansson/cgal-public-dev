@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+#include <cassert>
 
 // CGAL includes.
 #include <CGAL/assertions.h>
@@ -42,7 +43,7 @@ bool test_region_growing_on_point_set_2(int argc, char *argv[]) {
   const std::size_t min_region_size    = 5;
     
   // Load data.
-  std::ifstream in(argc > 1 ? argv[1] : "../data/point_set_2.xyz");
+  std::ifstream in(argc > 1 ? argv[1] : "data/point_set_2.xyz");
   CGAL::set_ascii_mode(in);
 
   Input_range input_range;
@@ -53,7 +54,7 @@ bool test_region_growing_on_point_set_2(int argc, char *argv[]) {
     
   in.close();
 
-  CGAL_assertion(input_range.size() == 3634);
+  assert(input_range.size() == 3634);
   if (input_range.size() != 3634) 
     return false;
 
@@ -74,7 +75,7 @@ bool test_region_growing_on_point_set_2(int argc, char *argv[]) {
   region_growing.detect(std::back_inserter(regions));
 
   // Test data.
-  CGAL_assertion(regions.size() >= 63 && regions.size() <= 67);
+  assert(regions.size() >= 63 && regions.size() <= 67);
   if (regions.size() < 63 || regions.size() > 67) 
     return false;
 
@@ -85,7 +86,7 @@ bool test_region_growing_on_point_set_2(int argc, char *argv[]) {
   std::vector<std::size_t> unassigned_points;
   region_growing.unassigned_items(std::back_inserter(unassigned_points));
 
-  CGAL_assertion(unassigned_points.size() >= 77 && unassigned_points.size() <= 97);
+  assert(unassigned_points.size() >= 77 && unassigned_points.size() <= 97);
   if (unassigned_points.size() < 77 || unassigned_points.size() > 97) 
     return false;
 
@@ -101,7 +102,7 @@ int main(int argc, char *argv[]) {
     cartesian_double_test_success = false;
     
   std::cout << "cartesian_double_test_success: " << cartesian_double_test_success << std::endl;
-  CGAL_assertion(cartesian_double_test_success);
+  assert(cartesian_double_test_success);
 
   // ------>
 
@@ -110,7 +111,7 @@ int main(int argc, char *argv[]) {
     exact_inexact_test_success = false;
     
   std::cout << "exact_inexact_test_success: " << exact_inexact_test_success << std::endl;
-  CGAL_assertion(exact_inexact_test_success);
+  assert(exact_inexact_test_success);
 
   // ------>
 
@@ -119,5 +120,8 @@ int main(int argc, char *argv[]) {
     exact_exact_test_success = false;
     
   std::cout << "exact_exact_test_success: " << exact_exact_test_success << std::endl;
-  CGAL_assertion(exact_exact_test_success);
+  assert(exact_exact_test_success);
+
+  const bool success = cartesian_double_test_success && exact_inexact_test_success && exact_exact_test_success;
+  return (success) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

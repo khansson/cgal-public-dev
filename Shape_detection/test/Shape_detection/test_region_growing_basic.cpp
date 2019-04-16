@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+#include <cassert>
 
 // CGAL includes.
 #include <CGAL/assertions.h>
@@ -33,7 +34,7 @@ int main(int argc, char *argv[]) {
   bool success = true;
 
   // Load data.
-  std::ifstream in(argc > 1 ? argv[1] : "../data/point_set_2.xyz");
+  std::ifstream in(argc > 1 ? argv[1] : "data/point_set_2.xyz");
   CGAL::set_ascii_mode(in);
 
   Input_range input_range;
@@ -44,7 +45,7 @@ int main(int argc, char *argv[]) {
     
   in.close();
 
-  CGAL_assertion(input_range.size() == 3634);
+  assert(input_range.size() == 3634);
   if (input_range.size() != 3634) 
     success = false;
 
@@ -62,21 +63,21 @@ int main(int argc, char *argv[]) {
   std::vector<std::size_t> unassigned_points;
   region_growing.unassigned_items(std::back_inserter(unassigned_points));
 
-  CGAL_assertion(unassigned_points.size() == 3634);
+  assert(unassigned_points.size() == 3634);
   if (unassigned_points.size() != 3634) 
     success = false;
 
   std::vector< std::vector<std::size_t> > regions;
   region_growing.detect(std::back_inserter(regions));
 
-  CGAL_assertion(regions.size() != 0);
+  assert(regions.size() != 0);
   if (regions.size() == 0) 
     success = false;
 
   unassigned_points.clear();
   region_growing.unassigned_items(std::back_inserter(unassigned_points));
 
-  CGAL_assertion(unassigned_points.size() != 3634);
+  assert(unassigned_points.size() != 3634);
   if (unassigned_points.size() == 3634) 
     success = false;
 
@@ -84,10 +85,12 @@ int main(int argc, char *argv[]) {
   regions.clear();
   region_growing.detect(std::back_inserter(regions));
 
-  CGAL_assertion(regions.size() == num_regions);
+  assert(regions.size() == num_regions);
   if (regions.size() != num_regions) 
     success = false;
 
   std::cout << "basic_test_success: " << success << std::endl;
-  CGAL_assertion(success);
+  assert(success);
+
+  return (success) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

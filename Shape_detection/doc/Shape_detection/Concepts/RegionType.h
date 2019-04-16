@@ -18,15 +18,16 @@ class RegionType {
 public:
 
   /*!  
-    checks if the item with the index `query_index` can be added to the region
-    represented by `indices`.
+    checks if the item with the index `index_to`, which is a neighbor of the item
+    with the index `index_from`, can be added to the region represented by `indices`.
 
     `CGAL::Shape_detection::Region_growing` calls this function each time when 
     trying to add a new item to a region. If this function returns `true`, the 
-    query item is added to the region, otherwise ignored.
+    item with the index `index_to`, is added to the region, otherwise ignored.
   */
   bool is_part_of_region(
-    const std::size_t query_index, 
+    const std::size_t index_from,
+    const std::size_t index_to, 
     const std::vector<std::size_t>& indices) {
         
   }

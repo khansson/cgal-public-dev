@@ -7,7 +7,7 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 
 #include <CGAL/Shape_detection/Efficient_RANSAC.h>
-#include "efficient_RANSAC_with_custom_shape.h"
+#include "include/efficient_RANSAC_with_custom_shape.h"
 
 // Type declarations.
 typedef CGAL::Exact_predicates_inexact_constructions_kernel  Kernel;
@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
   Pwn_vector points;
 
   // Load point set from a file.
-  std::ifstream stream((argc > 1) ? argv[1] : "../data/cube.pwn");
+  std::ifstream stream((argc > 1) ? argv[1] : "data/cube.pwn");
 
   if (!stream || 
     !CGAL::read_xyz_points(

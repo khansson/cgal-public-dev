@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+#include <cassert>
 
 // CGAL includes.
 #include <CGAL/assertions.h>
@@ -34,7 +35,7 @@ using Region_growing = SD::Region_growing<Face_range, Neighbor_query, Region_typ
 int main(int argc, char *argv[]) {
 
   // Load data.
-  std::ifstream in(argc > 1 ? argv[1] : "../data/polygon_mesh.off");
+  std::ifstream in(argc > 1 ? argv[1] : "data/polygon_mesh.off");
   CGAL::set_ascii_mode(in);
 
   Polygon_mesh polygon_mesh;
@@ -76,10 +77,11 @@ int main(int argc, char *argv[]) {
   region_growing.detect(std::back_inserter(regions));
 
   region_growing.release_memory();
-  CGAL_assertion(regions.size() >= 323 && regions.size() <= 327);
+  assert(regions.size() >= 323 && regions.size() <= 327);
 
   const bool exact_exact_test_success = (regions.size() >= 323 && regions.size() <= 327);
   std::cout << "exact_exact_test_success: " << exact_exact_test_success << std::endl;
 
-  return EXIT_SUCCESS;
+  const bool success = exact_exact_test_success;
+  return (success) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
