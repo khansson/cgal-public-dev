@@ -39,7 +39,7 @@ bool test_region_growing_on_point_set_3(int argc, char *argv[]) {
   const std::size_t k                  = 12;
   const FT          distance_threshold = FT(2);
   const FT          angle_threshold    = FT(20);
-  const std::size_t min_region_size    = 25;
+  const std::size_t min_region_size    = 50;
     
   // Load data.
   std::ifstream in(argc > 1 ? argv[1] : "data/point_set_3.xyz");
@@ -51,8 +51,8 @@ bool test_region_growing_on_point_set_3(int argc, char *argv[]) {
   in >> input_range;
   in.close();
 
-  assert(input_range.size() == 300000);
-  if (input_range.size() != 300000) 
+  assert(input_range.size() == 8075);
+  if (input_range.size() != 8075) 
     return false;
 
   // Create parameter classes.
@@ -74,8 +74,8 @@ bool test_region_growing_on_point_set_3(int argc, char *argv[]) {
   region_growing.detect(std::back_inserter(regions));
 
   // Test data.
-  assert(regions.size() >= 138 && regions.size() <= 142);
-  if (regions.size() < 138 || regions.size() > 142) 
+  assert(regions.size() >= 6 && regions.size() <= 8);
+  if (regions.size() < 6 || regions.size() > 8) 
     return false;
 
   for (const auto& region : regions)
@@ -85,8 +85,8 @@ bool test_region_growing_on_point_set_3(int argc, char *argv[]) {
   std::vector<std::size_t> unassigned_points;
   region_growing.unassigned_items(std::back_inserter(unassigned_points));
 
-  assert(unassigned_points.size() >= 13457 && unassigned_points.size() <= 13477);
-  if (unassigned_points.size() < 13457 || unassigned_points.size() > 13477) 
+  assert(unassigned_points.size() >= 528 && unassigned_points.size() <= 548);
+  if (unassigned_points.size() < 528 || unassigned_points.size() > 548) 
     return false;
 
   return true;

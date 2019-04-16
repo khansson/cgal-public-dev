@@ -1,3 +1,11 @@
+README:
+
+Data:
+To keep the size of this package small, all benchmark data are placed here:
+https://github.com/... /data
+
+You can download them and use to get the results below.
+
 Results (Point Set 2):
 
 ```

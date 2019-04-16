@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
   const std::size_t k                  = 12;
   const FT          distance_threshold = FT(2);
   const FT          angle_threshold    = FT(20);
-  const std::size_t min_region_size    = 25;
+  const std::size_t min_region_size    = 50;
 
   // Create parameter classes.
   Neighbor_query neighbor_query(
@@ -80,9 +80,9 @@ int main(int argc, char *argv[]) {
   region_growing.detect(std::back_inserter(regions));
 
   region_growing.release_memory();
-  assert(regions.size() >= 138 && regions.size() <= 142);
+  assert(regions.size() >= 6 && regions.size() <= 8);
 
-  const bool exact_inexact_test_success = (regions.size() >= 138 && regions.size() <= 142);
+  const bool exact_inexact_test_success = (regions.size() >= 6 && regions.size() <= 8);
   std::cout << "exact_inexact_test_success: " << exact_inexact_test_success << std::endl;
 
   const bool success = exact_inexact_test_success;

@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
   const std::size_t k                     = 12;
   const FT          max_distance_to_plane = FT(2);
   const FT          max_accepted_angle    = FT(20);
-  const std::size_t min_region_size       = 25;
+  const std::size_t min_region_size       = 50;
 
   // Create instances of the classes Neighbor_query and Region_type.
   Neighbor_query neighbor_query(
