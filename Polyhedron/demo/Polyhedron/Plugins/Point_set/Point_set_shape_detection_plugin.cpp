@@ -19,8 +19,8 @@
 #include <CGAL/Random.h>
 #include <CGAL/Real_timer.h>
 
-#include <CGAL/Shape_detection_3.h>
-#include <CGAL/regularize_planes.h>
+#include <CGAL/Shape_detection.h>
+#include <CGAL/Regularization.h>
 #include <CGAL/Delaunay_triangulation_2.h>
 #include <CGAL/Alpha_shape_2.h>
 #include <CGAL/Alpha_shape_face_base_2.h>
@@ -120,8 +120,7 @@ class Polyhedron_demo_point_set_shape_detection_plugin :
   typedef Point_set_3<Kernel>::Point_map PointPMap;
   typedef Point_set_3<Kernel>::Vector_map NormalPMap;
 
-  typedef CGAL::Shape_detection_3::Shape_detection_traits<Epic_kernel, Point_set, PointPMap, NormalPMap> Traits;
-  typedef CGAL::Shape_detection_3::Efficient_RANSAC<Traits> Shape_detection;
+  typedef CGAL::Shape_detection::Efficient_RANSAC_traits<Epic_kernel, Point_set, PointPMap, NormalPMap> Traits;
   
 public:
   void init(QMainWindow* mainWindow, CGAL::Three::Scene_interface* scene_interface, Messages_interface*) {
@@ -158,32 +157,38 @@ private:
 
   // RANSAC can handle all types of shapes
   template <typename Traits, typename Shape>
-  void add_shape (CGAL::Shape_detection_3::Efficient_RANSAC<Traits>& shape_detection,
+  void add_shape (CGAL::Shape_detection::Efficient_RANSAC<Traits>& ransac,
                   const Shape&)
   {
-    shape_detection.template add_shape_factory<Shape>();
+    ransac.template add_shape_factory<Shape>();
   }
 
-  // Region growing can't handle all types of shapes
-  template <typename Traits, typename Shape>
-  void add_shape (CGAL::Shape_detection_3::Region_growing<Traits>&,
-                  const Shape&)
-  {
+  void detect_shapes_with_region_growing (
+    Scene_points_with_normal_item* item,
+    Point_set_demo_point_set_shape_detection_dialog& dialog) {
+    
+    // op.min_points = dialog.min_points();
+    // op.epsilon = dialog.epsilon();
+    // op.cluster_epsilon = dialog.cluster_epsilon();
+    // op.normal_threshold = dialog.normal_tolerance();
   }
 
-  // Region growing only handles planes
-  template <typename Traits>
-  void add_shape (CGAL::Shape_detection_3::Region_growing<Traits>& shape_detection,
-                  const CGAL::Shape_detection_3::Plane<Traits>&)
-  {
-    shape_detection.template add_shape_factory<CGAL::Shape_detection_3::Plane<Traits> >();
-  }
-
-  template <typename Traits, typename Shape_detection>
-  void detect_shapes (typename Shape_detection::Parameters& op,
-                      Scene_points_with_normal_item* item,
+  void detect_shapes_with_ransac (Scene_points_with_normal_item* item,
                       Point_set_demo_point_set_shape_detection_dialog& dialog)
   {
+    typedef Point_set::Point_map PointPMap;
+    typedef Point_set::Vector_map NormalPMap;
+
+    typedef CGAL::Shape_detection::Efficient_RANSAC_traits<Epic_kernel, Point_set, PointPMap, NormalPMap> Traits;
+    typedef CGAL::Shape_detection::Efficient_RANSAC<Traits> Ransac;
+
+    Ransac::Parameters op;
+    op.probability = dialog.search_probability();       // probability to miss the largest primitive on each iteration.
+    op.min_points = dialog.min_points();          // Only extract shapes with a minimum number of points.
+    op.epsilon = dialog.epsilon();          // maximum euclidean distance between point and shape.
+    op.cluster_epsilon = dialog.cluster_epsilon();    // maximum euclidean distance between points to be clustered.
+    op.normal_threshold = dialog.normal_tolerance();   // normal_threshold < dot(surface_normal, point_normal); 
+
     CGAL::Random rand(time(0));
     // Gets point set
     Point_set* points = item->point_set();
@@ -237,8 +242,8 @@ private:
     
     QApplication::setOverrideCursor(Qt::BusyCursor);
 
-    Shape_detection shape_detection;
-    shape_detection.set_input(*points, points->point_map(), points->normal_map());
+    Ransac ransac;
+    ransac.set_input(*points, points->point_map(), points->normal_map());
 
     std::vector<Scene_group_item *> groups;
     groups.resize(5);
@@ -246,48 +251,48 @@ private:
     if(dialog.detect_plane()){
       groups[0] = new Scene_group_item("Planes");
       groups[0]->setRenderingMode(Points);
-      add_shape<Traits> (shape_detection, CGAL::Shape_detection_3::Plane<Traits>());
+      add_shape<Traits> (ransac, CGAL::Shape_detection::Plane<Traits>());
     }
     if(dialog.detect_cylinder()){
       groups[1] = new Scene_group_item("Cylinders");
       groups[1]->setRenderingMode(Points);
-      add_shape<Traits> (shape_detection, CGAL::Shape_detection_3::Cylinder<Traits>());
+      add_shape<Traits> (ransac, CGAL::Shape_detection::Cylinder<Traits>());
     }
     if(dialog.detect_torus()){
       groups[2] = new Scene_group_item("Torus");
       groups[2]->setRenderingMode(Points);
-      add_shape<Traits> (shape_detection, CGAL::Shape_detection_3::Torus<Traits>());
+      add_shape<Traits> (ransac, CGAL::Shape_detection::Torus<Traits>());
     }
     if(dialog.detect_cone()){
       groups[3] = new Scene_group_item("Cones");
       groups[3]->setRenderingMode(Points);
-      add_shape<Traits> (shape_detection, CGAL::Shape_detection_3::Cone<Traits>());
+      add_shape<Traits> (ransac, CGAL::Shape_detection::Cone<Traits>());
     }
     if(dialog.detect_sphere()){
       groups[4] = new Scene_group_item("Spheres");
       groups[4]->setRenderingMode(Points);
-      add_shape<Traits> (shape_detection, CGAL::Shape_detection_3::Sphere<Traits>());
+      add_shape<Traits> (ransac, CGAL::Shape_detection::Sphere<Traits>());
     }
 
     // The actual shape detection.
     CGAL::Real_timer t;
     t.start();
-    Detect_shapes_functor<Shape_detection> functor (shape_detection, op);
+    Detect_shapes_functor<Ransac> functor (ransac, op);
     run_with_qprogressdialog<CGAL::Sequential_tag> (functor, "Detecting shapes...", mw);
     t.stop();
     
-    std::cout << shape_detection.shapes().size() << " shapes found in "
+    std::cout << ransac.shapes().size() << " shapes found in "
               << t.time() << " second(s)" << std::endl;
 
     if (dialog.regularize ())
       {
         std::cerr << "Regularization of planes... " << std::endl;
-        typename Shape_detection::Plane_range planes = shape_detection.planes();
+        typename Ransac::Plane_range planes = ransac.planes();
         CGAL::regularize_planes (*points,
                                  points->point_map(),
                                  planes,
-                                 CGAL::Shape_detection_3::Plane_map<Traits>(),
-                                 CGAL::Shape_detection_3::Point_to_shape_index_map<Traits>(*points, planes),
+                                 CGAL::Shape_detection::Plane_map<Traits>(),
+                                 CGAL::Shape_detection::Point_to_shape_index_map<Traits>(*points, planes),
                                  true, true, true, true,
                                  180 * std::acos (op.normal_threshold) / CGAL_PI, op.epsilon);
     
@@ -297,10 +302,10 @@ private:
     std::map<Kernel::Point_3, QColor> color_map;
     
     int index = 0;
-    BOOST_FOREACH(boost::shared_ptr<typename Shape_detection::Shape> shape, shape_detection.shapes())
+    BOOST_FOREACH(boost::shared_ptr<typename Ransac::Shape> shape, ransac.shapes())
     {
-      CGAL::Shape_detection_3::Cylinder<Traits> *cyl;
-      cyl = dynamic_cast<CGAL::Shape_detection_3::Cylinder<Traits> *>(shape.get());
+      CGAL::Shape_detection::Cylinder<Traits> *cyl;
+      cyl = dynamic_cast<CGAL::Shape_detection::Cylinder<Traits> *>(shape.get());
       if (cyl != NULL){
         if(cyl->radius() > diam){
           continue;
@@ -311,22 +316,22 @@ private:
       {
         std::ostringstream oss;
         oss << "shape " << index;
-        if (CGAL::Shape_detection_3::Plane<Traits>* s
-            = dynamic_cast<CGAL::Shape_detection_3::Plane<Traits> *>(shape.get()))
+        if (CGAL::Shape_detection::Plane<Traits>* s
+            = dynamic_cast<CGAL::Shape_detection::Plane<Traits> *>(shape.get()))
           oss << " plane " << Kernel::Plane_3(*s) << std::endl;
-        else if (CGAL::Shape_detection_3::Cylinder<Traits>* s
-            = dynamic_cast<CGAL::Shape_detection_3::Cylinder<Traits> *>(shape.get()))
+        else if (CGAL::Shape_detection::Cylinder<Traits>* s
+            = dynamic_cast<CGAL::Shape_detection::Cylinder<Traits> *>(shape.get()))
           oss << " cylinder axis = [" << s->axis() << "] radius = " << s->radius() << std::endl;
-        else if (CGAL::Shape_detection_3::Cone<Traits>* s
-            = dynamic_cast<CGAL::Shape_detection_3::Cone<Traits> *>(shape.get()))
+        else if (CGAL::Shape_detection::Cone<Traits>* s
+            = dynamic_cast<CGAL::Shape_detection::Cone<Traits> *>(shape.get()))
           oss << " cone apex = [" << s->apex() << "] axis = [" << s->axis()
               << "] angle = " << s->angle() << std::endl;
-        else if (CGAL::Shape_detection_3::Torus<Traits>* s
-            = dynamic_cast<CGAL::Shape_detection_3::Torus<Traits> *>(shape.get()))
+        else if (CGAL::Shape_detection::Torus<Traits>* s
+            = dynamic_cast<CGAL::Shape_detection::Torus<Traits> *>(shape.get()))
           oss << " torus center = [" << s->center() << "] axis = [" << s->axis()
               << "] R = " << s->major_radius() << " r = " << s->minor_radius() << std::endl;
-        else if (CGAL::Shape_detection_3::Sphere<Traits>* s
-            = dynamic_cast<CGAL::Shape_detection_3::Sphere<Traits> *>(shape.get()))
+        else if (CGAL::Shape_detection::Sphere<Traits>* s
+            = dynamic_cast<CGAL::Shape_detection::Sphere<Traits> *>(shape.get()))
           oss << " sphere center = [" << s->center() << "] radius = " << s->radius() << std::endl;
 
         comments += oss.str();
@@ -362,17 +367,17 @@ private:
       
       // Providing a useful name consisting of the order of detection, name of type and number of inliers
       std::stringstream ss;
-      if (dynamic_cast<CGAL::Shape_detection_3::Cylinder<Traits> *>(shape.get())){
-        CGAL::Shape_detection_3::Cylinder<Traits> * cyl 
-          = dynamic_cast<CGAL::Shape_detection_3::Cylinder<Traits> *>(shape.get());
+      if (dynamic_cast<CGAL::Shape_detection::Cylinder<Traits> *>(shape.get())){
+        CGAL::Shape_detection::Cylinder<Traits> * cyl 
+          = dynamic_cast<CGAL::Shape_detection::Cylinder<Traits> *>(shape.get());
         ss << item->name().toStdString() << "_cylinder_" << cyl->radius() << "_";
       }
-      else if (dynamic_cast<CGAL::Shape_detection_3::Plane<Traits> *>(shape.get()))
+      else if (dynamic_cast<CGAL::Shape_detection::Plane<Traits> *>(shape.get()))
         {
           ss << item->name().toStdString() << "_plane_";
 
-          boost::shared_ptr<CGAL::Shape_detection_3::Plane<Traits> > pshape
-            = boost::dynamic_pointer_cast<CGAL::Shape_detection_3::Plane<Traits> > (shape);
+          boost::shared_ptr<CGAL::Shape_detection::Plane<Traits> > pshape
+            = boost::dynamic_pointer_cast<CGAL::Shape_detection::Plane<Traits> > (shape);
           
           Kernel::Point_3 ref = CGAL::ORIGIN + pshape->plane_normal ();
 
@@ -437,11 +442,11 @@ private:
               }
             }
         }
-      else if (dynamic_cast<CGAL::Shape_detection_3::Cone<Traits> *>(shape.get()))
+      else if (dynamic_cast<CGAL::Shape_detection::Cone<Traits> *>(shape.get()))
         ss << item->name().toStdString() << "_cone_";
-      else if (dynamic_cast<CGAL::Shape_detection_3::Torus<Traits> *>(shape.get()))
+      else if (dynamic_cast<CGAL::Shape_detection::Torus<Traits> *>(shape.get()))
         ss << item->name().toStdString() << "_torus_";
-      else if (dynamic_cast<CGAL::Shape_detection_3::Sphere<Traits> *>(shape.get()))
+      else if (dynamic_cast<CGAL::Shape_detection::Sphere<Traits> *>(shape.get()))
         ss << item->name().toStdString() << "_sphere_";
 
 
@@ -453,16 +458,16 @@ private:
 
       if (dialog.generate_subset()){
         scene->addItem(point_item);
-        if (dynamic_cast<CGAL::Shape_detection_3::Cylinder<Traits> *>(shape.get()))
+        if (dynamic_cast<CGAL::Shape_detection::Cylinder<Traits> *>(shape.get()))
         {
           if(scene->item_id(groups[1]) == -1)
              scene->addItem(groups[1]);
           scene->changeGroup(point_item, groups[1]);
         }
-        else if (dynamic_cast<CGAL::Shape_detection_3::Plane<Traits> *>(shape.get()))
+        else if (dynamic_cast<CGAL::Shape_detection::Plane<Traits> *>(shape.get()))
         {
           point_item->point_set()->add_normal_map();
-          CGAL::Shape_detection_3::Plane<Traits> * plane = dynamic_cast<CGAL::Shape_detection_3::Plane<Traits> *>(shape.get());
+          CGAL::Shape_detection::Plane<Traits> * plane = dynamic_cast<CGAL::Shape_detection::Plane<Traits> *>(shape.get());
           //set normals for point_item to the plane's normal
           for(Point_set::iterator it = point_item->point_set()->begin(); it != point_item->point_set()->end(); ++it)
             point_item->point_set()->normal(*it) = plane->plane_normal();
@@ -471,19 +476,19 @@ private:
              scene->addItem(groups[0]);
           scene->changeGroup(point_item, groups[0]);
         }
-        else if (dynamic_cast<CGAL::Shape_detection_3::Cone<Traits> *>(shape.get()))
+        else if (dynamic_cast<CGAL::Shape_detection::Cone<Traits> *>(shape.get()))
         {
           if(scene->item_id(groups[3]) == -1)
              scene->addItem(groups[3]);
           scene->changeGroup(point_item, groups[3]);
         }
-        else if (dynamic_cast<CGAL::Shape_detection_3::Torus<Traits> *>(shape.get()))
+        else if (dynamic_cast<CGAL::Shape_detection::Torus<Traits> *>(shape.get()))
         {
           if(scene->item_id(groups[2]) == -1)
              scene->addItem(groups[2]);
           scene->changeGroup(point_item, groups[2]);
         }
-        else if (dynamic_cast<CGAL::Shape_detection_3::Sphere<Traits> *>(shape.get()))
+        else if (dynamic_cast<CGAL::Shape_detection::Sphere<Traits> *>(shape.get()))
         {
           if(scene->item_id(groups[4]) == -1)
              scene->addItem(groups[4]);
@@ -506,14 +511,14 @@ private:
         Scene_points_with_normal_item *pts_full = new Scene_points_with_normal_item;
         pts_full->point_set()->add_normal_map();
         
-        typename Shape_detection::Plane_range planes = shape_detection.planes();
+        typename Ransac::Plane_range planes = ransac.planes();
         CGAL::structure_point_set (*points,
                                    planes,
                                    boost::make_function_output_iterator (build_from_pair ((*(pts_full->point_set())))),
                                    op.cluster_epsilon,
                                    points->parameters().
-                                   plane_map(CGAL::Shape_detection_3::Plane_map<Traits>()).
-                                   plane_index_map(CGAL::Shape_detection_3::Point_to_shape_index_map<Traits>(*points, planes)));
+                                   plane_map(CGAL::Shape_detection::Plane_map<Traits>()).
+                                   plane_index_map(CGAL::Shape_detection::Point_to_shape_index_map<Traits>(*points, planes)));
                 
         if (pts_full->point_set ()->empty ())
           delete pts_full;
@@ -553,7 +558,7 @@ private:
     return centroid + query.x() * base1 + query.y() * base2;
   }
 
-  void build_alpha_shape (Point_set& points, boost::shared_ptr<CGAL::Shape_detection_3::Plane<Traits> > plane,
+  void build_alpha_shape (Point_set& points, boost::shared_ptr<CGAL::Shape_detection::Plane<Traits> > plane,
                           Scene_polyhedron_item* item, Scene_surface_mesh_item* sm_item, double epsilon);
 
 }; // end Polyhedron_demo_point_set_shape_detection_plugin
@@ -581,32 +586,13 @@ void Polyhedron_demo_point_set_shape_detection_plugin::on_actionDetect_triggered
         return;
       
       QApplication::setOverrideCursor(Qt::WaitCursor);
-
-      typedef Point_set::Point_map PointPMap;
-      typedef Point_set::Vector_map NormalPMap;
-
-      typedef CGAL::Shape_detection_3::Shape_detection_traits<Epic_kernel, Point_set, PointPMap, NormalPMap> Traits;
-      typedef CGAL::Shape_detection_3::Region_growing<Traits> Region_growing;
-      typedef CGAL::Shape_detection_3::Efficient_RANSAC<Traits> Ransac;
-      
       if (dialog.region_growing())
       {
-        Region_growing::Parameters op;
-        op.min_points = dialog.min_points();          // Only extract shapes with a minimum number of points.
-        op.epsilon = dialog.epsilon();          // maximum euclidean distance between point and shape.
-        op.cluster_epsilon = dialog.cluster_epsilon();    // maximum euclidean distance between points to be clustered.
-        op.normal_threshold = dialog.normal_tolerance();   // normal_threshold < dot(surface_normal, point_normal); 
-        detect_shapes<Traits, Region_growing> (op, item, dialog);
+        detect_shapes_with_region_growing(item, dialog);
       }
       else
       {
-        Ransac::Parameters op;
-        op.probability = dialog.search_probability();       // probability to miss the largest primitive on each iteration.
-        op.min_points = dialog.min_points();          // Only extract shapes with a minimum number of points.
-        op.epsilon = dialog.epsilon();          // maximum euclidean distance between point and shape.
-        op.cluster_epsilon = dialog.cluster_epsilon();    // maximum euclidean distance between points to be clustered.
-        op.normal_threshold = dialog.normal_tolerance();   // normal_threshold < dot(surface_normal, point_normal); 
-        detect_shapes<Traits, Ransac> (op, item, dialog);
+        detect_shapes_with_ransac(item, dialog);
       }
 
       // Updates scene
@@ -619,7 +605,7 @@ void Polyhedron_demo_point_set_shape_detection_plugin::on_actionDetect_triggered
 }
 
 void Polyhedron_demo_point_set_shape_detection_plugin::build_alpha_shape
-(Point_set& points,  boost::shared_ptr<CGAL::Shape_detection_3::Plane<Traits> > plane,
+(Point_set& points,  boost::shared_ptr<CGAL::Shape_detection::Plane<Traits> > plane,
  Scene_polyhedron_item* item, Scene_surface_mesh_item* sm_item, double epsilon)
 {
   typedef Kernel::Point_2  Point_2;
