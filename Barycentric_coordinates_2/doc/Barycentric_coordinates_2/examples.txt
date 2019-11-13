@@ -1,9 +1,9 @@
 /*!
-\example Barycentric_coordinates_2/example_segment_coordinates.cpp
-\example Barycentric_coordinates_2/example_triangle_coordinates.cpp
-\example Barycentric_coordinates_2/example_Wachspress_coordinates.cpp
-\example Barycentric_coordinates_2/example_mean_value_coordinates.cpp
-\example Barycentric_coordinates_2/example_discrete_harmonic_coordinates.cpp
-\example Barycentric_coordinates_2/example_harmonic_coordinates.cpp
-\example Barycentric_coordinates_2/example_terrain_height_modeling.cpp
+\example Barycentric_coordinates_2/segment_coordinates.cpp
+\example Barycentric_coordinates_2/triangle_coordinates.cpp
+\example Barycentric_coordinates_2/Wachspress_coordinates.cpp
+\example Barycentric_coordinates_2/mean_value_coordinates.cpp
+\example Barycentric_coordinates_2/discrete_harmonic_coordinates.cpp
+\example Barycentric_coordinates_2/harmonic_coordinates.cpp
+\example Barycentric_coordinates_2/terrain_height_modeling.cpp
 */

@@ -44,7 +44,7 @@ may have occured during the computation.
 Example's point pattern.
 \cgalFigureEnd
 
-\cgalExample{Barycentric_coordinates_2/example_segment_coordinates.cpp}
+\cgalExample{Barycentric_coordinates_2/segment_coordinates.cpp}
 
 
 \subsection tri_example Triangle Coordinates
@@ -58,7 +58,7 @@ Note that some of the coordinate values for the exterior points are negative.
 Example's point pattern.
 \cgalFigureEnd
 
-\cgalExample{Barycentric_coordinates_2/example_triangle_coordinates.cpp}
+\cgalExample{Barycentric_coordinates_2/triangle_coordinates.cpp}
 
 
 \subsection wp_example Wachspress Coordinates
@@ -66,7 +66,7 @@ Example's point pattern.
 In the following example, we create 1000 random points, then we take the convex hull 
 of this set of points as our polygon, and compute Wachspress coordinates at all the defined points. 
 
-\cgalExample{Barycentric_coordinates_2/example_Wachspress_coordinates.cpp}
+\cgalExample{Barycentric_coordinates_2/Wachspress_coordinates.cpp}
 
 
 \subsection dh_example Discrete Harmonic Coordinates
@@ -80,7 +80,7 @@ We also show how to specify the location of a query point using additional funct
 Example's point pattern.
 \cgalFigureEnd
 
-\cgalExample{Barycentric_coordinates_2/example_discrete_harmonic_coordinates.cpp}
+\cgalExample{Barycentric_coordinates_2/discrete_harmonic_coordinates.cpp}
 
 
 \subsection mv_example Mean Value Coordinates
@@ -96,14 +96,14 @@ coordinate values for points outside <a href="https://en.wikipedia.org/wiki/Star
 Example's point pattern.
 \cgalFigureEnd
 
-\cgalExample{Barycentric_coordinates_2/example_mean_value_coordinates.cpp}
+\cgalExample{Barycentric_coordinates_2/mean_value_coordinates.cpp}
 
 
 \subsection hm_example Harmonic Coordinates
 To be added...
 
 \anchor hm_coord_example
-\cgalExample{Barycentric_coordinates_2/example_harmonic_coordinates.cpp}
+\cgalExample{Barycentric_coordinates_2/harmonic_coordinates.cpp}
 
 
 \subsection height_inter_example Height Interpolation for Terrain Modeling
@@ -128,7 +128,7 @@ Finally, we interpolate the height data from the polygon's boundary to its inter
 using the computed coordinates and the global interpolation function from the 
 package \ref chapinterpolation "2D and Surface Function Interpolation".
 
-\cgalExample{Barycentric_coordinates_2/example_terrain_height_modeling.cpp}
+\cgalExample{Barycentric_coordinates_2/terrain_height_modeling.cpp}
 
 As a result, we get a smooth function inside the polygon that approximates the underlying terrain's surface.
 

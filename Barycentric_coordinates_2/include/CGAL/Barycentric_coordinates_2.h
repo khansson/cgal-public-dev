@@ -26,7 +26,7 @@
 #include <CGAL/license/Barycentric_coordinates_2.h>
 
 #include <CGAL/Barycentric_coordinates_2/barycentric_enum_2.h>
-#include <CGAL/Barycentric_coordinates_2/pointwise_coordinates_2.h>
+#include <CGAL/Barycentric_coordinates_2/analytic_coordinates_2.h>
 #include <CGAL/Barycentric_coordinates_2/Harmonic_coordinates_2.h>
 
 #include <CGAL/Barycentric_coordinates_2/Wachspress_weights_2.h>

@@ -17,11 +17,11 @@
 // SPDX-License-Identifier: GPL-3.0+
 //
 //
-// Author(s)     : Dmitry Anisimov
+// Author(s)     : Dmitry Anisimov, David Bommes, Kai Hormann, Pierre Alliez
 //
 
-#ifndef CGAL_BARYCENTRIC_COORDINATES_UTILS_2_H
-#define CGAL_BARYCENTRIC_COORDINATES_UTILS_2_H
+#ifndef CGAL_BARYCENTRIC_UTILS_2_H
+#define CGAL_BARYCENTRIC_UTILS_2_H
 
 #include <CGAL/license/Barycentric_coordinates_2.h>
 
@@ -37,6 +37,9 @@
 #include <CGAL/assertions.h>
 #include <CGAL/number_utils.h>
 #include <CGAL/Polygon_2_algorithms.h>
+
+// Internal includes.
+#include <CGAL/Barycentric_coordinates_2/barycentric_enum_2.h>
 
 namespace CGAL {
 namespace Barycentric_coordinates {
@@ -112,12 +115,11 @@ namespace internal {
   locate_wrt_polygon(
     const Polygon& polygon, 
     const typename GeomTraits::Point_2& query,
-    const VertexMap& vertex_map,
-    const GeomTraits& traits) {
+    const VertexMap vertex_map,
+    const GeomTraits traits) {
 
-    using Collinear_2 = typename GeomTraits::Collinear_2;
-    const Collinear_2 collinear_2 = traits.collinear_2_object();
-
+    using Point_2 = typename GeomTraits::Point_2;
+    const auto collinear_2 = traits.collinear_2_object();
     CGAL_precondition(polygon.size() >= 3);
 
     std::vector<Point_2> vertices;
@@ -171,14 +173,14 @@ namespace internal {
   typename Polygon,
   typename VertexMap,
   typename GeomTraits>
-  Polygon_type polygon_type(
+  Polygon_type 
+  polygon_type(
     const Polygon& polygon,
-    const VertexMap& vertex_map,
-    const GeomTraits& traits) const {
+    const VertexMap vertex_map,
+    const GeomTraits traits) {
     
-    using Collinear_2 = typename GeomTraits::Collinear_2;
-    const Collinear_2 collinear_2 = traits.collinear_2_object();
-
+    using Point_2 = typename GeomTraits::Point_2;
+    const auto collinear_2 = traits.collinear_2_object();
     CGAL_precondition(polygon.size() >= 3);
 
     std::vector<Point_2> vertices;
@@ -212,4 +214,4 @@ namespace internal {
 } // namespace Barycentric_coordinates
 } // namespace CGAL
 
-#endif // CGAL_BARYCENTRIC_COORDINATES_UTILS_2_H
+#endif // CGAL_BARYCENTRIC_UTILS_2_H

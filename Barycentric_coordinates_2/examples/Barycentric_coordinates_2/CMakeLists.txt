@@ -12,6 +12,11 @@ if(CGAL_FOUND)
   include(${CGAL_USE_FILE})
   include(CGAL_CreateSingleSourceCGALProgram)
 
+  create_single_source_cgal_program(
+    "segment_coordinates.cpp")
+  create_single_source_cgal_program(
+    "triangle_coordinates.cpp")
+
 else()
   message(WARNING 
   "This program requires the CGAL library, and will not be compiled.")

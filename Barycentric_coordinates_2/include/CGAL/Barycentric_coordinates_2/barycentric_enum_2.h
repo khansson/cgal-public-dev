@@ -20,15 +20,16 @@
 // Author(s)     : Dmitry Anisimov, David Bommes, Kai Hormann, Pierre Alliez
 //
 
-#ifndef CGAL_BARYCENTRIC_COORDINATES_ENUM_2_H
-#define CGAL_BARYCENTRIC_COORDINATES_ENUM_2_H
+#ifndef CGAL_BARYCENTRIC_ENUM_2_H
+#define CGAL_BARYCENTRIC_ENUM_2_H
 
 #include <CGAL/license/Barycentric_coordinates_2.h>
 
 namespace CGAL {
+
 /*!
   \ingroup PkgBarycentric_coordinates_2
-  The namespace `CGAL::Barycentric_coordinates` contains implementations of all 
+  The namespace `Barycentric_coordinates` contains implementations of all 
   generalized barycentric coordinates: 2D, 3D, related enumerations, etc.
 */
 namespace Barycentric_coordinates {
@@ -37,8 +38,8 @@ namespace Barycentric_coordinates {
 /// @{
 
 /*!
-  `Query_point_location` defines different possible locations 
-  of a query point.
+  `Query_point_location` defines different locations of a query point
+  with respect to a polygon.
 */
 enum class Query_point_location {
 
@@ -48,10 +49,10 @@ enum class Query_point_location {
   /// Query point is located on the edge of the polygon.
   ON_EDGE = 1,
 
-  /// Query point is located inside the polygon, excluding the boundary.
+  /// Query point is located in the polygon's interior.
   ON_BOUNDED_SIDE = 2,
 
-  /// Query point is located outside the polygon, excluding the boundary.
+  /// Query point is located in the polygon's exterior.
   ON_UNBOUNDED_SIDE = 3,
 
   /// Location is unspecified. Leads to all coordinates being set to zero.
@@ -60,20 +61,26 @@ enum class Query_point_location {
 
 /// @}
 
-/// \name Algorithm Types
+/// \name Computation Policies
 /// @{
 
 /*!
-  `Algorithm_type` provides a way to choose a type of the algorithm 
-  to compute pointwise barycentric weights.
+  `Computation_policy` provides a way to choose an asymptotic time complexity 
+  of the algorithm.
 */
-enum class Algorithm_type {
-    
-  /// A default slow version of the algorithm, but very precise.
-  MAX_PRECISION = 0,
+enum class Computation_policy {
 
-  /// A fast version of the algorithm, which is less precise but much faster.
-  MAX_SPEED = 1
+  /*! 
+    Computation is very precise but has typically a quadratic time complexity 
+    with respect to the number of the polygon's vertices.
+  */
+  PRECISE_COMPUTATION = 0,
+
+  /*! 
+    Computation has typically a linear time complexity with respect to the 
+    number of the polygon's vertices, but may be less precise.
+  */
+  FAST_COMPUTATION = 1
 };
 
 /// @}
@@ -81,4 +88,4 @@ enum class Algorithm_type {
 } // namespace Barycentric_coordinates
 } // namespace CGAL
 
-#endif // CGAL_BARYCENTRIC_COORDINATES_ENUM_2_H
+#endif // CGAL_BARYCENTRIC_ENUM_2_H
