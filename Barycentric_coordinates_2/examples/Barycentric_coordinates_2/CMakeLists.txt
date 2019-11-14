@@ -16,6 +16,8 @@ if(CGAL_FOUND)
     "segment_coordinates.cpp")
   create_single_source_cgal_program(
     "triangle_coordinates.cpp")
+  create_single_source_cgal_program(
+      "wachspress_coordinates.cpp")
 
 else()
   message(WARNING 

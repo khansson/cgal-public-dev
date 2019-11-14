@@ -36,6 +36,7 @@
 // CGAL includes.
 #include <CGAL/assertions.h>
 #include <CGAL/number_utils.h>
+#include <CGAL/property_map.h>
 #include <CGAL/Polygon_2_algorithms.h>
 
 // Internal includes.
@@ -107,30 +108,23 @@ namespace internal {
       *(output++) = 0;
   }
 
-  template<
-  typename Polygon,
-  typename VertexMap,
-  typename GeomTraits>
+  template<typename GeomTraits>
   boost::optional< std::pair<Query_point_location, std::size_t> >
-  locate_wrt_polygon(
-    const Polygon& polygon, 
+  locate_wrt_polygon_2(
+    const std::vector<typename GeomTraits::Point_2>& polygon, 
     const typename GeomTraits::Point_2& query,
-    const VertexMap vertex_map,
     const GeomTraits traits) {
 
     using Point_2 = typename GeomTraits::Point_2;
     const auto collinear_2 = traits.collinear_2_object();
+    const auto collinear_are_ordered_along_line_2 = 
+      traits.collinear_are_ordered_along_line_2_object();
     CGAL_precondition(polygon.size() >= 3);
 
-    std::vector<Point_2> vertices;
-    vertices.reserve(polygon.size());
-    for (const auto& item : polygon)
-      vertices.push_back(get(vertex_map, item));
-    CGAL_assertion(vertices.size() == polygon.size());
-
     const auto type = CGAL::bounded_side_2(
-      vertices.begin(), vertices.end(), query, traits);
+      polygon.begin(), polygon.end(), query, traits);
 
+    // Locate point with respect to different polygon locations.
     switch (type) {
       case CGAL::ON_BOUNDED_SIDE:
         return std::make_pair(Query_point_location::ON_BOUNDED_SIDE, std::size_t(-1));
@@ -138,23 +132,24 @@ namespace internal {
         return std::make_pair(Query_point_location::ON_UNBOUNDED_SIDE, std::size_t(-1));
       case CGAL::ON_BOUNDARY: {
 
-        for (std::size_t i = 0; i < vertices.size(); ++i)
-          if (vertices[i] == query)
+        const std::size_t n = polygon.size();
+        for (std::size_t i = 0; i < n; ++i) {
+          if (polygon[i] == query)
             return std::make_pair(Query_point_location::ON_VERTEX, i);
 
-        for (std::size_t i = 0; i < vertices.size(); ++i) {
-          const std::size_t ip = (i + 1) % vertices.size();
-
+          const std::size_t ip = (i + 1) % n;
           if (collinear_2(
-                vertices[i], vertices[ip], query) && 
+                polygon[i], polygon[ip], query) && 
               collinear_are_ordered_along_line_2(
-                vertices[i], query, vertices[ip]))
-            return std::make_pair(Query_point_location::ON_EDGE, i); 
+                polygon[i], query, polygon[ip]))
+            return std::make_pair(Query_point_location::ON_EDGE, i);
         }
       }
-      default: 
+      default: {
         return std::make_pair(Query_point_location::UNSPECIFIED, std::size_t(-1));
+      }
     }
+    return boost::none;
   }
 
   enum class Polygon_type {
@@ -169,38 +164,28 @@ namespace internal {
     STRICTLY_CONVEX = 2
   };
 
-  template<
-  typename Polygon,
-  typename VertexMap,
-  typename GeomTraits>
+  template<typename GeomTraits>
   Polygon_type 
-  polygon_type(
-    const Polygon& polygon,
-    const VertexMap vertex_map,
+  polygon_type_2(
+    const std::vector<typename GeomTraits::Point_2>& polygon,
     const GeomTraits traits) {
     
     using Point_2 = typename GeomTraits::Point_2;
     const auto collinear_2 = traits.collinear_2_object();
     CGAL_precondition(polygon.size() >= 3);
 
-    std::vector<Point_2> vertices;
-    vertices.reserve(polygon.size());
-    for (const auto& item : polygon)
-      vertices.push_back(get(vertex_map, item));
-    CGAL_assertion(vertices.size() == polygon.size());
-
     // First, test the polygon on convexity.
-    if (CGAL::is_convex_2(vertices.begin(), vertices.end(), traits)) {
+    if (CGAL::is_convex_2(polygon.begin(), polygon.end(), traits)) {
 
       // Test all the consequent triplets of the polygon's vertices on collinearity.
       // In case we find at least one, return WEAKLY_CONVEX polygon.
-      const std::size_t n = vertices.size();
+      const std::size_t n = polygon.size();
       for (std::size_t i = 0; i < n; ++i) {
       
         const std::size_t im = (i + n - 1) % n;
         const std::size_t ip = (i + 1) % n;
       
-        if (collinear_2(vertices[im], vertices[i], vertices[ip]))
+        if (collinear_2(polygon[im], polygon[i], polygon[ip]))
           return Polygon_type::WEAKLY_CONVEX;
       }
       // Otherwise, return STRICTLY_CONVEX polygon.
@@ -209,6 +194,103 @@ namespace internal {
     // Otherwise, return CONCAVE polygon.
     return Polygon_type::CONCAVE;
   }
+
+  template< 
+  typename OutputIterator,
+  typename GeomTraits>
+  boost::optional<OutputIterator> linear_coordinates_2(
+    const typename GeomTraits::Point_2& source, 
+    const typename GeomTraits::Point_2& target, 
+    const typename GeomTraits::Point_2& query, 
+    OutputIterator coordinates,
+    const GeomTraits traits) {
+
+    if (source == target)
+      return boost::none;
+
+    // Number type.
+    using FT = typename GeomTraits::FT;
+
+    // Functions.
+    const auto scalar_product_2   = traits.compute_scalar_product_2_object();
+    const auto squared_distance_2 = traits.compute_squared_distance_2_object();
+
+    // Project point on the segment.
+    const FT opposite_scalar_product = 
+    scalar_product_2(query - target, source - target);
+
+    // Compute coordinates.
+    const FT b0 = opposite_scalar_product / squared_distance_2(source, target);
+    const FT b1 = FT(1) - b0;
+
+    // Return coordinates.
+    *(coordinates++) = b0;
+    *(coordinates++) = b1;
+
+    return coordinates;
+  }
+
+  template<
+  typename OutputIterator,
+  typename GeomTraits>
+  boost::optional< std::pair<OutputIterator, bool> > boundary_coordinates_2(
+    const std::vector<typename GeomTraits::Point_2>& polygon,
+    const typename GeomTraits::Point_2& query,
+    const Query_point_location location,
+    const std::size_t index,
+    OutputIterator coordinates,
+    const GeomTraits traits) {
+
+    using FT = typename GeomTraits::FT;
+
+    // Compute coordinates with respect to the query point location.
+    switch (location) {
+      
+      case Query_point_location::ON_VERTEX: {
+
+        const std::size_t n = polygon.size();
+        CGAL_precondition(index >= 0 && index < n);
+        
+        for (std::size_t i = 0; i < n; ++i)
+          if (i == index) 
+            *(coordinates++) = FT(1);
+          else
+            *(coordinates++) = FT(0);
+        return std::make_pair(coordinates, true);
+      }
+      
+      case Query_point_location::ON_EDGE: {  
+
+        const std::size_t n = polygon.size();
+        CGAL_precondition(index >= 0 && index < n);
+        
+        const std::size_t indexp = (index + 1) % n;
+
+        const auto& source = polygon[index];
+        const auto& target = polygon[indexp];
+
+        for (std::size_t i = 0; i < n; ++i)
+          if (i == index)
+            linear_coordinates_2(source, target, query, coordinates, traits);
+          else
+            *(coordinates++) = FT(0);
+        return std::make_pair(coordinates, true);
+      }
+
+      default: {
+        internal::get_default(polygon.size(), coordinates);
+        return std::make_pair(coordinates, false);
+      }
+    } 
+    return boost::none;
+  }
+
+  enum class Edge_case {
+    
+    UNBOUNDED = 0, // point is on the unbounded side of the polygon
+    BOUNDARY  = 1, // point is on the boundary of the polygon
+    INTERIOR  = 2  // point is in the interior of the polygon
+  };
 
 } // namespace internal
 } // namespace Barycentric_coordinates

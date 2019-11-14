@@ -1,7 +1,7 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/Barycentric_coordinates_2/analytic_coordinates_2.h>
 
-// Some convenient typedefs.
+// Typedefs.
 using Kernel = CGAL::Exact_predicates_exact_constructions_kernel;
 
 using FT      = Kernel::FT;
@@ -30,7 +30,7 @@ int main() {
 
   for(const auto& query_point : query_points)
     CGAL::Barycentric_coordinates::segment_coordinates_2(
-      source, target, query_point, std::back_inserter(coordinates), Kernel());
+      source, target, query_point, std::back_inserter(coordinates));
 
   // Output segment coordinates.
   std::cout << std::endl << "segment coordinates: " << std::endl << std::endl;

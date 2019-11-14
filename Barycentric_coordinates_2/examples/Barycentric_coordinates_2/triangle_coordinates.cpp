@@ -1,7 +1,7 @@
 #include <CGAL/Simple_cartesian.h>
 #include <CGAL/Barycentric_coordinates_2/analytic_coordinates_2.h>
 
-// Some convenient typedefs.
+// Typedefs.
 using Kernel = CGAL::Simple_cartesian<double>;
 
 using FT      = Kernel::FT;
@@ -33,7 +33,7 @@ int main() {
 
   for(const auto& query_point : query_points)
     CGAL::Barycentric_coordinates::triangle_coordinates_2(
-      p0, p1, p2, query_point, std::back_inserter(coordinates), Kernel());
+      p0, p1, p2, query_point, std::back_inserter(coordinates));
 
   // Output triangle coordinates.
   std::cout << std::endl << "triangle coordinates: " << std::endl << std::endl;

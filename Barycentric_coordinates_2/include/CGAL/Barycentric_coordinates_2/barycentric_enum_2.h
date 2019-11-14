@@ -72,15 +72,31 @@ enum class Computation_policy {
 
   /*! 
     Computation is very precise but has typically a quadratic time complexity 
+    with respect to the number of the polygon's vertices. In addition,
+    each query point is controlled for different edge cases, which slows down
+    the computation. This is the default strategy.
+  */
+  PRECISE_COMPUTATION_WITH_EDGE_CASES = 0,
+
+  /*! 
+    Computation is very precise but has typically a quadratic time complexity 
     with respect to the number of the polygon's vertices.
   */
-  PRECISE_COMPUTATION = 0,
+  PRECISE_COMPUTATION = 1,
+
+  /*! 
+    Computation has typically a linear time complexity with respect to the 
+    number of the polygon's vertices, but may be less precise. In addition,
+    each query point is controlled for different edge cases, which slows down
+    the computation.
+  */
+  FAST_COMPUTATION_WITH_EDGE_CASES = 2,
 
   /*! 
     Computation has typically a linear time complexity with respect to the 
     number of the polygon's vertices, but may be less precise.
   */
-  FAST_COMPUTATION = 1
+  FAST_COMPUTATION = 3
 };
 
 /// @}
