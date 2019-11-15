@@ -36,7 +36,7 @@ from the Package \ref PkgInterpolation2Ref.}
 \cgalClassifedRefPages
 
 ## Concepts ##
-- `PointwiseWeights_2`
+- `AnalyticWeights_2`
 - `HarmonicCoordinatesSolver`
 
 ## Classes ##
@@ -47,12 +47,12 @@ from the Package \ref PkgInterpolation2Ref.}
 
 ## Enumerations ##
 - `CGAL::Barycentric_coordinates::Query_point_location`
-- `CGAL::Barycentric_coordinates::Algorithm_type`
+- `CGAL::Barycentric_coordinates::Computation_policy`
 
 ## Functions ##
 - `CGAL::Barycentric_coordinates::segment_coordinates_2()`
 - `CGAL::Barycentric_coordinates::triangle_coordinates_2()`
 - `CGAL::Barycentric_coordinates::boundary_coordinates_2()`
-- `CGAL::Barycentric_coordinates::pointwise_weights_2()`
-- `CGAL::Barycentric_coordinates::pointwise_coordinates_2()`
+- `CGAL::Barycentric_coordinates::analytic_weights_2()`
+- `CGAL::Barycentric_coordinates::analytic_coordinates_2()`
 */

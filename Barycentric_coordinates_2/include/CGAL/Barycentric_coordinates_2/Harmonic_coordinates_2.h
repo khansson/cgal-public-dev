@@ -1,4 +1,4 @@
-// Copyright (c) 2014 INRIA Sophia-Antipolis (France).
+// Copyright (c) 2019 INRIA Sophia-Antipolis (France).
 // All rights reserved.
 //
 // This file is part of CGAL (www.cgal.org).
@@ -20,13 +20,12 @@
 // Author(s)     : Dmitry Anisimov, David Bommes, Kai Hormann, Pierre Alliez
 //
 
-#ifndef CGAL_BARYCENTRIC_COORDINATES_HARMONIC_COORDINATES_2_H
-#define CGAL_BARYCENTRIC_COORDINATES_HARMONIC_COORDINATES_2_H
+#ifndef CGAL_BARYCENTRIC_HARMONIC_COORDINATES_2_H
+#define CGAL_BARYCENTRIC_HARMONIC_COORDINATES_2_H
 
 #include <CGAL/license/Barycentric_coordinates_2.h>
 
 // STL includes.
-#include <map>
 #include <vector>
 #include <utility>
 #include <iterator>
@@ -34,17 +33,9 @@
 // Boost includes.
 #include <boost/optional/optional.hpp>
 
-// CGAL includes.
-#include <CGAL/assertions.h>
-#include <CGAL/number_utils.h>
-#include <CGAL/property_map.h>
-#include <CGAL/Polygon_2_algorithms.h>
-
 // Internal includes.
 #include <CGAL/Barycentric_coordinates_2/internal/utils_2.h>
 #include <CGAL/Barycentric_coordinates_2/barycentric_enum_2.h>
-#include <CGAL/Barycentric_coordinates_2/Discrete_harmonic_coordinates_2.h>
-#include <CGAL/Barycentric_coordinates_2/pointwise_coordinates_2.h>
 
 // [1] Reference: 
 
@@ -52,12 +43,12 @@ namespace CGAL {
 namespace Barycentric_coordinates {
 
   /*! 
-    \ingroup PkgBarycentric_coordinates_2WAC
+    \ingroup PkgBarycentric_coordinates_2HAC
 
     \brief Harmonic coordinates.
 
     This class implements 2D harmonic coordinates and can be used in conjunction
-    with `CGAL::Barycentric_coordinates::pointwise_coordinates_2()` to evaluate 
+    with `Barycentric_coordinates::analytic_coordinates_2()` to evaluate 
     harmonic coordinate functions at any point inside a polygon.
     
     Harmonic coordinates are well-defined and non-negative in the closure 
@@ -67,19 +58,19 @@ namespace Barycentric_coordinates {
     is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
 
     \tparam Triangulation
-    is any type that inherits from `CGAL::Triangulation_2`.
+    to be added
 
     \tparam Solver
     is a model of `HarmonicCoordinatesSolver`.
 
     \tparam GeomTraits 
-    is a model of `Kernel`.
+    is a model of `BarycentricTraits_2`.
 
     \tparam VertexMap 
     is an `LvaluePropertyMap` whose key type is `Polygon::value_type` and
-    value type is `Point_2`.
-    
-    \cgalModels `PointwiseWeigts_2`
+    value type is `GeomTraits::Point_2`.
+
+    \cgalModels `AnalyticWeights_2`
   */
   template<
   typename Polygon,
@@ -87,7 +78,7 @@ namespace Barycentric_coordinates {
   typename Solver,
   typename GeomTraits,
   typename VertexMap = CGAL::Identity_property_map<typename GeomTraits::Point_2> >
-  class Harmonic_coordinates_2 : public Discrete_harmonic_weights_2<Polygon, GeomTraits, VertexMap> {
+  class Harmonic_coordinates_2 {
 
   public:
 
@@ -95,12 +86,11 @@ namespace Barycentric_coordinates {
     /// @{
 
     /// \cond SKIP_IN_MANUAL 
-    using Base = Discrete_harmonic_weights_2<Polygon, GeomTraits, VertexMap>;
     using Polygon_ = Polygon;
     using Triangulation_ = Triangulation;
     using Solver_ = Solver;
-    using Traits = GeomTraits;
-    using Vertex_map = VertexMap;
+    using GeomTraits_ = GeomTraits;
+    using VertexMap_ = VertexMap;
     using Face_handle = typename Triangulation::Face_handle;
     /// \endcond
       
@@ -125,15 +115,13 @@ namespace Barycentric_coordinates {
       for 2D query points.
 
       \param polygon
-      An instance of `Polygon` with vertices of a 2D polygon.
+      An instance of `Polygon` with vertices of a simple polygon.
 
       \param triangulation
-      An instance of `Triangulation` that contains a triangulation of the polygon's
-      interior domain.
+      An instance of `Triangulation`.
 
       \param solver
-      An instance of `Solver` that computes the factorization 
-      of a sparse matrix.
+      An instance of `Solver`.
 
       \param vertex_map
       An instance of `VertexMap` that maps a vertex from `polygon` 
@@ -142,21 +130,33 @@ namespace Barycentric_coordinates {
       \param traits
       An instance of `GeomTraits`.
 
-      \pre `polygon.size() > 3`
+      \pre `polygon.size() >= 3`
+      \pre `polygon is simple`
     */
     Harmonic_coordinates_2(
-      const Polygon& polygon,
+      const Polygon& input_polygon,
       const Triangulation& triangulation,
       const Solver& solver,
+      const Computation_policy computation_policy 
+        = Computation_policy::PRECISE_COMPUTATION_WITH_EDGE_CASES,
       const VertexMap vertex_map = VertexMap(),
       const GeomTraits traits = GeomTraits()) :
-    m_polygon(polygon),
+    m_input_polygon(input_polygon),
     m_triangulation(triangulation),
     m_solver(solver),
+    m_computation_policy(computation_policy),
     m_vertex_map(vertex_map),
-    m_traits(traits) {
-        
-      CGAL_precondition(polygon.size() > 3);
+    m_traits(traits) { 
+
+      m_polygon.clear();
+      m_polygon.reserve(m_input_polygon.size());
+      for (const auto& item : m_input_polygon)
+        m_polygon.push_back(get(m_vertex_map, item));
+
+      CGAL_precondition(
+        m_polygon.size() >= 3);
+      CGAL_precondition(
+        CGAL::is_simple_2(m_polygon.begin(), m_polygon.end(), m_traits));
     }
 
     /// @}
@@ -165,17 +165,12 @@ namespace Barycentric_coordinates {
     /// @{ 
 
     /*!
-      \brief implements `PointwiseWeights_2::operator()()`.
+      \brief implements `AnalyticWeights_2::operator()()`.
         
       This function fills `coordinates` with harmonic coordinates 
       evaluated at the point `query` with respect to the vertices of the polygon.
       Evaluation is performed by locating a triangle in the `triangulation` and then
-      applying `CGAL::Barycentric_coordinates::triangle_coordinates_2()` to
-      harmonic coordinates associated with the vertices of this triangle.
-
-      This function can be called for any 2D point inside the polygon.
-
-      The number of computed coordinates is equal to the `polygon.size()`.
+      interpolating harmonic coordinates within this triangle.
         
       \tparam OutputIterator
       is an output iterator whose value type is `FT`.
@@ -191,11 +186,7 @@ namespace Barycentric_coordinates {
       const Point_2& query, 
       OutputIterator coordinates) const {
 
-      if (!is_valid_point(query)) {
-        internal::get_default(m_polygon.size(), coordinates);
-        return;
-      }
-
+      /*
       const auto fh = m_triangulation.locate(query);
       const Point_2& p1 = fh->vertex(0)->point();
       const Point_2& p2 = fh->vertex(1)->point();
@@ -219,7 +210,7 @@ namespace Barycentric_coordinates {
       for (std::size_t i = 0; i < result.size(); ++i)
         *(coordinates++) = result[i];
       
-      return boost::optional<OutputIterator>(coordinates);
+      return boost::optional<OutputIterator>(coordinates); */
     }
 
     /*!
@@ -227,8 +218,6 @@ namespace Barycentric_coordinates {
         
       This function fills `coordinates` with harmonic coordinates 
       computed at the vertex `vh` of the input triangulation.
-
-      The number of computed coordinates is equal to the `polygon.size()`.
         
       \tparam OutputIterator
       is an output iterator whose value type is `FT`.
@@ -244,14 +233,13 @@ namespace Barycentric_coordinates {
       const Vertex_handle vh, 
       OutputIterator coordinates) const {
 
-
     }
 
     /*!
-      \brief returns harmonic coordinates computed at all triangulation vertices.
+      \brief returns harmonic coordinates computed at the triangulation vertices.
         
       This function fills `coordinates` with harmonic coordinates 
-      computed at all vertices of the input triangulation.
+      computed at all the vertices of the input triangulation.
         
       \tparam OutputIterator
       is an output iterator whose value type is `std::vector<FT>`.
@@ -262,37 +250,6 @@ namespace Barycentric_coordinates {
     template<typename OutputIterator>
     boost::optional<OutputIterator> coordinates(OutputIterator coordinates) const {
 
-        
-    }
-
-    /// @}
-
-    /// \name Verifications
-    /// @{
-
-    /*!
-      \brief implements `PointwiseWeights_2::is_valid_point()`.
-
-      This function checks if a given point `query` is valid to compute harmonic coordinates.
-      It returns `true` if and only if `query` is in the polygon's closure.
-
-      \param query
-      A query point.
-
-      \return boolean `true` or `false`.
-    */
-    bool is_valid_point(const Point_2& query) const {
-        
-      const auto result = internal::locate_wrt_polygon(
-        m_polygon, query, 
-        m_vertex_map, 
-        m_traits);
-
-      const Query_point_location location = (*result).first;
-      if (location == Query_point_location::ON_UNBOUNDED_SIDE) 
-        return false;
-        
-      return true;
     }
 
     /// @}
@@ -301,10 +258,11 @@ namespace Barycentric_coordinates {
     /// @{
 
     /*!
-      computes harmonic coordinates at all vertices of the input triangulation.
+      computes harmonic coordinates at all the vertices of the input triangulation.
     */
     void compute() {
 
+      /*
       // Boundary and interior.
       const std::size_t n = _v.size();
       const std::size_t N = _mesh.numVertices();
@@ -409,7 +367,7 @@ namespace Barycentric_coordinates {
             bb[j][i] = p[j].b()[i];
           }
         }
-      }
+      } */
     }
 
     /// @}
@@ -436,15 +394,18 @@ namespace Barycentric_coordinates {
   private:
       
     // Fields.
-    const Polygon& m_polygon;
+    const Polygon& m_input_polygon;
     const Triangulation& m_triangulation;
     const Solver& m_solver;
-    const Vertex_map m_vertex_map;
-    const Traits m_traits;
+    const Computation_policy m_computation_policy;
+    const VertexMap m_vertex_map;
+    const GeomTraits m_traits;
 
+    std::vector<Point_2> m_polygon;
     std::map<Vertex_handle, std::vector<FT> > m_coordinates;
 
     // Function that solves the linear system.
+    /*
     void solve_linear_system(
       const Eigen::SparseMatrix<double>& A, 
       const MatrixXd& b, 
@@ -455,10 +416,10 @@ namespace Barycentric_coordinates {
 
       ldlt.compute(A);
       x = ldlt.solve(b);
-    }
+    } */
   };
 
 } // namespace Barycentric_coordinates
 } // namespace CGAL
 
-#endif // CGAL_BARYCENTRIC_COORDINATES_HARMONIC_COORDINATES_2_H
+#endif // CGAL_BARYCENTRIC_HARMONIC_COORDINATES_2_H

@@ -28,6 +28,10 @@
 // STL includes.
 #include <vector>
 #include <utility>
+#include <iterator>
+
+// Boost includes.
+#include <boost/optional/optional.hpp>
 
 // Internal includes.
 #include <CGAL/Barycentric_coordinates_2/internal/utils_2.h>
@@ -46,7 +50,7 @@ namespace Barycentric_coordinates {
     \brief Wachspress weights.
 
     This class implements 2D Wachspress weights ( \cite cgal:bc:fhk-gcbcocp-06, 
-    \cite cgal:bc:mlbd-gbcip-02, \cite cgal:bc:w-rfeb-75 ) and can be used in conjunction
+    \cite cgal:bc:mlbd-gbcip-02, \cite cgal:bc:w-rfeb-75) and can be used in conjunction
     with `Barycentric_coordinates::analytic_coordinates_2()` to compute
     Wachspress coordinates.
     
@@ -115,6 +119,7 @@ namespace Barycentric_coordinates {
       An instance of `GeomTraits`.
 
       \pre `polygon.size() >= 3`
+      \pre `polygon is simple`
       \pre `polygon is strictly convex`
     */
     Wachspress_weights_2(
@@ -144,11 +149,14 @@ namespace Barycentric_coordinates {
         internal::polygon_type_2(m_polygon, m_traits);
 
       if (polygon_type != internal::Polygon_type::STRICTLY_CONVEX)
-        m_is_valid_polygon = false;
+        m_is_strictly_convex_polygon = false;
       else 
-        m_is_valid_polygon = true;
+        m_is_strictly_convex_polygon = true;
       
-      CGAL_precondition(m_is_valid_polygon);
+      CGAL_precondition(
+        CGAL::is_simple_2(m_polygon.begin(), m_polygon.end(), m_traits));
+      CGAL_precondition(
+        m_is_strictly_convex_polygon);
     }
 
     /// @}
@@ -161,10 +169,7 @@ namespace Barycentric_coordinates {
         
       This function fills `weights` with Wachspress weights 
       computed at the `query` point with respect to the vertices of the polygon.
-        
-      If `query` is not valid for computing Wachspress weights, all weights
-      are set to zero. If `query` belongs to the polygon's boundary, the returned
-      weights are normalized.
+      If `query` belongs to the polygon's boundary, the returned weights are normalized.
 
       \tparam OutputIterator
       is an output iterator whose value type is `FT`.
@@ -188,8 +193,11 @@ namespace Barycentric_coordinates {
         }
         case Computation_policy::PRECISE_COMPUTATION_WITH_EDGE_CASES: {
           const auto edge_case = verify(query, weights);
-          if (edge_case != internal::Edge_case::INTERIOR)
+          if (edge_case == internal::Edge_case::BOUNDARY)
             return weights;
+          if (edge_case == internal::Edge_case::UNBOUNDED)
+            std::cerr << std::endl << 
+            "point does not belong to the polygon" << std::endl;
           return max_precision_weights(query, weights);
         }
         case Computation_policy::FAST_COMPUTATION: {
@@ -197,12 +205,21 @@ namespace Barycentric_coordinates {
         }
         case Computation_policy::FAST_COMPUTATION_WITH_EDGE_CASES: {
           const auto edge_case = verify(query, weights);
-          if (edge_case != internal::Edge_case::INTERIOR)
+          if (edge_case == internal::Edge_case::BOUNDARY)
             return weights;
+          if (edge_case == internal::Edge_case::UNBOUNDED)
+            std::cerr << std::endl << 
+            "point does not belong to the polygon" << std::endl;
           return max_speed_weights(query, weights);
         }
         default: {
-          internal::get_default(m_polygon.size(), weights); return weights;
+          const auto edge_case = verify(query, weights);
+          if (edge_case == internal::Edge_case::BOUNDARY)
+            return weights;
+          if (edge_case == internal::Edge_case::UNBOUNDED)
+            std::cerr << std::endl << 
+            "point does not belong to the polygon" << std::endl;
+          return max_precision_weights(query, weights);
         }
       }
       return boost::none;
@@ -228,7 +245,7 @@ namespace Barycentric_coordinates {
       const Point_2& query, 
       OutputIterator weights) {
       
-      return operator()(m_polygon, query, weights, m_traits);
+      return operator()(m_input_polygon, query, weights, m_traits);
     }
 
     /// @}
@@ -248,7 +265,7 @@ namespace Barycentric_coordinates {
     const Area_2 m_area_2;
     
     std::vector<Point_2> m_polygon;
-    bool m_is_valid_polygon;
+    bool m_is_strictly_convex_polygon;
 
     // Functions.
     template<typename OutputIterator>

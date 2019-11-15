@@ -28,6 +28,7 @@
 // STL includes.
 #include <vector>
 #include <utility>
+#include <iterator>
 
 // Boost headers.
 #include <boost/mpl/has_xxx.hpp>
@@ -55,9 +56,8 @@ namespace internal {
 
   public:
     FT operator()(const FT value) const { 
-      
-      CGAL_precondition(value >= FT(0));
-      return static_cast<FT>(CGAL::sqrt(CGAL::to_double(value)));
+      return static_cast<FT>(
+        CGAL::sqrt(CGAL::to_double(CGAL::abs(value))));
     }
   };
 
@@ -98,8 +98,10 @@ namespace internal {
       sum += value;
     
     CGAL_assertion(sum != FT(0));
+    const FT inv_sum = FT(1) / sum;
+
     for (auto& value : values)
-      value /= sum;
+      value *= inv_sum;
   }
 
   template<typename OutputIterator>
@@ -233,6 +235,34 @@ namespace internal {
   template<
   typename OutputIterator,
   typename GeomTraits>
+  boost::optional< std::pair<OutputIterator, bool> > coordinates_on_last_edge_2(
+    const std::vector<typename GeomTraits::Point_2>& polygon,
+    const typename GeomTraits::Point_2& query,
+    OutputIterator coordinates,
+    const GeomTraits traits) {
+
+    using FT = typename GeomTraits::FT;
+    const std::size_t n = polygon.size();
+
+    std::vector<FT> b; 
+    b.reserve(2);
+
+    const auto& source = polygon[n - 1];
+    const auto& target = polygon[0];
+
+    linear_coordinates_2(
+      source, target, query, std::back_inserter(b), traits);
+    *(coordinates++) = b[1];
+    for (std::size_t i = 1; i < n - 1; ++i)
+      *(coordinates++) = FT(0);
+    *(coordinates++) = b[0];
+
+    return std::make_pair(coordinates, true);
+  }
+
+  template<
+  typename OutputIterator,
+  typename GeomTraits>
   boost::optional< std::pair<OutputIterator, bool> > boundary_coordinates_2(
     const std::vector<typename GeomTraits::Point_2>& polygon,
     const typename GeomTraits::Point_2& query,
@@ -242,13 +272,12 @@ namespace internal {
     const GeomTraits traits) {
 
     using FT = typename GeomTraits::FT;
+    const std::size_t n = polygon.size();
 
     // Compute coordinates with respect to the query point location.
     switch (location) {
       
       case Query_point_location::ON_VERTEX: {
-
-        const std::size_t n = polygon.size();
         CGAL_precondition(index >= 0 && index < n);
         
         for (std::size_t i = 0; i < n; ++i)
@@ -260,25 +289,28 @@ namespace internal {
       }
       
       case Query_point_location::ON_EDGE: {  
-
-        const std::size_t n = polygon.size();
         CGAL_precondition(index >= 0 && index < n);
-        
+
+        if (index == n - 1)
+          return coordinates_on_last_edge_2(
+            polygon, query, coordinates, traits);
+
         const std::size_t indexp = (index + 1) % n;
 
         const auto& source = polygon[index];
         const auto& target = polygon[indexp];
 
         for (std::size_t i = 0; i < n; ++i)
-          if (i == index)
-            linear_coordinates_2(source, target, query, coordinates, traits);
-          else
+          if (i == index) {
+            linear_coordinates_2(source, target, query, coordinates, traits); ++i;
+          } else {
             *(coordinates++) = FT(0);
+          }
         return std::make_pair(coordinates, true);
       }
 
       default: {
-        internal::get_default(polygon.size(), coordinates);
+        internal::get_default(n, coordinates);
         return std::make_pair(coordinates, false);
       }
     } 

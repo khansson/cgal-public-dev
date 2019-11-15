@@ -299,13 +299,19 @@ namespace Barycentric_coordinates {
     const GeomTraits traits,
     const VertexMap vertex_map) {
 
+    using Point_2 = typename GeomTraits::Point_2;
+    std::vector<Point_2> poly;
+    poly.reserve(polygon.size());
+    for (const auto& item : polygon)
+      poly.push_back(get(vertex_map, item));
+
     const auto result = 
-    internal::locate_wrt_polygon_2(polygon, query, vertex_map, traits);
+    internal::locate_wrt_polygon_2(poly, query, traits);
     const auto location = (*result).first;
     const auto index    = (*result).second;
 
     return internal::boundary_coordinates_2(
-      polygon, query, location, index, coordinates, vertex_map, traits);
+      poly, query, location, index, coordinates, traits);
   }
 
   /*!
@@ -433,16 +439,27 @@ namespace Barycentric_coordinates {
     const PointMap point_map) {
 
     using FT = typename GeomTraits::FT;
+    using Point_2 = typename GeomTraits::Point_2;
+
+    std::vector<Point_2> poly;
+    poly.reserve(polygon.size());
+    for (const auto& item : polygon)
+      poly.push_back(get(vertex_map, item));
 
     std::vector<FT> b;
     b.reserve(polygon.size());
 
     for (const auto& item : queries) {
       const auto& query = get(point_map, item);
-      b.clear(); boundary_coordinates_2(
-        polygon, query,
-        std::back_inserter(b),
-        traits, vertex_map);
+
+      const auto result = 
+      internal::locate_wrt_polygon_2(poly, query, traits);
+      const auto location = (*result).first;
+      const auto index    = (*result).second;
+
+      b.clear();
+      internal::boundary_coordinates_2(
+        poly, query, location, index, std::back_inserter(b), traits);
       *(coordinates++) = b;
     }
     return coordinates;

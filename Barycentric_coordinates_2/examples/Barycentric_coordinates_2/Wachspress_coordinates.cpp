@@ -22,10 +22,10 @@ using Wachspress = CGAL::Barycentric_coordinates::Wachspress_weights_2<Points_2,
 int main() {
   
   // Choose how many random query points we want to generate.
-  const std::size_t num_query_points = 1000;
+  const std::size_t num_query_points = 100;
 
   // Create vectors to store query points and polygon vertices.
-  Points_2 query_points, polygon;
+  Points_2 query_points, convex;
 
   // Generate a set of random query points.
   query_points.reserve(num_query_points);
@@ -37,25 +37,27 @@ int main() {
   // This convex hull gives the vertices of a convex polygon 
   // that contains all the generated points.
   CGAL::convex_hull_2(
-    query_points.begin(), query_points.end(), std::back_inserter(polygon));
-  const std::size_t num_vertices = polygon.size();
+    query_points.begin(), query_points.end(), std::back_inserter(convex));
+  const std::size_t num_vertices = convex.size();
 
   // Instantiate the class with Wachspress weights.
-  Wachspress wachspress(polygon);
+  Wachspress wachspress(convex);
     
   // Compute Wachspress coordinates for all queries at once.
-  std::vector< std::vector<FT> > coordinates;
-  coordinates.reserve(query_points.size());
+  std::vector< std::vector<FT> > bs;
+  bs.reserve(query_points.size());
   CGAL::Barycentric_coordinates::analytic_coordinates_2(
-    polygon, query_points, wachspress, 
-    std::back_inserter(coordinates), Kernel(), Point_map());
+    convex, query_points, wachspress, 
+    std::back_inserter(bs), Kernel(), Point_map());
 
   // Output Wachspress coordinates.
-  std::cout << std::endl << "Wachspress coordinates: " << std::endl << std::endl;
-  for (const auto& vec : coordinates) {
-    for (const FT coordinate : vec)
-      std::cout << coordinate << ", ";
-    std::cout << std::endl;
+  std::cout << std::endl << 
+    "Wachspress coordinates (interior + boundary): " 
+  << std::endl << std::endl;
+  for (const auto& b : bs) {
+    for (std::size_t i = 0; i < b.size() - 1; ++i)
+      std::cout << b[i] << ", ";
+    std::cout << b[b.size() - 1] << std::endl;
   }
 
   return EXIT_SUCCESS;
