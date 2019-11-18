@@ -58,7 +58,7 @@ namespace Barycentric_coordinates {
     convex polygon but they do not necesserily give positive values.
 
     \tparam Polygon
-    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+    is a model of `ConstRange`.
 
     \tparam GeomTraits 
     is a model of `BarycentricTraits_2`.
@@ -106,7 +106,7 @@ namespace Barycentric_coordinates {
       This class implements the behavior of discrete harmonic weights 
       for 2D query points.
 
-      \param polygon
+      \param input_polygon
       An instance of `Polygon` with vertices of a strictly convex polygon.
 
       \param computation_policy

@@ -256,7 +256,7 @@ namespace Barycentric_coordinates {
     In all other cases, all the coordinates are set to zero.
 
     \tparam Polygon
-    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+    is a model of `ConstRange`.
 
     \tparam OutputIterator
     is an output iterator whose value type is `GeomTraits::FT`.
@@ -328,7 +328,7 @@ namespace Barycentric_coordinates {
     generic function above.
 
     \tparam Polygon
-    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+    is a model of `ConstRange`.
 
     \tparam Point_2
     is a point type.
@@ -382,10 +382,10 @@ namespace Barycentric_coordinates {
     This function calls the function above on a range of query points.
 
     \tparam Polygon
-    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+    is a model of `ConstRange`.
 
     \tparam QueryRange
-    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+    is a model of `ConstRange`.
 
     \tparam OutputIterator
     is an output iterator whose value type is `std::vector<GeomTraits::FT>`.
@@ -467,14 +467,14 @@ namespace Barycentric_coordinates {
 
   /*!
     This function takes a range of `query` points and computes the chosen 
-    barycentric `weights` at each point with respect to the vertices of a given `polygon`. 
+    barycentric `weights` at each point with respect to the given `vertices`. 
     These weights are then returned in `output`.
 
-    \tparam Polygon
-    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+    \tparam VertexRange
+    is a model of `ConstRange`.
 
     \tparam QueryRange
-    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+    is a model of `ConstRange`.
 
     \tparam Weights
     is a model of `AnalyticWeights_2`.
@@ -489,8 +489,8 @@ namespace Barycentric_coordinates {
     is an `LvaluePropertyMap` whose key type is `QueryRange::value_type` and
     value type is `GeomTraits::Point_2`.
 
-    \param polygon
-    An instance of `Polygon` with vertices of a simple polygon.
+    \param vertices
+    An instance of `VertexRange` with vertices.
 
     \param queries
     An instance of `QueryRange` with query points.
@@ -512,14 +512,14 @@ namespace Barycentric_coordinates {
     \return an optional output iterator.
   */
   template<
-  typename Polygon,
+  typename VertexRange,
   typename QueryRange,
   typename Weights,
   typename OutputIterator,
   typename GeomTraits,
   typename PointMap>
   boost::optional<OutputIterator> analytic_weights_2(
-    const Polygon& polygon,
+    const VertexRange& vertices,
     const QueryRange& queries,
     Weights& weights,
     OutputIterator output,
@@ -529,12 +529,12 @@ namespace Barycentric_coordinates {
     using FT = typename GeomTraits::FT;
 
     std::vector<FT> w;
-    w.reserve(polygon.size());
+    w.reserve(vertices.size());
 
     for (const auto& item : queries) {
       const auto& query = get(point_map, item);
       w.clear(); weights(
-        polygon, query, std::back_inserter(w), traits); 
+        vertices, query, std::back_inserter(w), traits); 
       *(output++) = w;
     }
     return output;
@@ -542,14 +542,14 @@ namespace Barycentric_coordinates {
 
   /*!
     This function takes a `query` point and computes the chosen barycentric
-    `weights` at this point with respect to the vertices of a given `polygon`. 
-    These weights are then normalized and returned in `coordinates`.
+    `weights` at this point with respect to the given `vertices`. These weights 
+    are then normalized and returned in `coordinates`.
 
-    \tparam Polygon
-    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+    \tparam VertexRange
+    is a model of `ConstRange`.
 
     \tparam Point_2
-    is point type.
+    is a point type.
 
     \tparam Weights
     is a model of `AnalyticWeights_2`.
@@ -560,8 +560,8 @@ namespace Barycentric_coordinates {
     \tparam GeomTraits 
     is a model of `BarycentricTraits_2`.
 
-    \param polygon
-    An instance of `Polygon` with vertices of a simple polygon.
+    \param vertices
+    An instance of `VertexRange` with vertices.
 
     \param query
     A query point.
@@ -579,13 +579,13 @@ namespace Barycentric_coordinates {
     \return an optional output iterator.
   */
   template<
-  typename Polygon,
+  typename VertexRange,
   typename Point_2,
   typename Weights,
   typename OutputIterator,
   typename GeomTraits>
   boost::optional<OutputIterator> analytic_coordinates_2(
-    const Polygon& polygon,
+    const VertexRange& vertices,
     const Point_2& query,
     Weights& weights,
     OutputIterator coordinates,
@@ -594,9 +594,9 @@ namespace Barycentric_coordinates {
     using FT = typename GeomTraits::FT;
 
     std::vector<FT> b;
-    b.reserve(polygon.size());
+    b.reserve(vertices.size());
 
-    weights(polygon, query, std::back_inserter(b), traits);
+    weights(vertices, query, std::back_inserter(b), traits);
     internal::normalize(b);
     for (const auto& value : b)
       *(coordinates++) = value;
@@ -605,17 +605,17 @@ namespace Barycentric_coordinates {
 
   /*!
     This function takes a `query` point and computes the chosen barycentric
-    `weights` at this point with respect to the vertices of a given `polygon`. 
-    These weights are then normalized and returned in `coordinates`.
+    `weights` at this point with respect to the given `vertices`. These weights 
+    are then normalized and returned in `coordinates`.
 
     This function infers a traits class from the `Point_2` class and calls the
     generic function above.
 
-    \tparam Polygon
-    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+    \tparam VertexRange
+    is a model of `ConstRange`.
 
     \tparam Point_2
-    is point type.
+    is a point type.
 
     \tparam Weights
     is a model of `AnalyticWeights_2`.
@@ -623,8 +623,8 @@ namespace Barycentric_coordinates {
     \tparam OutputIterator
     is an output iterator whose value type is `Kernel_traits<Point_2>::Kernel::FT`.
 
-    \param polygon
-    An instance of `Polygon` with vertices of a simple polygon.
+    \param vertices
+    An instance of `VertexRange` with vertices.
 
     \param query
     A query point.
@@ -639,31 +639,31 @@ namespace Barycentric_coordinates {
     \return an optional output iterator.
   */
   template<
-  typename Polygon,
+  typename VertexRange,
   typename Point_2,
   typename Weights,
   typename OutputIterator>
   boost::optional<OutputIterator> analytic_coordinates_2(
-    const Polygon& polygon,
+    const VertexRange& vertices,
     const Point_2& query,
     Weights& weights,
     OutputIterator coordinates) {
 
     using GeomTraits = typename Kernel_traits<Point_2>::Kernel;
     return analytic_coordinates_2(
-      polygon, query, weights, coordinates, GeomTraits());
+      vertices, query, weights, coordinates, GeomTraits());
   }
 
   /*!
     This function takes a range of `query` points and computes the chosen 
-    barycentric `weights` at each point with respect to the vertices of a given `polygon`. 
+    barycentric `weights` at each point with respect to the given `vertices`. 
     These weights are then normalized and returned in `coordinates`.
 
-    \tparam Polygon
-    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+    \tparam VertexRange
+    is a model of `ConstRange`.
 
     \tparam QueryRange
-    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+    is a model of `ConstRange`.
 
     \tparam Weights
     is a model of `AnalyticWeights_2`.
@@ -678,8 +678,8 @@ namespace Barycentric_coordinates {
     is an `LvaluePropertyMap` whose key type is `QueryRange::value_type` and
     value type is `GeomTraits::Point_2`.
 
-    \param polygon
-    An instance of `Polygon` with vertices of a simple polygon.
+    \param vertices
+    An instance of `VertexRange` with vertices.
 
     \param queries
     An instance of `QueryRange` with query points.
@@ -701,14 +701,14 @@ namespace Barycentric_coordinates {
     \return an optional output iterator.
   */
   template<
-  typename Polygon,
+  typename VertexRange,
   typename QueryRange,
   typename Weights,
   typename OutputIterator,
   typename GeomTraits,
   typename PointMap>
   boost::optional<OutputIterator> analytic_coordinates_2(
-    const Polygon& polygon,
+    const VertexRange& vertices,
     const QueryRange& queries,
     Weights& weights,
     OutputIterator coordinates,
@@ -718,11 +718,11 @@ namespace Barycentric_coordinates {
     using FT = typename GeomTraits::FT;
 
     std::vector<FT> b;
-    b.reserve(polygon.size());
+    b.reserve(vertices.size());
 
     for (const auto& item : queries) {
       const auto& query = get(point_map, item);
-      b.clear(); weights(polygon, query, std::back_inserter(b), traits);
+      b.clear(); weights(vertices, query, std::back_inserter(b), traits);
       internal::normalize(b); *(coordinates++) = b;
     }
     return coordinates;

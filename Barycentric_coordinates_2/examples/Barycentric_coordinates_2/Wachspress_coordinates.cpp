@@ -22,32 +22,32 @@ using Wachspress = CGAL::Barycentric_coordinates::Wachspress_weights_2<Points_2,
 int main() {
   
   // Choose how many random query points we want to generate.
-  const std::size_t num_query_points = 100;
+  const std::size_t num_queries = 100;
 
   // Create vectors to store query points and polygon vertices.
-  Points_2 query_points, convex;
+  Points_2 queries, convex;
 
   // Generate a set of random query points.
-  query_points.reserve(num_query_points);
+  queries.reserve(num_queries);
   Generator generator(1.0);
   std::copy_n(
-    generator, num_query_points, std::back_inserter(query_points));
+    generator, num_queries, std::back_inserter(queries));
 
   // Find the convex hull of the generated query points.
   // This convex hull gives the vertices of a convex polygon 
   // that contains all the generated points.
   CGAL::convex_hull_2(
-    query_points.begin(), query_points.end(), std::back_inserter(convex));
+    queries.begin(), queries.end(), std::back_inserter(convex));
   const std::size_t num_vertices = convex.size();
 
   // Instantiate the class with Wachspress weights.
   Wachspress wachspress(convex);
     
-  // Compute Wachspress coordinates for all queries at once.
+  // Compute Wachspress coordinates for all query points at once.
   std::vector< std::vector<FT> > bs;
-  bs.reserve(query_points.size());
+  bs.reserve(queries.size());
   CGAL::Barycentric_coordinates::analytic_coordinates_2(
-    convex, query_points, wachspress, 
+    convex, queries, wachspress, 
     std::back_inserter(bs), Kernel(), Point_map());
 
   // Output Wachspress coordinates.

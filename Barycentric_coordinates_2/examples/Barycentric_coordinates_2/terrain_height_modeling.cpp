@@ -20,22 +20,23 @@ using Projection = CGAL::Projection_traits_xy_3<Kernel>;
 using FT    = typename Projection::FT;
 using Point = typename Projection::Point_2;
 
-// Coordinates.
-using Points     = std::vector<Point>;
-using Mean_value = CGAL::Barycentric_coordinates::Mean_value_weights_2<Points, Projection>;
-
 // Triangulation.
 using FB  = CGAL::Delaunay_mesh_face_base_2<Projection>;
 using VB  = CGAL::Triangulation_vertex_base_2<Projection>;
 using TDS = CGAL::Triangulation_data_structure_2<VB, FB>;
 using CDT = CGAL::Constrained_Delaunay_triangulation_2<Projection, TDS>;
 
+using Vertex_handle = typename CDT::Vertex_handle;
+
+// Mesher.
 using Criteria = CGAL::Delaunay_mesh_size_criteria_2<CDT>;
 using Mesher   = CGAL::Delaunay_mesher_2<CDT, Criteria>;
 
-using Vertex_handle = typename CDT::Vertex_handle;
+// Coordinates.
+using Points     = std::vector<Point>;
+using Mean_value = CGAL::Barycentric_coordinates::Mean_value_weights_2<Points, Projection>;
 
-// Interpolation
+// Interpolation.
 using Interpolation_traits   = CGAL::Interpolation_traits_2<Projection>;
 using Vertex_function_value  = std::map<Point, FT, typename Projection::Less_xy_2>;
 using Function_value_access  = CGAL::Data_access<Vertex_function_value>;

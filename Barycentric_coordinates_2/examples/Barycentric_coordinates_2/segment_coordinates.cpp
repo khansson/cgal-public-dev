@@ -17,7 +17,7 @@ int main() {
   const Point_2 target(FT(2), y);
 
   // Instantiate three interior and two exterior query points.
-  const std::vector<Point_2> query_points = { 
+  const std::vector<Point_2> queries = { 
     Point_2(FT(2) / FT(5), y), // interior query points
     Point_2(FT(5) / FT(5), y),
     Point_2(FT(8) / FT(5), y),
@@ -27,11 +27,11 @@ int main() {
 
   // Compute segment coordinates.
   std::vector<FT> coordinates;
-  coordinates.reserve(query_points.size() * 2);
+  coordinates.reserve(queries.size() * 2);
 
-  for(const auto& query_point : query_points)
+  for(const auto& query : queries)
     CGAL::Barycentric_coordinates::segment_coordinates_2(
-      source, target, query_point, std::back_inserter(coordinates));
+      source, target, query, std::back_inserter(coordinates));
 
   // Output segment coordinates.
   std::cout << std::endl << "segment coordinates: " << std::endl << std::endl;

@@ -62,7 +62,7 @@ namespace Barycentric_coordinates {
     non-negative in the kernel of a star-shaped polygon.
 
     \tparam Polygon
-    is a model of `ConstRange` whose iterator type is `RandomAccessIterator`.
+    is a model of `ConstRange`.
 
     \tparam GeomTraits 
     is a model of `BarycentricTraits_2`.
@@ -114,7 +114,7 @@ namespace Barycentric_coordinates {
       This class implements the behavior of mean value weights 
       for 2D query points.
 
-      \param polygon
+      \param input_polygon
       An instance of `Polygon` with vertices of a simple polygon.
 
       \param computation_policy

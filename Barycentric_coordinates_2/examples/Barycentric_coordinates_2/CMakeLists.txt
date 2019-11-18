@@ -23,10 +23,21 @@ if(CGAL_FOUND)
   create_single_source_cgal_program(
     "mean_value_coordinates.cpp")
   create_single_source_cgal_program(
-    "harmonic_coordinates.cpp")
-  create_single_source_cgal_program(
     "terrain_height_modeling.cpp")
 
+  find_package(Eigen3 REQUIRED)
+  if(EIGEN3_FOUND)  
+    include(${EIGEN3_USE_FILE})
+
+    create_single_source_cgal_program(
+      "harmonic_coordinates.cpp")
+    create_single_source_cgal_program(
+      "affine_coordinates.cpp")
+
+  else()
+    message(WARNING 
+    "Harmonic/Affine coordinates require the Eigen library, and will not be compiled.")
+  endif()
 else()
   message(WARNING 
   "This program requires the CGAL library, and will not be compiled.")

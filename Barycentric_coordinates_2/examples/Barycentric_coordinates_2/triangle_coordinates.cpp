@@ -16,7 +16,7 @@ int main() {
   const Point_2 p2(1.0, 2.0);
 
   // Instantiate several interior, boundary, and exterior query points.
-  const std::vector<Point_2> query_points = { 
+  const std::vector<Point_2> queries = { 
     Point_2(0.5, 0.5), // interior query points
     Point_2(1.0, 0.5), Point_2(1.0, 0.75), Point_2(1.0, 1.0),
     
@@ -30,11 +30,11 @@ int main() {
 
   // Compute triangle coordinates.
   std::vector<FT> coordinates;
-  coordinates.reserve(query_points.size() * 3);
+  coordinates.reserve(queries.size() * 3);
 
-  for(const auto& query_point : query_points)
+  for(const auto& query : queries)
     CGAL::Barycentric_coordinates::triangle_coordinates_2(
-      p0, p1, p2, query_point, std::back_inserter(coordinates));
+      p0, p1, p2, query, std::back_inserter(coordinates));
 
   // Output triangle coordinates.
   std::cout << std::endl << "triangle coordinates: " << std::endl << std::endl;

@@ -58,7 +58,8 @@ int main() {
   discrete_harmonic(center, std::back_inserter(weights));
 
   std::cout << std::endl << "discrete harmonic weights (center): ";
-  for (const FT weight : weights) std::cout << weight << " ";
+  for (const FT weight : weights) 
+    std::cout << weight << " ";
   std::cout << std::endl;
 
   // Compute discrete harmonic coordinates for the center point.
@@ -67,7 +68,8 @@ int main() {
     square, center, discrete_harmonic, std::back_inserter(coordinates));
 
   std::cout << std::endl << "discrete harmonic coordinates (center): ";
-  for (const FT coordinate : coordinates) std::cout << coordinate << " ";
+  for (const FT coordinate : coordinates) 
+    std::cout << coordinate << " ";
   std::cout << std::endl;
   
   // Instantiate several interior points.

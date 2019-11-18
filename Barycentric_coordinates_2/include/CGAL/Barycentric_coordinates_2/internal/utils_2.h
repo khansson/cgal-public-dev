@@ -97,6 +97,9 @@ namespace internal {
     for (const auto& value : values)
       sum += value;
     
+    if (sum == FT(0))
+      return;
+
     CGAL_assertion(sum != FT(0));
     const FT inv_sum = FT(1) / sum;
 
