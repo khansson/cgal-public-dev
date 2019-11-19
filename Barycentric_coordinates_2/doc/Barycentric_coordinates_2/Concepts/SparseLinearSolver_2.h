@@ -3,13 +3,12 @@
 \cgalConcept
 
 A concept that describes the set of methods that should be defined for all
-solvers that can be used to solve the Laplace equation in 
-`Barycentric_coordinates::Harmonic_coordinates_2`.
+sparse linear solvers that can be used to solve the Laplace equation.
 
 This concept follows the generic sparse solver concept from Eigen.
 */
 
-class HarmonicCoordinatesSolver_2 {
+class SparseLinearSolver_2 {
 
 public:
 

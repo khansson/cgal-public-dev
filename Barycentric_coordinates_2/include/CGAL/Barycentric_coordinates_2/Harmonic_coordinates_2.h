@@ -25,16 +25,6 @@
 
 #include <CGAL/license/Barycentric_coordinates_2.h>
 
-// STL includes.
-#include <map>
-#include <memory>
-#include <vector>
-#include <utility>
-#include <iterator>
-
-// Boost includes.
-#include <boost/optional/optional.hpp>
-
 // Eigen includes.
 #include <Eigen/Core>
 #include <Eigen/Dense>
@@ -43,10 +33,10 @@
 // Internal includes.
 #include <CGAL/Barycentric_coordinates_2/internal/utils_2.h>
 #include <CGAL/Barycentric_coordinates_2/barycentric_enum_2.h>
-#include <CGAL/Barycentric_coordinates_2/Discrete_harmonic_weights_2.h>
-#include <CGAL/Barycentric_coordinates_2/analytic_coordinates_2.h>
 
-// [1] Reference: 
+// [1] Reference: "P. Joshi, M. Meyer, T. DeRose, B. Green, and T. Sanocki. 
+// Harmonic coordinates for character articulation.
+// ACM Transactions on Graphics, 26(3):71:1-9, 2007.".
 
 namespace CGAL {
 namespace Barycentric_coordinates {
@@ -66,11 +56,12 @@ namespace Barycentric_coordinates {
     \tparam Polygon
     is a model of `ConstRange`.
 
-    \tparam Triangulation
-    is a model of `HarmonicCoordinatesDomain_2`.
+    \tparam Domain
+    is a model of `DiscretizedDomain_2`. For the moment, we only support domains
+    that have elements, which are triangles.
 
     \tparam Solver
-    is a model of `HarmonicCoordinatesSolver_2`.
+    is a model of `SparseLinearSolver_2`.
 
     \tparam GeomTraits 
     is a model of `BarycentricTraits_2`.
@@ -83,7 +74,7 @@ namespace Barycentric_coordinates {
   */
   template<
   typename Polygon,
-  typename Triangulation,
+  typename Domain,
   typename Solver,
   typename GeomTraits,
   typename VertexMap = CGAL::Identity_property_map<typename GeomTraits::Point_2> >
@@ -95,12 +86,11 @@ namespace Barycentric_coordinates {
     /// @{
 
     /// \cond SKIP_IN_MANUAL 
-    using Polygon_ = Polygon;
-    using Triangulation_ = Triangulation;
-    using Solver_ = Solver;
+    using Polygon_    = Polygon;
+    using Domain_     = Domain;
+    using Solver_     = Solver;
     using GeomTraits_ = GeomTraits;
-    using VertexMap_ = VertexMap;
-    using Face_handle = typename Triangulation::Face_handle;
+    using VertexMap_  = VertexMap;
     /// \endcond
       
     /// Number type.
@@ -109,19 +99,12 @@ namespace Barycentric_coordinates {
     /// Point type.
     typedef typename GeomTraits::Point_2 Point_2;
 
-    /// Vertex handle type.
-    typedef typename Triangulation::Vertex_handle Vertex_handle;
-
     /// \cond SKIP_IN_MANUAL 
+    using Vector_2 = typename GeomTraits::Vector_2;
+
     using MatrixFT  = Eigen::SparseMatrix<FT>;
     using VectorFT  = Eigen::Matrix<FT, Eigen::Dynamic, Eigen::Dynamic>;
     using TripletFT = Eigen::Triplet<FT>;
-
-    using Discrete_harmonic = 
-      CGAL::Barycentric_coordinates::Discrete_harmonic_weights_2<
-        Polygon, GeomTraits, VertexMap>;
-    using Policy = CGAL::Barycentric_coordinates::Computation_policy;
-    using Location = std::pair<Query_point_location, std::size_t>;
     /// \endcond
 
     /// @}
@@ -135,11 +118,11 @@ namespace Barycentric_coordinates {
       This class implements the behavior of harmonic coordinates 
       for 2D query points.
 
-      \param input_polygon
+      \param polygon
       An instance of `Polygon` with vertices of a simple polygon.
 
-      \param triangulation
-      An instance of `Triangulation`.
+      \param domain
+      An instance of `Domain`.
 
       \param solver
       An instance of `Solver`.
@@ -155,13 +138,13 @@ namespace Barycentric_coordinates {
       \pre `polygon is simple`
     */
     Harmonic_coordinates_2(
-      const Polygon& input_polygon,
-      const Triangulation& triangulation,
-      const Solver& solver,
+      const Polygon& polygon,
+      const Domain& domain,
+      Solver& solver,
       const VertexMap vertex_map = VertexMap(),
       const GeomTraits traits = GeomTraits()) :
-    m_input_polygon(input_polygon),
-    m_triangulation(triangulation),
+    m_input_polygon(polygon),
+    m_domain(domain),
     m_solver(solver),
     m_vertex_map(vertex_map),
     m_traits(traits) { 
@@ -176,7 +159,10 @@ namespace Barycentric_coordinates {
       CGAL_precondition(
         CGAL::is_simple_2(m_polygon.begin(), m_polygon.end(), m_traits));
       CGAL_precondition(
-        m_triangulation.number_of_vertices() >= m_polygon.size());
+        m_domain.number_of_vertices() >= m_polygon.size());
+
+      m_b.reserve(3);
+      m_element.reserve(3);
     }
 
     /// @}
@@ -189,9 +175,12 @@ namespace Barycentric_coordinates {
         
       This function fills `coordinates` with harmonic coordinates 
       evaluated at the point `query` with respect to the vertices of the polygon.
-      Evaluation is performed by locating a triangle in the `triangulation` and then
-      interpolating harmonic coordinates within this triangle.
+      Evaluation is performed by locating an element in the `domain` that contains
+      `query` and then interpolating harmonic coordinates within this element.
         
+      If query is not inside `domain`, all coordinates are set to zero. If the
+      located element has more than 3 vertices, all coordinates are set to zero.
+
       \tparam OutputIterator
       is an output iterator whose value type is `FT`.
 
@@ -200,6 +189,10 @@ namespace Barycentric_coordinates {
 
       \param coordinates
       An output iterator that stores the computed coordinates.
+
+      \pre `element.size() == 3`
+
+      \warning `compute()` should be called before calling this method!
     */
     template<typename OutputIterator>
     boost::optional<OutputIterator> operator()(
@@ -208,46 +201,49 @@ namespace Barycentric_coordinates {
       OutputIterator coordinates,
       GeomTraits) {
 
-      const auto fh = m_triangulation.locate(query);
-      if (!fh->is_in_domain()) {
-        internal::get_default(m_polygon.size(), coordinates);
+      const std::size_t n = m_polygon.size();
+
+      m_element.clear();
+      const bool is_in_domain = m_domain.locate(query, m_element);
+      if (!is_in_domain || m_element.size() > 3) {
+        internal::get_default(n, coordinates);
         return coordinates;
       }
 
-      const auto& p0 = fh->vertex(0)->point();
-      const auto& p1 = fh->vertex(1)->point();
-      const auto& p2 = fh->vertex(2)->point();
+      const std::size_t i0 = m_element[0];
+      const std::size_t i1 = m_element[1];
+      const std::size_t i2 = m_element[2];
 
-      std::vector<FT> b;
-      b.reserve(3);
+      CGAL_assertion(i0 >= 0 && i0 < m_domain.number_of_vertices());
+      CGAL_assertion(i1 >= 0 && i1 < m_domain.number_of_vertices());
+      CGAL_assertion(i2 >= 0 && i2 < m_domain.number_of_vertices());
 
-      CGAL::Barycentric_coordinates::triangle_coordinates_2(
-        p0, p1, p2, query, std::back_inserter(b), m_traits);
+      const auto& p0 = m_domain.vertex(i0);
+      const auto& p1 = m_domain.vertex(i1);
+      const auto& p2 = m_domain.vertex(i2);
 
-      CGAL_assertion(b.size() == 3);
-      CGAL_assertion(m_coordinates.find(fh->vertex(0)) != m_coordinates.end());
-      CGAL_assertion(m_coordinates.find(fh->vertex(1)) != m_coordinates.end());
-      CGAL_assertion(m_coordinates.find(fh->vertex(2)) != m_coordinates.end());
-
-      const auto& hm0 = m_coordinates.at(fh->vertex(0));
-      const auto& hm1 = m_coordinates.at(fh->vertex(1));
-      const auto& hm2 = m_coordinates.at(fh->vertex(2));
-
-      std::vector<FT> result(m_polygon.size(), FT(0));
-      for (std::size_t i = 0; i < m_polygon.size(); ++i)
-        result[i] = hm0[i] * b[0] + hm1[i] * b[1] + hm2[i] * b[2];
+      m_b.clear();
+      CGAL::Barycentric_coordinates::internal::planar_coordinates_2(
+        p0, p1, p2, query, std::back_inserter(m_b), m_traits);
+      CGAL_assertion(m_b.size() == 3);
       
-      for (std::size_t i = 0; i < result.size(); ++i)
-        *(coordinates++) = result[i];
-      
+      CGAL_assertion(
+        m_coordinates.size() == m_domain.number_of_vertices());
+      const auto& hm0 = m_coordinates[i0];
+      const auto& hm1 = m_coordinates[i1];
+      const auto& hm2 = m_coordinates[i2];
+
+      std::vector<FT> result(n, FT(0));
+      for (std::size_t k = 0; k < n; ++k)
+        *(coordinates++) = hm0[k] * m_b[0] + hm1[k] * m_b[1] + hm2[k] * m_b[2];
       return coordinates;
     }
 
     /*! 
       This function fills `coordinates` with harmonic coordinates 
       evaluated at the point `query` with respect to the vertices of the polygon.
-      Evaluation is performed by locating a triangle in the `triangulation` and then
-      interpolating harmonic coordinates within this triangle.
+      Evaluation is performed by locating an element in the `domain` that contains
+      `query` and then interpolating harmonic coordinates within this element.
         
       This function calls the function above.
 
@@ -259,6 +255,8 @@ namespace Barycentric_coordinates {
 
       \param coordinates
       An output iterator that stores the computed coordinates.
+
+      \warning `compute()` should be called before calling this method!
     */
     template<typename OutputIterator>
     boost::optional<OutputIterator> operator()(
@@ -269,51 +267,58 @@ namespace Barycentric_coordinates {
     }
 
     /*!
-      \brief returns harmonic coordinates computed at the given triangulation vertex.
-        
-      This function fills `coordinates` with harmonic coordinates 
-      computed at the vertex `vh` of the input triangulation.
+      \brief fills `coordinates` with harmonic coordinates computed at the 
+      vertex of the input domain with the index `query`.
         
       \tparam OutputIterator
       is an output iterator whose value type is `FT`.
 
-      \param vh
-      A vertex handle.
+      \param query
+      A vertex index.
 
       \param coordinates
       An output iterator that stores the computed coordinates.
+
+      \pre `query >= 0 && query < domain.number_of_vertices()`
+
+      \warning `compute()` should be called before calling this method!
     */
     template<typename OutputIterator>
     boost::optional<OutputIterator> coordinates(
-      const Vertex_handle vh, 
+      const std::size_t query, 
       OutputIterator coordinates) const {
 
-      const auto& bs = m_coordinates.at(vh);
+      CGAL_precondition(
+        query >= 0 && query < m_domain.number_of_vertices());
+      CGAL_precondition(
+        m_coordinates.size() == m_domain.number_of_vertices());
+
+      const auto& bs = m_coordinates[query];
       for (const FT& b : bs)
         *(coordinates++) = b;
       return coordinates;
     }
 
     /*!
-      \brief returns harmonic coordinates computed at the triangulation vertices.
-        
-      This function fills `coordinates` with harmonic coordinates 
-      computed at all the vertices of the input triangulation.
+      \brief fills `coordinates` with harmonic coordinates computed at all the 
+      vertices of the input domain.
         
       \tparam OutputIterator
       is an output iterator whose value type is `std::vector<FT>`.
 
       \param coordinates
       An output iterator that stores the computed coordinates.
+
+      \warning `compute()` should be called before calling this method!
     */
     template<typename OutputIterator>
     boost::optional<OutputIterator> coordinates(
       OutputIterator coordinates) const {
 
-      for (const auto& item : m_coordinates) {
-        const auto& b = item.second;
+      CGAL_assertion(
+        m_coordinates.size() == m_domain.number_of_vertices());
+      for (const auto& b : m_coordinates)
         *(coordinates++) = b;
-      }
     }
 
     /// @}
@@ -322,155 +327,125 @@ namespace Barycentric_coordinates {
     /// @{
 
     /*!
-      computes harmonic coordinates at all the vertices of the input triangulation.
+      computes harmonic coordinates at all the vertices of the input domain.
     */
     void compute() {
 
       const std::size_t n = m_polygon.size();
-      const std::size_t N = m_triangulation.number_of_vertices();
-
-      std::vector<Location> tags;
-      tags.reserve(N);
-
-      for (auto vh = m_triangulation.finite_vertices_begin();
-      vh != m_triangulation.finite_vertices_end(); ++vh) {
-        const auto& query = vh->point();
-        tags.push_back(*(internal::locate_wrt_polygon_2(
-          m_polygon, query, m_traits)));
-      }
-      CGAL_assertion(tags.size() == N);
+      const std::size_t N = m_domain.number_of_vertices();
 
       std::vector<std::size_t> indices;
       indices.reserve(N);
 
-      std::size_t out_count = 0;
       std::size_t numB = 0, numI = 0;
-
-      for (auto vh = m_triangulation.finite_vertices_begin();
-      vh != m_triangulation.finite_vertices_end(); ++vh, ++out_count) {
-        if (
-          tags[out_count].first == Query_point_location::ON_VERTEX ||
-          tags[out_count].first == Query_point_location::ON_EDGE ) 
-          indices.push_back(numB++);
-        else if (
-          tags[out_count].first == Query_point_location::ON_BOUNDED_SIDE)
-          indices.push_back(numI++);
+      for (std::size_t i = 0; i < N; ++i) {
+        if (m_domain.is_on_boundary(i)) {
+          indices.push_back(numB); ++numB;
+        } else {
+          indices.push_back(numI); ++numI;
+        }
       }
-      CGAL_assertion(indices.size() <= N);
 
       VectorFT boundary(numB, n);
       MatrixFT A(numI, numI);
-
       VectorFT x = VectorFT::Zero(numI, n);
       VectorFT b = VectorFT::Zero(numI, n);
 
-      out_count = 0;
-      std::size_t in_count = 0;
+      std::vector<FT> empty_vec;
+      empty_vec.reserve(n);
+      internal::get_default(
+        n, std::back_inserter(empty_vec));
+
       std::vector<FT> lambda; 
       lambda.reserve(n);
 
-      std::vector<FT> empty_vec;
-      internal::get_default(n, std::back_inserter(empty_vec));
+      m_coordinates.clear();
+      m_coordinates.reserve(N);
 
-      for (auto vh = m_triangulation.finite_vertices_begin();
-      vh != m_triangulation.finite_vertices_end(); ++vh, ++out_count) {
-        const auto& query = vh->point();
-        m_coordinates[vh] = empty_vec;
-        
-        if (
-          tags[out_count].first == Query_point_location::ON_VERTEX ||
-          tags[out_count].first == Query_point_location::ON_EDGE ) {
+      for (std::size_t i = 0; i < N; ++i) {
+        m_coordinates.push_back(empty_vec);
+
+        if (m_domain.is_on_boundary(i)) {
+          const auto& query = m_domain.vertex(i);
+          const auto edge_found = internal::get_edge_index(
+            m_polygon, query, m_traits);
+          assert(edge_found);
+
+          const auto location = (*edge_found).first;
+          const auto index = (*edge_found).second;
           
           lambda.clear();
           internal::boundary_coordinates_2(
-            m_polygon, query, tags[out_count].first, tags[out_count].second,
+            m_polygon, query, location, index, 
             std::back_inserter(lambda), m_traits);
-          
-          for (std::size_t j = 0; j < n; ++j) 
-            boundary(indices[in_count], j) = lambda[j];
-          ++in_count;
-        } else if (
-          tags[out_count].first == Query_point_location::ON_BOUNDED_SIDE)
-          ++in_count;
+
+          for (std::size_t k = 0; k < n; ++k)
+            boundary(indices[i], k) = lambda[k];
+        }
       }
 
-      std::vector<TripletFT> tripletList;
-      tripletList.reserve(numI * 7);
+      std::vector<TripletFT> triplet_list;
+      triplet_list.reserve(numI * 7);
 
-      out_count = 0;
-      for (auto vh = m_triangulation.finite_vertices_begin();
-      vh != m_triangulation.finite_vertices_end(); ++vh, ++out_count) {
-        const auto& query = vh->point();
-        
-        if (
-          tags[out_count].first == Query_point_location::ON_BOUNDED_SIDE) {
+      std::vector<std::size_t> neighbors;
+      std::vector<FT> alpha_cot, beta_cot;
 
-          // std::vector<int> neighbours;
-          // _mesh.getRing(i, neighbours);
+      for (std::size_t i = 0; i < N; ++i) {
+        if (!m_domain.is_on_boundary(i)) {
+          const auto& query = m_domain.vertex(i);
 
-          // const std::size_t nn = neighbours.size();
-          // std::vector<double> alphaCot(nn), betaCot(nn);
+          neighbors.clear();
+          m_domain(i, neighbors);
+          const std::size_t nn = neighbors.size();
+          
+          alpha_cot.clear(); beta_cot.clear();
+          for (std::size_t j = 0; j < nn; ++j) {
+            const std::size_t jp = (j + 1) % nn;
 
-          // for (std::size_t j = 0; j < nn; ++j) {
-          //   const size_t jp = (j + 1) % nn;
+            const auto& p1 = m_domain.vertex(neighbors[j]);
+            const auto& p2 = m_domain.vertex(neighbors[jp]); 
 
-          //   VertexR2 s1 = p[i] - p[neighbours[j]];
-          //   VertexR2 s2 = p[neighbours[jp]] - p[neighbours[j]];
+            Vector_2 s1 = query - p1;
+            Vector_2 s2 = p2 - p1;
+            alpha_cot.push_back(internal::cotangent_2(s2, s1, m_traits));
 
-          //   alphaCot[j] = cotangent(s2, s1);
+            s1 = p1 - p2;
+            s2 = query - p2;
+            beta_cot.push_back(internal::cotangent_2(s2, s1, m_traits));
+          }
 
-          //   s1 = p[neighbours[j]] - p[neighbours[jp]];
-          //   s2 = p[i] - p[neighbours[jp]];
+          FT W = FT(0);
+          for (std::size_t j = 0; j < nn; ++j) {
+            const std::size_t jp  = (j + 1) % nn;
+            const std::size_t idx = neighbors[jp];
 
-          //   betaCot[j] = cotangent(s2, s1);
-          // }
+            const FT w = -( alpha_cot[j] + beta_cot[jp] );
+            W -= w;
 
-          // double W = 0.0;
-          // for (std::size_t j = 0; j < nn; ++j) {
-
-          //   const std::size_t jp  = (j + 1) % nn;
-          //   const std::size_t idx = neighbours[jp];
-
-          //   const double w = -(alphaCot[j] + betaCot[jp]);
-          //   W -= w;
-
-          //   if (p[idx].type != INTERIOR) {
-          //     for (std::size_t k = 0; k < n; ++k)
-          //       b(indices[i], k) -= boundary(indices[idx], k) * w;
-          //   } else {
-          //     tripletList.push_back(T(indices[i], indices[idx], w));
-          //   }
-          // }
-          // tripletList.push_back(T(indices[i], indices[i], W));
+            if (m_domain.is_on_boundary(idx)) {
+              for (std::size_t k = 0; k < n; ++k)
+                b(indices[i], k) -= boundary(indices[idx], k) * w;
+            } else {
+              triplet_list.push_back(
+                TripletFT(indices[i], indices[idx], w));
+            }
+          }
+          triplet_list.push_back(
+            TripletFT(indices[i], indices[i], W));
         }
       }
 
       A.setFromTriplets(
-        tripletList.begin(), tripletList.end());
+        triplet_list.begin(), triplet_list.end());
       A.makeCompressed();
+      solve_linear_system(A, b, x);
 
-      /* solveLinearSystem(A, b, x); */
-
-      for (std::size_t i = 0; i < n; ++i) {        
-        out_count = 0; in_count = 0;
-
-        for (auto vh = m_triangulation.finite_vertices_begin();
-        vh != m_triangulation.finite_vertices_end(); ++vh, ++out_count) {
-          if (
-            tags[out_count].first == Query_point_location::ON_VERTEX ||
-            tags[out_count].first == Query_point_location::ON_EDGE ) {
-                    
-            auto& vec = m_coordinates.at(vh);
-            vec[i] = boundary(indices[in_count], i);
-            ++in_count;
-
-          } else if (
-            tags[out_count].first == Query_point_location::ON_BOUNDED_SIDE) {
-                        
-            auto& vec = m_coordinates.at(vh);
-            vec[i] = x(indices[in_count], i);
-            ++in_count;
-          }
+      for (std::size_t k = 0; k < n; ++k) {
+        for (std::size_t i = 0; i < N; ++i) {
+          if (m_domain.is_on_boundary(i))
+            m_coordinates[i][k] = boundary(indices[i], k);
+          else             
+            m_coordinates[i][k] = x(indices[i], k);
         }
       }
     }
@@ -484,7 +459,7 @@ namespace Barycentric_coordinates {
       clears all internal data structures.
     */
     void clear() {
-      m_coordinates.clear();
+      m_coordinates.clear(); m_b.clear(); m_element.clear();
     }
 
     /*!
@@ -500,13 +475,18 @@ namespace Barycentric_coordinates {
       
     // Fields.
     const Polygon& m_input_polygon;
-    const Triangulation& m_triangulation;
-    const Solver& m_solver;
+    const Domain& m_domain;
+
+    Solver& m_solver;
+
     const VertexMap m_vertex_map;
     const GeomTraits m_traits;
 
     std::vector<Point_2> m_polygon;
-    std::map<Vertex_handle, std::vector<FT> > m_coordinates;
+    std::vector< std::vector<FT> > m_coordinates;
+
+    std::vector<FT> m_b;
+    std::vector<std::size_t> m_element;
 
     // Function that solves the linear system.
     void solve_linear_system(

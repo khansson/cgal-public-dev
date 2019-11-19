@@ -1,13 +1,8 @@
-#include <map>
-#include <vector>
-#include <CGAL/Delaunay_mesher_2.h>
-#include <CGAL/Interpolation_traits_2.h>
 #include <CGAL/Projection_traits_xy_3.h>
+#include <CGAL/Interpolation_traits_2.h>
 #include <CGAL/interpolation_functions.h>
-#include <CGAL/Delaunay_mesh_face_base_2.h>
-#include <CGAL/Delaunay_mesh_size_criteria_2.h>
-#include <CGAL/Constrained_Delaunay_triangulation_2.h>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/Barycentric_coordinates_2/Delaunay_domain_2.h>
 #include <CGAL/Barycentric_coordinates_2/Mean_value_weights_2.h>
 #include <CGAL/Barycentric_coordinates_2/analytic_coordinates_2.h>
 
@@ -20,21 +15,13 @@ using Projection = CGAL::Projection_traits_xy_3<Kernel>;
 using FT    = typename Projection::FT;
 using Point = typename Projection::Point_2;
 
-// Triangulation.
-using FB  = CGAL::Delaunay_mesh_face_base_2<Projection>;
-using VB  = CGAL::Triangulation_vertex_base_2<Projection>;
-using TDS = CGAL::Triangulation_data_structure_2<VB, FB>;
-using CDT = CGAL::Constrained_Delaunay_triangulation_2<Projection, TDS>;
-
-using Vertex_handle = typename CDT::Vertex_handle;
-
-// Mesher.
-using Criteria = CGAL::Delaunay_mesh_size_criteria_2<CDT>;
-using Mesher   = CGAL::Delaunay_mesher_2<CDT, Criteria>;
+using Points = std::vector<Point>;
 
 // Coordinates.
-using Points     = std::vector<Point>;
-using Mean_value = CGAL::Barycentric_coordinates::Mean_value_weights_2<Points, Projection>;
+using Domain     = CGAL::Barycentric_coordinates::Delaunay_domain_2<
+  Points, Projection>;
+using Mean_value = CGAL::Barycentric_coordinates::Mean_value_weights_2<
+  Points, Projection>;
 
 // Interpolation.
 using Interpolation_traits   = CGAL::Interpolation_traits_2<Projection>;
@@ -68,22 +55,12 @@ int main() {
     Point(0.01, 0.10, 480.0), Point(0.02, 0.07, 490.0)
   };
 
-  // Create a Delaunay triangulation with polygon edges as constraints.
-  CDT cdt;
-  std::vector<Vertex_handle> vhs;
-  vhs.reserve(polygon.size());
-  for (const auto& vertex : polygon) 
-    vhs.push_back(cdt.insert(vertex));
-
-  for(std::size_t i = 0; i < vhs.size(); ++i) {
-    const std::size_t ip = (i + 1) % vhs.size();
-    cdt.insert_constraint(vhs[i], vhs[ip]);
-  }
-
-  // Refine this triangulation.
-  Mesher mesher(cdt);
-  mesher.set_criteria(Criteria(0.01, 0.01));
-  mesher.refine_mesh();
+  // Instantiate a Delaunay domain.
+  std::list<Point> list_of_seeds;
+  list_of_seeds.push_back(Point(0.1, 0.1, 0.0));
+  
+  Domain domain(polygon);
+  domain.create(0.01, list_of_seeds);
 
   // Associate each polygon vertex with the corresponding function value.
   Vertex_function_value vertex_function_value;
@@ -96,7 +73,7 @@ int main() {
 
   // Store all generated interior points with interpolated data here.
   Points queries;
-  queries.reserve(cdt.number_of_vertices());
+  queries.reserve(domain.number_of_vertices());
 
   // Instantiate the class with mean value weights.
   Mean_value mean_value(polygon);
@@ -105,11 +82,10 @@ int main() {
   // from the polygon's boundary to its interior.
   std::vector<FT> coordinates;
   coordinates.reserve(polygon.size());
-  for (auto vh = cdt.finite_vertices_begin();
-  vh != cdt.finite_vertices_end(); ++vh) {
+  for (std::size_t i = 0; i < domain.number_of_vertices(); ++i) {
+    const auto& query = domain.vertex(i);
     
     coordinates.clear();
-    const auto& query = vh->point();
     CGAL::Barycentric_coordinates::analytic_coordinates_2(
     polygon, query, mean_value, std::back_inserter(coordinates), Projection());
 

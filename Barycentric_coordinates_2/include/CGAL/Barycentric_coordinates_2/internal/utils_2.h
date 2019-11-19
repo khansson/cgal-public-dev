@@ -26,6 +26,11 @@
 #include <CGAL/license/Barycentric_coordinates_2.h>
 
 // STL includes.
+#include <set>
+#include <map>
+#include <list>
+#include <string>
+#include <memory>
 #include <vector>
 #include <utility>
 #include <iterator>
@@ -35,7 +40,9 @@
 #include <boost/optional/optional.hpp>
 
 // CGAL includes.
+#include <CGAL/barycenter.h>
 #include <CGAL/assertions.h>
+#include <CGAL/utils.h>
 #include <CGAL/number_utils.h>
 #include <CGAL/property_map.h>
 #include <CGAL/Polygon_2_algorithms.h>
@@ -113,18 +120,142 @@ namespace internal {
       *(output++) = 0;
   }
 
+  template< 
+  typename OutputIterator,
+  typename GeomTraits>
+  boost::optional<OutputIterator> linear_coordinates_2(
+    const typename GeomTraits::Point_2& source, 
+    const typename GeomTraits::Point_2& target, 
+    const typename GeomTraits::Point_2& query, 
+    OutputIterator coordinates,
+    const GeomTraits traits) {
+
+    if (source == target)
+      return boost::none;
+
+    // Number type.
+    using FT = typename GeomTraits::FT;
+
+    // Functions.
+    const auto scalar_product_2   = traits.compute_scalar_product_2_object();
+    const auto squared_distance_2 = traits.compute_squared_distance_2_object();
+
+    // Project point on the segment.
+    const FT opposite_scalar_product = 
+    scalar_product_2(query - target, source - target);
+
+    // Compute coordinates.
+    const FT b0 = opposite_scalar_product / squared_distance_2(source, target);
+    const FT b1 = FT(1) - b0;
+
+    // Return coordinates.
+    *(coordinates++) = b0;
+    *(coordinates++) = b1;
+
+    return coordinates;
+  }
+
+  template<
+  typename OutputIterator,
+  typename GeomTraits>
+  boost::optional<OutputIterator> planar_coordinates_2(
+    const typename GeomTraits::Point_2& p0, 
+    const typename GeomTraits::Point_2& p1, 
+    const typename GeomTraits::Point_2& p2, 
+    const typename GeomTraits::Point_2& query,
+    OutputIterator coordinates,
+    const GeomTraits traits) {
+
+    // Number type.
+    using FT = typename GeomTraits::FT;
+
+    // Functions.
+    const auto area_2 = traits.compute_area_2_object();
+
+    if (area_2(p0, p1, p2) == FT(0))
+      return boost::none;
+
+    // Compute some related sub-areas.
+    const FT A1 = area_2(p1, p2, query);
+    const FT A2 = area_2(p2, p0, query);
+
+    // Compute the inverted total area of the triangle.
+    const FT inverted_total_area = FT(1) / area_2(p0, p1, p2);
+
+    // Compute coordinates.
+    const FT b0 = A1 * inverted_total_area;
+    const FT b1 = A2 * inverted_total_area;
+    const FT b2 = FT(1) - b0 - b1;
+
+    // Return coordinates.
+    *(coordinates++) = b0;
+    *(coordinates++) = b1;
+    *(coordinates++) = b2;
+
+    return coordinates;
+  }
+
+  template<typename GeomTraits>
+  boost::optional< std::pair<Query_point_location, std::size_t> >
+  get_edge_index(
+    const std::vector<typename GeomTraits::Point_2>& polygon, 
+    const typename GeomTraits::Point_2& query,
+    const GeomTraits traits) {
+
+    const auto collinear_2 = traits.collinear_2_object();
+    const auto collinear_are_ordered_along_line_2 = 
+      traits.collinear_are_ordered_along_line_2_object();
+    CGAL_precondition(polygon.size() >= 3);
+
+    const std::size_t n = polygon.size();
+    for (std::size_t i = 0; i < n; ++i) {
+      if (polygon[i] == query)
+        return std::make_pair(Query_point_location::ON_VERTEX, i);
+
+      const std::size_t ip = (i + 1) % n;
+      if (
+        collinear_2(
+          polygon[i], polygon[ip], query) && 
+        collinear_are_ordered_along_line_2(
+          polygon[i], query, polygon[ip]))
+        return std::make_pair(Query_point_location::ON_EDGE, i);
+    }
+
+    /*
+    using FT = typename GeomTraits::FT;
+    using Vector_2 = typename GeomTraits::Vector_2;
+    using Segment_2 = typename GeomTraits::Segment_2;
+
+    const FT tol = FT(1) / FT(100000);
+    for (std::size_t i = 0; i < n; ++i) {          
+      const Segment_2 segment = Segment_2(query, polygon[i]);
+      const FT r = segment.squared_length();
+      if (CGAL::abs(r) < tol)
+        return std::make_pair(Query_point_location::ON_VERTEX, i);
+    }
+
+    for (std::size_t i = 0; i < n; ++i) {          
+      const std::size_t ip = (i + 1) % n;
+
+      const Vector_2 s1 = Vector_2(query, polygon[i]);
+      const Vector_2 s2 = Vector_2(query, polygon[ip]);
+
+      const FT A = CGAL::determinant(s1, s2) / FT(2);
+      const FT D = CGAL::scalar_product(s1, s2);
+
+      if (CGAL::abs(A) < tol && D < FT(0))
+        return std::make_pair(Query_point_location::ON_EDGE, i);
+    } */
+
+    return boost::none;
+  }
+
   template<typename GeomTraits>
   boost::optional< std::pair<Query_point_location, std::size_t> >
   locate_wrt_polygon_2(
     const std::vector<typename GeomTraits::Point_2>& polygon, 
     const typename GeomTraits::Point_2& query,
     const GeomTraits traits) {
-
-    using Point_2 = typename GeomTraits::Point_2;
-    const auto collinear_2 = traits.collinear_2_object();
-    const auto collinear_are_ordered_along_line_2 = 
-      traits.collinear_are_ordered_along_line_2_object();
-    CGAL_precondition(polygon.size() >= 3);
 
     const auto type = CGAL::bounded_side_2(
       polygon.begin(), polygon.end(), query, traits);
@@ -135,24 +266,10 @@ namespace internal {
         return std::make_pair(Query_point_location::ON_BOUNDED_SIDE, std::size_t(-1));
       case CGAL::ON_UNBOUNDED_SIDE:
         return std::make_pair(Query_point_location::ON_UNBOUNDED_SIDE, std::size_t(-1));
-      case CGAL::ON_BOUNDARY: {
-
-        const std::size_t n = polygon.size();
-        for (std::size_t i = 0; i < n; ++i) {
-          if (polygon[i] == query)
-            return std::make_pair(Query_point_location::ON_VERTEX, i);
-
-          const std::size_t ip = (i + 1) % n;
-          if (collinear_2(
-                polygon[i], polygon[ip], query) && 
-              collinear_are_ordered_along_line_2(
-                polygon[i], query, polygon[ip]))
-            return std::make_pair(Query_point_location::ON_EDGE, i);
-        }
-      }
-      default: {
+      case CGAL::ON_BOUNDARY:
+        return get_edge_index(polygon, query, traits);
+      default:
         return std::make_pair(Query_point_location::UNSPECIFIED, std::size_t(-1));
-      }
     }
     return boost::none;
   }
@@ -198,41 +315,6 @@ namespace internal {
     }
     // Otherwise, return CONCAVE polygon.
     return Polygon_type::CONCAVE;
-  }
-
-  template< 
-  typename OutputIterator,
-  typename GeomTraits>
-  boost::optional<OutputIterator> linear_coordinates_2(
-    const typename GeomTraits::Point_2& source, 
-    const typename GeomTraits::Point_2& target, 
-    const typename GeomTraits::Point_2& query, 
-    OutputIterator coordinates,
-    const GeomTraits traits) {
-
-    if (source == target)
-      return boost::none;
-
-    // Number type.
-    using FT = typename GeomTraits::FT;
-
-    // Functions.
-    const auto scalar_product_2   = traits.compute_scalar_product_2_object();
-    const auto squared_distance_2 = traits.compute_squared_distance_2_object();
-
-    // Project point on the segment.
-    const FT opposite_scalar_product = 
-    scalar_product_2(query - target, source - target);
-
-    // Compute coordinates.
-    const FT b0 = opposite_scalar_product / squared_distance_2(source, target);
-    const FT b1 = FT(1) - b0;
-
-    // Return coordinates.
-    *(coordinates++) = b0;
-    *(coordinates++) = b1;
-
-    return coordinates;
   }
 
   template<
@@ -326,6 +408,22 @@ namespace internal {
     BOUNDARY  = 1, // point is on the boundary of the polygon
     INTERIOR  = 2  // point is in the interior of the polygon
   };
+
+  template<typename GeomTraits>
+  typename GeomTraits::FT 
+  cotangent_2(
+    const typename GeomTraits::Vector_2& v1, 
+    const typename GeomTraits::Vector_2& v2,
+    const GeomTraits traits) {
+
+    using FT = typename GeomTraits::FT;
+    const auto scalar_product_2 = traits.compute_scalar_product_2_object();
+    const auto cross_product_2  = traits.compute_determinant_2_object();
+
+    const FT dot = scalar_product_2(v1, v2);
+    const FT det = cross_product_2(v1, v2);
+    return dot / CGAL::abs(det);
+  }
 
 } // namespace internal
 } // namespace Barycentric_coordinates

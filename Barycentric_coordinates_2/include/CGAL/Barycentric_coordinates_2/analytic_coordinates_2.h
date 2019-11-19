@@ -25,18 +25,6 @@
 
 #include <CGAL/license/Barycentric_coordinates_2.h>
 
-// STL headers.
-#include <vector>
-#include <utility>
-#include <iterator>
-
-// Boost headers.
-#include <boost/optional.hpp>
-
-// CGAL headers.
-#include <CGAL/assertions.h>
-#include <CGAL/property_map.h>
-
 // Internal includes.
 #include <CGAL/Barycentric_coordinates_2/internal/utils_2.h>
 #include <CGAL/Barycentric_coordinates_2/barycentric_enum_2.h>
@@ -170,33 +158,8 @@ namespace Barycentric_coordinates {
     OutputIterator coordinates,
     const GeomTraits traits) {
 
-    // Number type.
-    using FT = typename GeomTraits::FT;
-
-    // Functions.
-    const auto area_2 = traits.compute_area_2_object();
-
-    if (area_2(p0, p1, p2) == FT(0))
-      return boost::none;
-
-    // Compute some related sub-areas.
-    const FT A1 = area_2(p1, p2, query);
-    const FT A2 = area_2(p2, p0, query);
-
-    // Compute the inverted total area of the triangle.
-    const FT inverted_total_area = FT(1) / area_2(p0, p1, p2);
-
-    // Compute coordinates.
-    const FT b0 = A1 * inverted_total_area;
-    const FT b1 = A2 * inverted_total_area;
-    const FT b2 = FT(1) - b0 - b1;
-
-    // Return coordinates.
-    *(coordinates++) = b0;
-    *(coordinates++) = b1;
-    *(coordinates++) = b2;
-
-    return coordinates;
+    return internal::planar_coordinates_2(
+      p0, p1, p2, query, coordinates, traits);
   }
 
   /*!
@@ -307,8 +270,13 @@ namespace Barycentric_coordinates {
 
     const auto result = 
     internal::locate_wrt_polygon_2(poly, query, traits);
-    const auto location = (*result).first;
-    const auto index    = (*result).second;
+    auto location = (*result).first;
+    auto index    = (*result).second;
+
+    if (!result) {
+      location = Query_point_location::UNSPECIFIED;
+      index = std::size_t(-1);
+    }
 
     return internal::boundary_coordinates_2(
       poly, query, location, index, coordinates, traits);
@@ -454,8 +422,13 @@ namespace Barycentric_coordinates {
 
       const auto result = 
       internal::locate_wrt_polygon_2(poly, query, traits);
-      const auto location = (*result).first;
-      const auto index    = (*result).second;
+      auto location = (*result).first;
+      auto index    = (*result).second;
+
+      if (!result) {
+        location = Query_point_location::UNSPECIFIED;
+        index = std::size_t(-1);
+      }
 
       b.clear();
       internal::boundary_coordinates_2(

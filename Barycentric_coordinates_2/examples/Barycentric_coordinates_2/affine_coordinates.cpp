@@ -1,9 +1,5 @@
-#include <vector>
-#include <iterator>
 #include <Eigen/Core>
 #include <Eigen/Dense>
-#include <CGAL/barycenter.h>
-#include <CGAL/property_map.h>
 #include <CGAL/Simple_cartesian.h>
 #include <boost/iterator/transform_iterator.hpp>
 #include <CGAL/Barycentric_coordinates_2/analytic_coordinates_2.h>

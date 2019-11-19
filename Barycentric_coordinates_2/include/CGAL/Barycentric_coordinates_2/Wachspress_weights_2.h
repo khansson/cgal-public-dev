@@ -25,14 +25,6 @@
 
 #include <CGAL/license/Barycentric_coordinates_2.h>
 
-// STL includes.
-#include <vector>
-#include <utility>
-#include <iterator>
-
-// Boost includes.
-#include <boost/optional/optional.hpp>
-
 // Internal includes.
 #include <CGAL/Barycentric_coordinates_2/internal/utils_2.h>
 #include <CGAL/Barycentric_coordinates_2/barycentric_enum_2.h>
@@ -105,7 +97,7 @@ namespace Barycentric_coordinates {
       This class implements the behavior of Wachspress weights 
       for 2D query points.
 
-      \param input_polygon
+      \param polygon
       An instance of `Polygon` with vertices of a strictly convex polygon.
 
       \param computation_policy
@@ -123,12 +115,12 @@ namespace Barycentric_coordinates {
       \pre `polygon is strictly convex`
     */
     Wachspress_weights_2(
-      const Polygon& input_polygon,
+      const Polygon& polygon,
       const Computation_policy computation_policy 
         = Computation_policy::PRECISE_COMPUTATION_WITH_EDGE_CASES,
       const VertexMap vertex_map = VertexMap(),
       const GeomTraits traits = GeomTraits()) :
-    m_input_polygon(input_polygon),
+    m_input_polygon(polygon),
     m_computation_policy(computation_policy),
     m_vertex_map(vertex_map),
     m_traits(traits),
@@ -275,6 +267,9 @@ namespace Barycentric_coordinates {
 
       const auto result = internal::locate_wrt_polygon_2(
         m_polygon, query, m_traits);
+
+      if (!result)
+        return internal::Edge_case::UNBOUNDED;
 
       const Query_point_location location = (*result).first;
       const std::size_t index = (*result).second;
