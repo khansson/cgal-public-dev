@@ -42,7 +42,13 @@ namespace Barycentric_coordinates {
   /*! 
     \ingroup PkgBarycentric_coordinates_2DD
 
-    \brief Delaunay domain 2.
+    \brief Delaunay domain restricted to a simple polygon.
+
+    This class implements a discretized domain of a simple polygon, where 
+    space partition is represented as a constrained Delaunay triangulation.
+
+    Internally, the package `2D Conforming Triangulations and Meshes` is used.
+    See it for more advance reference.
 
     \tparam Polygon
     is a model of `ConstRange`.
@@ -135,10 +141,18 @@ namespace Barycentric_coordinates {
     }
 
     /*!
-      creates input domain.
+      \brief creates a constrained Delaunay triangulation restricted to 
+      the input polygon.
+
+      \param shape_size
+      A shape size bound. See `Delaunay_mesh_size_criteria_2`.
+
+      \param list_of_seeds
+      Contains seed points indicating, which parts of the polygon 
+      should be partitioned and subdivided.
     */
     void create(
-      const FT edge_size,
+      const FT shape_size,
       const std::list<Point_2>& list_of_seeds) {
 
       // Create Delaunay triangulation.
@@ -155,7 +169,7 @@ namespace Barycentric_coordinates {
       // Refine this triangulation.
       Mesher mesher(m_cdt);
       mesher.set_seeds(list_of_seeds.begin(), list_of_seeds.end(), true);
-      mesher.set_criteria(Criteria(edge_size, edge_size));
+      mesher.set_criteria(Criteria(shape_size, shape_size));
       mesher.refine_mesh();
 
       // Find interior points.
@@ -175,11 +189,6 @@ namespace Barycentric_coordinates {
           m_polygon, vh->point(), m_traits);
         const auto location = (*result).first;
 
-        /*
-        if (
-          location == Query_point_location::ON_UNBOUNDED_SIDE)
-          vh->info().type = internal::Edge_case::BOUNDARY; */
-
         if (
           location == Query_point_location::ON_VERTEX ||
           location == Query_point_location::ON_EDGE)
@@ -189,13 +198,22 @@ namespace Barycentric_coordinates {
           location == Query_point_location::ON_BOUNDED_SIDE)
           vh->info().type = internal::Edge_case::INTERIOR;
 
+        /*
+        CGAL_assertion(
+          location != Query_point_location::ON_UNBOUNDED_SIDE); */
+
         vh->info().index = count;
         m_vhs.push_back(vh); ++count;
       }
     }
 
     /*!
-      get barycenters.
+      \brief returns barycenters of all finite elements in the discretized domain.
+
+      \param barycenters
+      An `std::vector` that stores the computed coordinates.
+
+      \warning `create()` should be called before calling this method!
     */
     void get_barycenters(
       std::vector<Point_2>& barycenters) const {
@@ -214,14 +232,26 @@ namespace Barycentric_coordinates {
     }
 
     /*!
-      returns number of vertices.
+      \brief implements `DiscretizedDomain_2::number_of_vertices()`.
+      
+      This function returns the number of vertices in the discretized domain.
     */
     const std::size_t number_of_vertices() const {
       return m_vhs.size();
     }
 
     /*!
-      returns a vertex.
+      \brief implements `DiscretizedDomain_2::vertex()`.
+      
+      This function returns a vertex of the discretized domain with 
+      the index `query_index`.
+
+      \param query_index
+      An index of the requested vertex.
+
+      \pre `query_index >= 0 && query_index < number_of_vertices()`
+
+      \warning `create()` should be called before calling this method!
     */
     const Point_2& vertex(
       const std::size_t query_index) const {
@@ -233,7 +263,17 @@ namespace Barycentric_coordinates {
     }
 
     /*!
-      controls the boundary.
+      \brief implements `DiscretizedDomain_2::is_on_boundary()`.
+      
+      This function controls if the vertex of the discretized domain with the 
+      index `query_index` is on the polygon's boundary.
+
+      \param query_index
+      An index of the query vertex.
+
+      \pre `query_index >= 0 && query_index < number_of_vertices()`
+
+      \warning `create()` should be called before calling this method!
     */
     const bool is_on_boundary(
       const std::size_t query_index) const {
@@ -245,7 +285,20 @@ namespace Barycentric_coordinates {
     }
 
     /*!
-      returns neighbors.
+      \brief implements `DiscretizedDomain_2::operator()()`.
+      
+      This function returns a one-ring neighborhood of the vertex of the 
+      discretized domain with the index `query_index`.
+
+      \param query_index
+      An index of the query vertex.
+
+      \param neighbors
+      Stores indices of all direct neighbors of the query vertex.
+
+      \pre `query_index >= 0 && query_index < number_of_vertices()`
+
+      \warning `create()` should be called before calling this method!
     */
     void operator()(
       const std::size_t query_index, 
@@ -277,7 +330,19 @@ namespace Barycentric_coordinates {
     }
 
     /*!
-      locates the point.
+      \brief implements `DiscretizedDomain_2::locate()`.
+      
+      This function locates a query point in the discretized domain.
+
+      \param query
+      A query point.
+
+      \param element
+      Stores indices of the finite element that contains `query`.
+
+      \pre `query_index >= 0 && query_index < number_of_vertices()`
+
+      \warning `create()` should be called before calling this method!
     */
     bool locate(
       const Point_2& query, 

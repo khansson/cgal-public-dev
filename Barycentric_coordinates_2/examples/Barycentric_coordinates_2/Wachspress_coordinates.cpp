@@ -57,6 +57,7 @@ int main() {
       std::cout << b[i] << ", ";
     std::cout << b[b.size() - 1] << std::endl;
   }
+  std::cout << std::endl;
 
   return EXIT_SUCCESS;
 }

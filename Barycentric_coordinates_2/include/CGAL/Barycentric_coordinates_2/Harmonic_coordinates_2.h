@@ -229,9 +229,9 @@ namespace Barycentric_coordinates {
       
       CGAL_assertion(
         m_coordinates.size() == m_domain.number_of_vertices());
-      const auto& hm0 = m_coordinates[i0];
-      const auto& hm1 = m_coordinates[i1];
-      const auto& hm2 = m_coordinates[i2];
+      const auto& hm0 = m_coordinates.at(i0);
+      const auto& hm1 = m_coordinates.at(i1);
+      const auto& hm2 = m_coordinates.at(i2);
 
       std::vector<FT> result(n, FT(0));
       for (std::size_t k = 0; k < n; ++k)
@@ -293,7 +293,7 @@ namespace Barycentric_coordinates {
       CGAL_precondition(
         m_coordinates.size() == m_domain.number_of_vertices());
 
-      const auto& bs = m_coordinates[query];
+      const auto& bs = m_coordinates.at(query);
       for (const FT& b : bs)
         *(coordinates++) = b;
       return coordinates;
