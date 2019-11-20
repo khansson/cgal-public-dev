@@ -42,7 +42,7 @@ namespace CGAL {
 namespace Barycentric_coordinates {
 
   /*! 
-    \ingroup PkgBarycentric_coordinates_2HAC
+    \ingroup PkgBarycentric_coordinates_2Classes
 
     \brief Harmonic coordinates.
 

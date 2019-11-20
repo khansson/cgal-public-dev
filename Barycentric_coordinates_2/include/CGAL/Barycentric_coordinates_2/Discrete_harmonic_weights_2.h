@@ -37,7 +37,7 @@ namespace CGAL {
 namespace Barycentric_coordinates {
 
   /*! 
-    \ingroup PkgBarycentric_coordinates_2DHC
+    \ingroup PkgBarycentric_coordinates_2Classes
 
     \brief Discrete harmonic weights.
 

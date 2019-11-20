@@ -6,7 +6,7 @@
 
 Concepts, which are used to parameterize barycentric coordinate classes.
 
-\defgroup PkgBarycentric_coordinates_2WAC Classes
+\defgroup PkgBarycentric_coordinates_2Classes Classes
 \ingroup PkgBarycentric_coordinates_2
 
 Generalized barycentric weight and coordinate functions.

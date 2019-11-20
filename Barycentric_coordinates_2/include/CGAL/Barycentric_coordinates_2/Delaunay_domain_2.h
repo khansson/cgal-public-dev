@@ -40,7 +40,7 @@ namespace CGAL {
 namespace Barycentric_coordinates {
 
   /*! 
-    \ingroup PkgBarycentric_coordinates_2DD
+    \ingroup PkgBarycentric_coordinates_2Classes
 
     \brief Delaunay domain restricted to a simple polygon.
 

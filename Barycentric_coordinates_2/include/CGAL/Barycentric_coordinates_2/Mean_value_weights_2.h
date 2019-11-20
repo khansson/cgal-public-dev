@@ -41,7 +41,7 @@ namespace CGAL {
 namespace Barycentric_coordinates {
 
   /*! 
-    \ingroup PkgBarycentric_coordinates_2MVC
+    \ingroup PkgBarycentric_coordinates_2Classes
 
     \brief Mean value weights.
 
