@@ -218,7 +218,7 @@ namespace Barycentric_coordinates {
       This function fills `weights` with mean value weights 
       computed at the `query` point with respect to the vertices of the polygon.
         
-      This function calls the function above.
+      This function calls the generic function above.
 
       \tparam OutputIterator
       is an output iterator whose value type is `FT`.

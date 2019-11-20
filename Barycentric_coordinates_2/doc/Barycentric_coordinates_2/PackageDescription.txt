@@ -22,7 +22,7 @@ Generalized barycentric weight and coordinate functions.
 robust implementation of two-dimensional generalized barycentric coordinates defined 
 for simple two-dimensional polygons. If coordinates with respect to multivariate 
 scattered points instead of a polygon are required, please refer to natural neighbor coordinates 
-from the Package \ref PkgInterpolation2Ref.}
+from the Package \ref PkgInterpolation2.}
 \cgalPkgManuals{Chapter_2D_Generalized_Barycentric_Coordinates, PkgBarycentric_coordinates_2}
 \cgalPkgSummaryEnd
 
@@ -37,13 +37,15 @@ from the Package \ref PkgInterpolation2Ref.}
 
 ## Concepts ##
 - `AnalyticWeights_2`
-- `HarmonicCoordinatesSolver`
+- `BarycentricTraits_2`
+- `DiscretizedDomain_2`
+- `SparseLinearSolver_2`
 
 ## Classes ##
 - `CGAL::Barycentric_coordinates::Wachspress_weights_2<Polygon, GeomTraits, VertexMap>`
 - `CGAL::Barycentric_coordinates::Mean_value_weights_2<Polygon, GeomTraits, VertexMap>`
 - `CGAL::Barycentric_coordinates::Discrete_harmonic_weights_2<Polygon, GeomTraits, VertexMap>`
-- `CGAL::Barycentric_coordinates::Harmonic_coordinates_2<Polygon, Triangulation, Solver, GeomTraits, VertexMap>`
+- `CGAL::Barycentric_coordinates::Harmonic_coordinates_2<Polygon, Domain, Solver, GeomTraits, VertexMap>`
 
 ## Enumerations ##
 - `CGAL::Barycentric_coordinates::Query_point_location`

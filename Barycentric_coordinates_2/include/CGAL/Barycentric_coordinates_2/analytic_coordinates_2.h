@@ -80,7 +80,7 @@ namespace Barycentric_coordinates {
     The coordinates are returned in `coordinates`.
 
     This function infers a traits class from the `Point_2` class and calls the
-    generic function above.
+    generic version of this function.
 
     \tparam Point_2
     is a point type.
@@ -168,7 +168,7 @@ namespace Barycentric_coordinates {
     The coordinates are returned in `coordinates`.
 
     This function infers a traits class from the `Point_2` class and calls the
-    generic function above.
+    generic version of this function.
 
     \tparam Point_2
     is a point type.
@@ -217,6 +217,8 @@ namespace Barycentric_coordinates {
     all other coordinates are zero. If `query` is on the edge, the two corresponding
     coordinates are segment coordinates, while all other coordinates are set to zero.
     In all other cases, all the coordinates are set to zero.
+
+    Internally, `Barycentric_coordinates::segment_coordinates_2` are used.
 
     \tparam Polygon
     is a model of `ConstRange`.
@@ -287,13 +289,8 @@ namespace Barycentric_coordinates {
     coordinates at this point with respect to the vertices of a given `polygon`.
     These coordinates are then returned in `coordinates`.
 
-    If `query` is at the vertex, the corresponding coordinate is set to one, while
-    all other coordinates are zero. If `query` is on the edge, the two corresponding
-    coordinates are segment coordinates, while all other coordinates are set to zero.
-    In all other cases, all the coordinates are set to zero.
-
     This function infers a traits class from the `Point_2` class and calls the
-    generic function above.
+    generic version of this function.
 
     \tparam Polygon
     is a model of `ConstRange`.
@@ -346,8 +343,6 @@ namespace Barycentric_coordinates {
 
     If a query point from the range does not belong to the polygon's boundary,
     its coordinates are set to zero.
-
-    This function calls the function above on a range of query points.
 
     \tparam Polygon
     is a model of `ConstRange`.
@@ -582,7 +577,7 @@ namespace Barycentric_coordinates {
     are then normalized and returned in `coordinates`.
 
     This function infers a traits class from the `Point_2` class and calls the
-    generic function above.
+    generic version of this function.
 
     \tparam VertexRange
     is a model of `ConstRange`.

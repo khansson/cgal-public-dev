@@ -53,6 +53,9 @@ namespace Barycentric_coordinates {
     Harmonic coordinates are well-defined and non-negative in the closure 
     of any simple polygon.
 
+    Internally, the `Barycentric_coordinates::Discrete_harmonic_weights_2`
+    are used.
+
     \tparam Polygon
     is a model of `ConstRange`.
 
@@ -181,6 +184,8 @@ namespace Barycentric_coordinates {
       If query is not inside `domain`, all coordinates are set to zero. If the
       located element has more than 3 vertices, all coordinates are set to zero.
 
+      Internally, `Barycentric_coordinates::triangle_coordinates_2` are used.
+
       \tparam OutputIterator
       is an output iterator whose value type is `FT`.
 
@@ -245,7 +250,7 @@ namespace Barycentric_coordinates {
       Evaluation is performed by locating an element in the `domain` that contains
       `query` and then interpolating harmonic coordinates within this element.
         
-      This function calls the function above.
+      This function calls the generic function above.
 
       \tparam OutputIterator
       is an output iterator whose value type is `FT`.

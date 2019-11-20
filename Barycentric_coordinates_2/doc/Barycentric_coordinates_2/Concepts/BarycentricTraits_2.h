@@ -1,11 +1,11 @@
 /*!
-\ingroup PkgBarycentricCoordinates2Concepts
+\ingroup PkgBarycentric_coordinates_2Concepts
 \cgalConcept
 
 Requirements of the template parameter `GeomTraits` for all the classes with 2D 
-barycentric coordinates from the namespace `Barycentric_coordinates`.
+barycentric coordinates from the namespace `CGAL::Barycentric_coordinates`.
 
-\cgalHasModel All models of `Kernel`
+\cgalHasModel All models of `Kernel`.
 */
 
 class BarycentricTraits_2 {

@@ -5,7 +5,9 @@
 A concept that describes the set of methods that should be defined for all
 sparse linear solvers that can be used to solve the Laplace equation.
 
-This concept follows the generic sparse solver concept from Eigen.
+This concept follows the generic sparse solver concept from \ref thirdpartyEigen "Eigen".
+
+\cgalHasModel All models of \ref thirdpartyEigen "Eigen" sparse solvers.
 */
 
 class SparseLinearSolver_2 {
@@ -16,7 +18,6 @@ public:
     computes factorization of a sparse square `n x n` symmetric positive definite 
     matrix `A`, where `n` is the number of unknowns.
   */
-  template<typename FT>
   void compute(
     const Eigen::SparseMatrix<FT>& A) {
 
@@ -29,7 +30,6 @@ public:
 
     \return solution `n x 1` vector `x`.
   */
-  template<typename FT>
   Eigen::Matrix<FT, Eigen::Dynamic, Eigen::Dynamic> solve(
     const Eigen::Matrix<FT, Eigen::Dynamic, Eigen::Dynamic>& b) {
 

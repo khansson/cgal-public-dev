@@ -3,7 +3,10 @@
 \cgalConcept
 
 A concept that describes the set of methods that should be defined for all
-discretized domains.
+discretized domains restricted to a simple polygon.
+
+\cgalHasModel 
+- `CGAL::Barycentric_coordinates::Delaunay_domain_2`
 */
 
 class DiscretizedDomain_2 {
@@ -20,7 +23,6 @@ public:
   /*!  
     returns a const reference to the vertex with the index `query_index`.
   */
-  template<typename Point_2>
   const Point_2& vertex(
     const std::size_t query_index) const {
 
@@ -28,7 +30,7 @@ public:
 
   /*!  
     controls if the vertex with the index `query_index` is on the 
-    boundary of the domain.
+    boundary of the polygon.
   */
   const bool is_on_boundary(
     const std::size_t query_index) const {
@@ -46,10 +48,9 @@ public:
   }
 
   /*!  
-    fills `neighbors` with the indices of all vertices, which are vertices of the 
-    element that contains `query`, returns if `query` belongs to the domain or not.
+    fills `element` with the indices of all vertices, which are vertices of the 
+    element that contains `query`, returns true if `query` belongs to the domain.
   */
-  template<typename Point_2>
   bool locate(
     const Point_2& query, 
     std::vector<std::size_t>& element) {
