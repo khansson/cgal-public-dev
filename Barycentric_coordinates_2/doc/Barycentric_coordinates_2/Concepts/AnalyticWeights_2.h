@@ -1,5 +1,8 @@
+namespace CGAL {
+namespace Barycentric_coordinates {
+
 /*!
-\ingroup PkgBarycentric_coordinates_2Concepts
+\ingroup PkgBarycentricCoordinates2RefConcepts
 \cgalConcept
 
 A concept that describes the set of methods that should be defined for all
@@ -34,3 +37,5 @@ public:
         
   }
 };
+}
+}

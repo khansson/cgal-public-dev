@@ -1,5 +1,8 @@
+namespace CGAL {
+namespace Barycentric_coordinates {
+
 /*!
-\ingroup PkgBarycentric_coordinates_2Concepts
+\ingroup PkgBarycentricCoordinates2RefConcepts
 \cgalConcept
 
 Requirements of the template parameter `GeomTraits` for all the classes with 2D 
@@ -90,3 +93,5 @@ typedef unspecified_type Collinear_are_ordered_along_line_2;
 /// @} 
 
 };
+}
+}

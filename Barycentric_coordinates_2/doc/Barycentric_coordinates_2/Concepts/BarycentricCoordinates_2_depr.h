@@ -1,8 +1,11 @@
+namespace CGAL {
+namespace Barycentric_coordinates_depr {
+
 /*!
-\ingroup PkgBarycentric_coordinates_2Concepts
+\ingroup PkgBarycentricCoordinates2RefConcepts
 \cgalConcept
 
-Requirements of the template parameter `Coordinate_2` for the class `CGAL::Barycentric_coordinates::Generalized_barycentric_coordinates_2_depr`.
+Requirements of the template parameter `Coordinate_2` for the class `CGAL::Barycentric_coordinates_depr::Generalized_barycentric_coordinates_2`.
 
 \cgalHasModel `CGAL::Barycentric_coordinates_depr::Wachspress_2`
 \cgalHasModel `CGAL::Barycentric_coordinates_depr::Mean_value_2`
@@ -51,3 +54,5 @@ boost::optional<OutputIterator> coordinates_on_unbounded_side(const Traits::Poin
 /// @} 
 
 }; /* end BarycentricCoordinates_2_depr */
+}
+}

@@ -50,7 +50,7 @@ namespace Barycentric_coordinates_depr {
 // [1] Reference: "M. S. Floater, K. Hormann, and G. Kos. A general construction of barycentric coordinates over convex polygons. Advances in Computational Mathematics, 24(1-4):311-331, 2006.".
 
 /*!
- * \ingroup PkgBarycentricCoordinates2Ref
+ * \ingroup PkgBarycentricCoordinates2RefDeprecated
  * The class `Wachspress_2` implements 2D Wachspress coordinates ( \cite cgal:bc:fhk-gcbcocp-06, \cite cgal:bc:mlbd-gbcip-02, \cite cgal:bc:w-rfeb-75 ).
  * This class is parameterized by a traits class `Traits`, and it is used as a coordinate class to complete the class `Generalized_barycentric_coordinates_2`.
  * For a polygon with three vertices it is better to use the class `Triangle_coordinates_2`.
@@ -58,9 +58,9 @@ namespace Barycentric_coordinates_depr {
 
  * \deprecated This part of the package is deprecated since the version 5.1 of \cgal.
 
-\tparam Traits must be a model of the concepts `BarycentricTraits_2` and `PolygonTraits_2`.
+\tparam Traits must be a model of the concepts `CGAL::Barycentric_coordinates::BarycentricTraits_2` and `PolygonTraits_2`.
 
-\cgalModels `BarycentricCoordinates_2_depr`
+\cgalModels `CGAL::Barycentric_coordinates::BarycentricCoordinates_2_depr`
 
 \pre The provided polygon is strictly convex.
 

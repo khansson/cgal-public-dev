@@ -102,7 +102,7 @@ public:
 // [2] Reference: "M. S. Floater, Wachspress and mean value coordinates, to appear in the Proceedings of the 14th International Conference on Approximation Theory, G. Fasshauer and L. L. Schumaker (eds.)."
 
 /*!
- * \ingroup PkgBarycentricCoordinates2Ref
+ * \ingroup PkgBarycentricCoordinates2RefDeprecated
  * The class `Mean_value_2` implements 2D mean value coordinates ( \cite cgal:bc:hf-mvcapp-06, \cite cgal:bc:fhk-gcbcocp-06, \cite cgal:f-mvc-03 ).
  * This class is parameterized by a traits class `Traits`, and it is used as a coordinate class to complete the class `Generalized_barycentric_coordinates_2`.
  * For a polygon with three vertices (triangle) it is better to use the class `Triangle_coordinates_2`.
@@ -110,9 +110,9 @@ public:
 
  * \deprecated This part of the package is deprecated since the version 5.1 of \cgal.
 
-\tparam Traits must be a model of the concept `BarycentricTraits_2`.
+\tparam Traits must be a model of the concept `CGAL::Barycentric_coordinates::BarycentricTraits_2`.
 
-\cgalModels `BarycentricCoordinates_2_depr`
+\cgalModels `CGAL::Barycentric_coordinates::BarycentricCoordinates_2_depr`
 
 */
  

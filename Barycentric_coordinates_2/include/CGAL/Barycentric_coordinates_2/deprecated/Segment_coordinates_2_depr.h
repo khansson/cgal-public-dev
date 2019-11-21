@@ -49,13 +49,13 @@ namespace Barycentric_coordinates_depr {
 // Examples: see the User Manual - https://doc.cgal.org/latest/Manual/index.html.
 
 /*!
- * \ingroup PkgBarycentricCoordinates2Ref
+ * \ingroup PkgBarycentricCoordinates2RefDeprecated
  * The class `Segment_coordinates_2` implements barycentric coordinates with respect to an arbitrary non-degenerate segment along an arbitrary line in the plane.
  * This class is parameterized by a traits class `Traits`.
 
  * \deprecated This part of the package is deprecated since the version 5.1 of \cgal.
 
-\tparam Traits must be a model of the concept `BarycentricTraits_2`.
+\tparam Traits must be a model of the concept `CGAL::Barycentric_coordinates::BarycentricTraits_2`.
 
 */
 
@@ -215,7 +215,7 @@ private:
  * \relates Segment_coordinates_2
  * This is a global function that takes both vertices of a segment and computes segment coordinates at a given query point with respect to these vertices.
  
-\tparam Traits must be a model of the concept `BarycentricTraits_2`.
+\tparam Traits must be a model of the concept `CGAL::Barycentric_coordinates::BarycentricTraits_2`.
 
 */
 

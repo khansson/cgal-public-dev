@@ -49,15 +49,15 @@ namespace Barycentric_coordinates_depr {
 // Examples: see the User Manual here - https://doc.cgal.org/latest/Manual/index.html.
 
 /*!
- * \ingroup PkgBarycentricCoordinates2Ref
+ * \ingroup PkgBarycentricCoordinates2RefDeprecated
  * The class `Generalized_barycentric_coordinates_2` implements generalized barycentric coordinates along the polygon's boundary and provides a common interface for all coordinate classes.
  * This class is parameterized by a coordinate class `Coordinate_2`, and a traits class `Traits`.
 
  * \deprecated This part of the package is deprecated since the version 5.1 of \cgal.
 
-\tparam Coordinate_2 must be a model of the concept `BarycentricCoordinates_2_depr`.
+\tparam Coordinate_2 must be a model of the concept `CGAL::Barycentric_coordinates::BarycentricCoordinates_2_depr`.
 
-\tparam Traits must be a model of the concepts `BarycentricTraits_2` and `PolygonTraits_2`.
+\tparam Traits must be a model of the concepts `CGAL::Barycentric_coordinates::BarycentricTraits_2` and `PolygonTraits_2`.
 
 */
 
@@ -117,15 +117,15 @@ public:
     /// Computed coordinates are stored in the output iterator `output`.
     ///
     /// Different choices of the parameter `query_point_location` are possible: 
-    /// `CGAL::Barycentric_coordinates::UNSPECIFIED_LOCATION` - default constant with automatic check for a location, 
-    /// `CGAL::Barycentric_coordinates::ON_BOUNDED_SIDE` - for a strictly interior query point, 
-    /// `CGAL::Barycentric_coordinates::ON_BOUNDARY` - for a query point on the boundary of the polygon,
-    /// `CGAL::Barycentric_coordinates::ON_VERTEX` - for a query point at one of the polygon's vertices, and
-    /// `CGAL::Barycentric_coordinates::ON_UNBOUNDED_SIDE` - for a strictly exterior query point.
+    /// `CGAL::Barycentric_coordinates_depr::UNSPECIFIED_LOCATION` - default constant with automatic check for a location, 
+    /// `CGAL::Barycentric_coordinates_depr::ON_BOUNDED_SIDE` - for a strictly interior query point, 
+    /// `CGAL::Barycentric_coordinates_depr::ON_BOUNDARY` - for a query point on the boundary of the polygon,
+    /// `CGAL::Barycentric_coordinates_depr::ON_VERTEX` - for a query point at one of the polygon's vertices, and
+    /// `CGAL::Barycentric_coordinates_depr::ON_UNBOUNDED_SIDE` - for a strictly exterior query point.
     ///
     /// Another parameter is `type_of_algorithm` with the following possible constants: 
-    /// `CGAL::Barycentric_coordinates::PRECISE` - default slow algorithm, which is as precise as possible and
-    /// `CGAL::Barycentric_coordinates::FAST` - fast algorithm, which is less precise but much faster.
+    /// `CGAL::Barycentric_coordinates_depr::PRECISE` - default slow algorithm, which is as precise as possible and
+    /// `CGAL::Barycentric_coordinates_depr::FAST` - fast algorithm, which is less precise but much faster.
     template<class OutputIterator>
         inline boost::optional<OutputIterator> operator()(const Point_2 &query_point, OutputIterator output, Query_point_location query_point_location = UNSPECIFIED_LOCATION, Type_of_algorithm type_of_algorithm = PRECISE)
     {   
@@ -257,11 +257,11 @@ public:
         if(int(number_of_vertices) < 3) {
             output_stream << "This polygon has " << number_of_vertices << " vertices." << std::endl;
             output_stream << "Since number of vertices is less than 3, generalized barycentric coordinates cannot be computed!" << std::endl;
-            output_stream << "Please use the class CGAL::Barycentric_coordinates::Segment_coordinates_2!" << std::endl;
+            output_stream << "Please use the class CGAL::Barycentric_coordinates_depr::Segment_coordinates_2!" << std::endl;
         } else {
             if(int(number_of_vertices) == 3) {
                  output_stream << "This polygon has " << number_of_vertices << " vertices." << std::endl;
-                 output_stream << "For triangles it is better to use the class CGAL::Barycentric_coordinates::Triangle_coordinates_2!" << std::endl;
+                 output_stream << "For triangles it is better to use the class CGAL::Barycentric_coordinates_depr::Triangle_coordinates_2!" << std::endl;
             }
             else output_stream << "This polygon has " << number_of_vertices << " vertices." << std::endl;
         }

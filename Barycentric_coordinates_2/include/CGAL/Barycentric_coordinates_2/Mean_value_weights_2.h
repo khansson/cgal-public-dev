@@ -41,7 +41,7 @@ namespace CGAL {
 namespace Barycentric_coordinates {
 
   /*! 
-    \ingroup PkgBarycentric_coordinates_2Classes
+    \ingroup PkgBarycentricCoordinates2RefClasses
 
     \brief Mean value weights.
 
@@ -57,13 +57,13 @@ namespace Barycentric_coordinates {
     is a model of `ConstRange`.
 
     \tparam GeomTraits 
-    is a model of `BarycentricTraits_2`.
+    is a model of `CGAL::Barycentric_coordinates::BarycentricTraits_2`.
 
     \tparam VertexMap 
     is an `LvaluePropertyMap` whose key type is `Polygon::value_type` and
     value type is `GeomTraits::Point_2`.
 
-    \cgalModels `AnalyticWeights_2`
+    \cgalModels `CGAL::Barycentric_coordinates::AnalyticWeights_2`
   */
   template<
   typename Polygon,
@@ -163,10 +163,10 @@ namespace Barycentric_coordinates {
     /// @{ 
 
     /*!
-      \brief implements `AnalyticWeights_2::operator()()`.
+      \brief implements `CGAL::Barycentric_coordinates::AnalyticWeights_2::operator()()`.
         
       This function fills `weights` with mean value weights 
-      computed at the `query` point with respect to the vertices of the polygon.
+      computed at the `query` point with respect to the vertices of the `polygon`.
       If `query` belongs to the polygon's boundary, the returned weights are normalized.
 
       \tparam OutputIterator
@@ -216,7 +216,7 @@ namespace Barycentric_coordinates {
 
     /*! 
       This function fills `weights` with mean value weights 
-      computed at the `query` point with respect to the vertices of the polygon.
+      computed at the `query` point with respect to the vertices of the `polygon`.
         
       This function calls the generic function above.
 
@@ -276,15 +276,15 @@ namespace Barycentric_coordinates {
       if (!result)
         return internal::Edge_case::UNBOUNDED;
 
-      const Query_point_location location = (*result).first;
+      const internal::Query_point_location location = (*result).first;
       const std::size_t index = (*result).second;
 
-      if (location == Query_point_location::ON_UNBOUNDED_SIDE) 
+      if (location == internal::Query_point_location::ON_UNBOUNDED_SIDE) 
         return internal::Edge_case::UNBOUNDED;
 
       if (
-        location == Query_point_location::ON_VERTEX ||
-        location == Query_point_location::ON_EDGE ) {
+        location == internal::Query_point_location::ON_VERTEX ||
+        location == internal::Query_point_location::ON_EDGE ) {
         internal::boundary_coordinates_2(
           m_polygon, query, location, index, weights, m_traits);
         return internal::Edge_case::BOUNDARY;

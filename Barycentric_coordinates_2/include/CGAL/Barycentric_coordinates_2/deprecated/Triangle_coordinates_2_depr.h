@@ -50,14 +50,14 @@ namespace Barycentric_coordinates_depr {
 // [1] Reference: Weisstein, Eric W. "Barycentric Coordinates." From MathWorld--A Wolfram Web Resource. http://mathworld.wolfram.com/BarycentricCoordinates.html.
 
 /*!
- * \ingroup PkgBarycentricCoordinates2Ref
+ * \ingroup PkgBarycentricCoordinates2RefDeprecated
  * The class `Triangle_coordinates_2` implements barycentric coordinates ( <a href="http://mathworld.wolfram.com/BarycentricCoordinates.html" target=blanc>[1]</a>,
  * <a href="https://en.wikipedia.org/wiki/Barycentric_coordinate_system" target=blanc>[2]</a> ) with respect to an arbitrary non-degenerate triangle in the plane.
  * This class is parameterized by a traits class `Traits`.
 
  * \deprecated This part of the package is deprecated since the version 5.1 of \cgal.
 
-\tparam Traits must be a model of the concept `BarycentricTraits_2`.
+\tparam Traits must be a model of the concept `CGAL::Barycentric_coordinates::BarycentricTraits_2`.
 
 */
 
@@ -235,7 +235,7 @@ private:
  * \relates Triangle_coordinates_2
  * This is a global function that takes three vertices of a triangle and computes triangle coordinates at a given query point with respect to these vertices.
  
-\tparam Traits must be a model of the concept `BarycentricTraits_2`.
+\tparam Traits must be a model of the concept `CGAL::Barycentric_coordinates::BarycentricTraits_2`.
 
 */
 

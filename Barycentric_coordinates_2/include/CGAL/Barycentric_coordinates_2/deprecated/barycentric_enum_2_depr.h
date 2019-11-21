@@ -32,7 +32,7 @@
 namespace CGAL {
 
 /*!
- * \ingroup PkgBarycentricCoordinates2Ref
+ * \ingroup PkgBarycentricCoordinates2RefDeprecated
  * The namespace Barycentric_coordinates contains implementations of all generalized barycentric coordinates: 2D, 3D, related enumerations, and so on.
  
  * \deprecated This part of the package is deprecated since the version 5.1 of \cgal.

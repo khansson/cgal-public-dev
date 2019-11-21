@@ -40,7 +40,7 @@ namespace CGAL {
 namespace Barycentric_coordinates {
 
   /*! 
-    \ingroup PkgBarycentric_coordinates_2Classes
+    \ingroup PkgBarycentricCoordinates2RefClasses
 
     \brief Delaunay domain restricted to a simple polygon.
 
@@ -54,13 +54,13 @@ namespace Barycentric_coordinates {
     is a model of `ConstRange`.
 
     \tparam GeomTraits 
-    is a model of `BarycentricTraits_2`.
+    is a model of `CGAL::Barycentric_coordinates::BarycentricTraits_2`.
 
     \tparam VertexMap 
     is an `LvaluePropertyMap` whose key type is `Polygon::value_type` and
     value type is `GeomTraits::Point_2`.
 
-    \cgalModels `DiscretizedDomain_2`
+    \cgalModels `CGAL::Barycentric_coordinates::DiscretizedDomain_2`
   */
   template<
   typename Polygon,
@@ -142,13 +142,13 @@ namespace Barycentric_coordinates {
 
     /*!
       \brief creates a constrained Delaunay triangulation restricted to 
-      the input polygon.
+      the input `polygon`.
 
       \param shape_size
       A shape size bound. See `Delaunay_mesh_size_criteria_2`.
 
       \param list_of_seeds
-      Contains seed points indicating, which parts of the polygon 
+      Contains seed points indicating, which parts of the `polygon` 
       should be partitioned and subdivided.
     */
     void create(
@@ -190,12 +190,12 @@ namespace Barycentric_coordinates {
         const auto location = (*result).first;
 
         if (
-          location == Query_point_location::ON_VERTEX ||
-          location == Query_point_location::ON_EDGE)
+          location == internal::Query_point_location::ON_VERTEX ||
+          location == internal::Query_point_location::ON_EDGE)
           vh->info().type = internal::Edge_case::BOUNDARY;
 
         if (
-          location == Query_point_location::ON_BOUNDED_SIDE)
+          location == internal::Query_point_location::ON_BOUNDED_SIDE)
           vh->info().type = internal::Edge_case::INTERIOR;
 
         /*
@@ -232,7 +232,7 @@ namespace Barycentric_coordinates {
     }
 
     /*!
-      \brief implements `DiscretizedDomain_2::number_of_vertices()`.
+      \brief implements `CGAL::Barycentric_coordinates::DiscretizedDomain_2::number_of_vertices()`.
       
       This function returns the number of vertices in the discretized domain.
     */
@@ -241,7 +241,7 @@ namespace Barycentric_coordinates {
     }
 
     /*!
-      \brief implements `DiscretizedDomain_2::vertex()`.
+      \brief implements `CGAL::Barycentric_coordinates::DiscretizedDomain_2::vertex()`.
       
       This function returns a vertex of the discretized domain with 
       the index `query_index`.
@@ -263,10 +263,10 @@ namespace Barycentric_coordinates {
     }
 
     /*!
-      \brief implements `DiscretizedDomain_2::is_on_boundary()`.
+      \brief implements `CGAL::Barycentric_coordinates::DiscretizedDomain_2::is_on_boundary()`.
       
       This function controls if the vertex of the discretized domain with the 
-      index `query_index` is on the polygon's boundary.
+      index `query_index` is on the boundary of the `polygon`.
 
       \param query_index
       An index of the query vertex.
@@ -285,7 +285,7 @@ namespace Barycentric_coordinates {
     }
 
     /*!
-      \brief implements `DiscretizedDomain_2::operator()()`.
+      \brief implements `CGAL::Barycentric_coordinates::DiscretizedDomain_2::operator()()`.
       
       This function returns a one-ring neighborhood of the vertex of the 
       discretized domain with the index `query_index`.
@@ -330,7 +330,7 @@ namespace Barycentric_coordinates {
     }
 
     /*!
-      \brief implements `DiscretizedDomain_2::locate()`.
+      \brief implements `CGAL::Barycentric_coordinates::DiscretizedDomain_2::locate()`.
       
       This function locates a query point in the discretized domain.
 

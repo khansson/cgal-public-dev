@@ -54,6 +54,24 @@ namespace CGAL {
 namespace Barycentric_coordinates {
 namespace internal {
 
+  enum class Query_point_location {
+
+    /// Query point is located at the vertex of the polygon.
+    ON_VERTEX = 0,
+
+    /// Query point is located on the edge of the polygon.
+    ON_EDGE = 1,
+
+    /// Query point is located in the polygon's interior.
+    ON_BOUNDED_SIDE = 2,
+
+    /// Query point is located in the polygon's exterior.
+    ON_UNBOUNDED_SIDE = 3,
+
+    /// Location is unspecified. Leads to all coordinates being set to zero.
+    UNSPECIFIED = 4
+  };
+
   template<typename GeomTraits> 
   class Default_sqrt {
     

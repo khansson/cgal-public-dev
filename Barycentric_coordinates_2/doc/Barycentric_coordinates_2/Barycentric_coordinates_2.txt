@@ -26,7 +26,7 @@ See also Section \ref gbc_theory for a short introduction to the topic of baryce
 
 Each class that computes barycentric coordinates is parameterized by a traits class. 
 This traits class defines types and geometric primitives, which are used in the computation 
-and must be a model of the concept `BarycentricTraits_2`.
+and must be a model of the concept `CGAL::Barycentric_coordinates::BarycentricTraits_2`.
 
 The main entry point to the component is a `ConstRange` of generic items, which contain vertices of a polygon.
 The vertices are accessed through a \ref PkgPropertyMapRef "propery map" that maps a user-defined type of the item to `CGAL::Point_2`.
@@ -39,7 +39,7 @@ are, by definition, limited to strictly convex polygons. Segment coordinates tak
 any non-degenerate segment, and triangle coordinates allow an arbitrary non-degenerate triangle.
 
 Segment and triangle coordinates can be computed through the corresponding global functions. 
-All generalized coordinates can be computed by creating a model of `AnalyticWeights_2`. 
+All generalized coordinates can be computed by creating a model of `CGAL::Barycentric_coordinates::AnalyticWeights_2`. 
 These models provide either unnormalized or normalized generalized barycentric weights, 
 which depends on the chosen type of coordinates. If the weights are unnormalized, they can be 
 normalized through one of the global functions from `CGAL::Barycentric_coordinates`.
@@ -52,7 +52,7 @@ in Section \ref gbc_degeneracies.
 
 Once instantiated for a polygon, generalized coordinates can be computed multiple times 
 for different query points with respect to the polygon's vertices. See 
-\ref PkgBarycentric_coordinates_2 "Reference Manual" for the detailed interface.
+\ref PkgBarycentricCoordinates2Ref "Reference Manual" for the detailed interface.
 
 The output of the computation is a set of coordinate values at the given query point 
 with respect to the polygon's vertices. This output can be stored in an arbitrary container 
@@ -447,7 +447,7 @@ compute the coordinates, and evaluate the coordinate functions at 1 million stri
 
 \section gbc_implementation Implementation Details
 
-The package consists of 5 classes, 2 enumerations, one namespace, and 11 global functions. 
+The package consists of 5 classes, 1 enumeration, one namespace, and 11 global functions. 
 Once instantiated, the coordinates can be computed multiple times for different query points.
 All the classes / functions are fully templated and have a simple and similar design.
 

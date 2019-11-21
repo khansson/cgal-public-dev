@@ -42,7 +42,7 @@ namespace CGAL {
 namespace Barycentric_coordinates {
 
   /*! 
-    \ingroup PkgBarycentric_coordinates_2Classes
+    \ingroup PkgBarycentricCoordinates2RefClasses
 
     \brief Harmonic coordinates.
 
@@ -60,20 +60,20 @@ namespace Barycentric_coordinates {
     is a model of `ConstRange`.
 
     \tparam Domain
-    is a model of `DiscretizedDomain_2`. For the moment, we only support domains
-    that have elements, which are triangles.
+    is a model of `CGAL::Barycentric_coordinates::DiscretizedDomain_2`. For the 
+    moment, we only support domains that have elements, which are triangles.
 
     \tparam Solver
-    is a model of `SparseLinearSolver_2`.
+    is a model of `CGAL::Barycentric_coordinates::SparseLinearSolver_2`.
 
     \tparam GeomTraits 
-    is a model of `BarycentricTraits_2`.
+    is a model of `CGAL::Barycentric_coordinates::BarycentricTraits_2`.
 
     \tparam VertexMap 
     is an `LvaluePropertyMap` whose key type is `Polygon::value_type` and
     value type is `GeomTraits::Point_2`.
 
-    \cgalModels `AnalyticWeights_2`
+    \cgalModels `CGAL::Barycentric_coordinates::AnalyticWeights_2`
   */
   template<
   typename Polygon,
@@ -174,10 +174,10 @@ namespace Barycentric_coordinates {
     /// @{ 
 
     /*!
-      \brief implements `AnalyticWeights_2::operator()()`.
+      \brief implements `CGAL::Barycentric_coordinates::AnalyticWeights_2::operator()()`.
         
       This function fills `coordinates` with harmonic coordinates 
-      evaluated at the point `query` with respect to the vertices of the polygon.
+      evaluated at the point `query` with respect to the vertices of the `polygon`.
       Evaluation is performed by locating an element in the `domain` that contains
       `query` and then interpolating harmonic coordinates within this element.
         
@@ -246,7 +246,7 @@ namespace Barycentric_coordinates {
 
     /*! 
       This function fills `coordinates` with harmonic coordinates 
-      evaluated at the point `query` with respect to the vertices of the polygon.
+      evaluated at the point `query` with respect to the vertices of the `polygon`.
       Evaluation is performed by locating an element in the `domain` that contains
       `query` and then interpolating harmonic coordinates within this element.
         
@@ -273,7 +273,7 @@ namespace Barycentric_coordinates {
 
     /*!
       \brief fills `coordinates` with harmonic coordinates computed at the 
-      vertex of the input domain with the index `query`.
+      vertex of the input `domain` with the index `query`.
         
       \tparam OutputIterator
       is an output iterator whose value type is `FT`.
@@ -306,7 +306,7 @@ namespace Barycentric_coordinates {
 
     /*!
       \brief fills `coordinates` with harmonic coordinates computed at all the 
-      vertices of the input domain.
+      vertices of the input `domain`.
         
       \tparam OutputIterator
       is an output iterator whose value type is `std::vector<FT>`.
@@ -332,7 +332,7 @@ namespace Barycentric_coordinates {
     /// @{
 
     /*!
-      computes harmonic coordinates at all the vertices of the input domain.
+      computes harmonic coordinates at all the vertices of the input `domain`.
     */
     void compute() {
 

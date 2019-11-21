@@ -41,7 +41,7 @@ namespace Barycentric_coordinates {
     is an output iterator whose value type is `GeomTraits::FT`.
 
     \tparam GeomTraits 
-    is a model of `BarycentricTraits_2`.
+    is a model of `CGAL::Barycentric_coordinates::BarycentricTraits_2`.
 
     \param source
     The source vertex of a segment.
@@ -125,7 +125,7 @@ namespace Barycentric_coordinates {
     is an output iterator whose value type is `GeomTraits::FT`.
 
     \tparam GeomTraits 
-    is a model of `BarycentricTraits_2`.
+    is a model of `CGAL::Barycentric_coordinates::BarycentricTraits_2`.
 
     \param p0
     The first vertex of a triangle.
@@ -227,7 +227,7 @@ namespace Barycentric_coordinates {
     is an output iterator whose value type is `GeomTraits::FT`.
 
     \tparam GeomTraits 
-    is a model of `BarycentricTraits_2`.
+    is a model of `CGAL::Barycentric_coordinates::BarycentricTraits_2`.
 
     \tparam VertexMap
     is an `LvaluePropertyMap` whose key type is `Polygon::value_type` and
@@ -276,7 +276,7 @@ namespace Barycentric_coordinates {
     auto index    = (*result).second;
 
     if (!result) {
-      location = Query_point_location::UNSPECIFIED;
+      location = internal::Query_point_location::UNSPECIFIED;
       index = std::size_t(-1);
     }
 
@@ -354,7 +354,7 @@ namespace Barycentric_coordinates {
     is an output iterator whose value type is `std::vector<GeomTraits::FT>`.
 
     \tparam GeomTraits 
-    is a model of `BarycentricTraits_2`.
+    is a model of `CGAL::Barycentric_coordinates::BarycentricTraits_2`.
 
     \tparam VertexMap
     is an `LvaluePropertyMap` whose key type is `Polygon::value_type` and
@@ -421,7 +421,7 @@ namespace Barycentric_coordinates {
       auto index    = (*result).second;
 
       if (!result) {
-        location = Query_point_location::UNSPECIFIED;
+        location = internal::Query_point_location::UNSPECIFIED;
         index = std::size_t(-1);
       }
 
@@ -445,13 +445,13 @@ namespace Barycentric_coordinates {
     is a model of `ConstRange`.
 
     \tparam Weights
-    is a model of `AnalyticWeights_2`.
+    is a model of `CGAL::Barycentric_coordinates::AnalyticWeights_2`.
 
     \tparam OutputIterator
     is an output iterator whose value type is `std::vector<GeomTraits::FT>`.
 
     \tparam GeomTraits 
-    is a model of `BarycentricTraits_2`.
+    is a model of `CGAL::Barycentric_coordinates::BarycentricTraits_2`.
 
     \tparam PointMap
     is an `LvaluePropertyMap` whose key type is `QueryRange::value_type` and
@@ -520,13 +520,13 @@ namespace Barycentric_coordinates {
     is a point type.
 
     \tparam Weights
-    is a model of `AnalyticWeights_2`.
+    is a model of `CGAL::Barycentric_coordinates::AnalyticWeights_2`.
 
     \tparam OutputIterator
     is an output iterator whose value type is `GeomTraits::FT`.
 
     \tparam GeomTraits 
-    is a model of `BarycentricTraits_2`.
+    is a model of `CGAL::Barycentric_coordinates::BarycentricTraits_2`.
 
     \param vertices
     An instance of `VertexRange` with vertices.
@@ -586,7 +586,7 @@ namespace Barycentric_coordinates {
     is a point type.
 
     \tparam Weights
-    is a model of `AnalyticWeights_2`.
+    is a model of `CGAL::Barycentric_coordinates::AnalyticWeights_2`.
 
     \tparam OutputIterator
     is an output iterator whose value type is `Kernel_traits<Point_2>::Kernel::FT`.
@@ -634,13 +634,13 @@ namespace Barycentric_coordinates {
     is a model of `ConstRange`.
 
     \tparam Weights
-    is a model of `AnalyticWeights_2`.
+    is a model of `CGAL::Barycentric_coordinates::AnalyticWeights_2`.
 
     \tparam OutputIterator
     is an output iterator whose value type is `std::vector<GeomTraits::FT>`.
 
     \tparam GeomTraits 
-    is a model of `BarycentricTraits_2`.
+    is a model of `CGAL::Barycentric_coordinates::BarycentricTraits_2`.
 
     \tparam PointMap
     is an `LvaluePropertyMap` whose key type is `QueryRange::value_type` and
