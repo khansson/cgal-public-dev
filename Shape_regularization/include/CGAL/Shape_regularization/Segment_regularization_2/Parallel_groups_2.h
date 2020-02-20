@@ -29,7 +29,7 @@
 #include <CGAL/Shape_regularization/internal/Segment_data_2.h>
 
 namespace CGAL {
-namespace Regularization {
+namespace Shape_regularization {
 
   /*!
     \ingroup PkgShape_regularization_utilities
@@ -156,7 +156,7 @@ namespace Regularization {
 
   };
 
-} // namespace Regularization
+} // namespace Shape_regularization
 } // namespace CGAL
 
 #endif // CGAL_SHAPE_REGULARIZATION_PARALLEL_GROUPS_2

@@ -24,17 +24,21 @@
 
 // #include <CGAL/license/Shape_regularization.h>
 
-#include <Eigen/Sparse>
-#include <Eigen/Dense>
+// STL includes.
 #include <vector>
 #include <utility>
 #include <set>
 #include <map>
 
+// Eigen includes.
+#include <Eigen/Sparse>
+#include <Eigen/Dense>
+
+// Internal includes.
 #include <CGAL/Shape_regularization/internal/OSQP_solver.h>
 
 namespace CGAL {
-namespace Regularization {
+namespace Shape_regularization {
 
     /*!
     \ingroup PkgShape_regularization
@@ -66,7 +70,7 @@ namespace Regularization {
     typename InputRange,
     typename NeighborQuery, 
     typename RegularizationType>
-  class Shape_regularization {
+  class QP_regularization {
 
   public:
     /// \cond SKIP_IN_MANUAL
@@ -100,7 +104,7 @@ namespace Regularization {
 
     */
 
-    Shape_regularization(
+    QP_regularization(
       InputRange& input_range, 
       NeighborQuery& neighbor_query, 
       RegularizationType& regularization_type) :
@@ -338,7 +342,7 @@ namespace Regularization {
     }
   };
 
-} // namespace Regularization
+} // namespace Shape_regularization
 } // namespace CGAL
 
 #endif // CGAL_SHAPE_REGULARIZATION

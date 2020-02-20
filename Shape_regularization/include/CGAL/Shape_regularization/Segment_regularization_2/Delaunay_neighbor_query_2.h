@@ -33,7 +33,7 @@
 #include <vector>
 
 namespace CGAL {
-namespace Regularization {
+namespace Shape_regularization {
 
   /*!
     \ingroup PkgShape_regularization2D_regularization
@@ -221,7 +221,7 @@ namespace Regularization {
     }
   };
 
-} // namespace Regularization
+} // namespace Shape_regularization
 } // namespace CGAL
 
 #endif // CGAL_SHAPE_REGULARIZATION_DELAUNEY_NEIGHBOR_QUERY_2

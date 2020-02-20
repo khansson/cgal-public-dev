@@ -37,7 +37,7 @@
 
 
 namespace CGAL {
-namespace Regularization {
+namespace Shape_regularization {
 
   /*!
     \ingroup PkgShape_regularization2D_regularization
@@ -424,7 +424,7 @@ namespace Regularization {
 
   };
 
-} // namespace Regularization
+} // namespace Shape_regularization
 } // namespace CGAL
 
 #endif // CGAL_SHAPE_REGULARIZATION_ANGLE_REGULARIZATION_2

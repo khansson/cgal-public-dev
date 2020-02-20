@@ -28,7 +28,7 @@
 #include <map>
 
 namespace CGAL {
-namespace Regularization {
+namespace Shape_regularization {
 namespace internal {
 
   template<
@@ -79,7 +79,7 @@ namespace internal {
     };
 
 } // namespace internal
-} // namespace Regularization
+} // namespace Shape_regularization
 } // namespace CGAL
 
 #endif // CGAL_SHAPE_REGULARIZATION_INTERNAL_CONDITIONS_ANGLES_2

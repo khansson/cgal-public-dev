@@ -27,7 +27,7 @@
 #include <CGAL/Shape_regularization/internal/Segment_data_2.h>
 
 namespace CGAL {
-namespace Regularization {
+namespace Shape_regularization {
 namespace internal {
 
   template<
@@ -70,7 +70,7 @@ namespace internal {
     };
 
 } // namespace internal
-} // namespace Regularization
+} // namespace Shape_regularization
 } // namespace CGAL
 
 #endif // CGAL_SHAPE_REGULARIZATION_INTERNAL_CONDITIONS_ORDINATES_2

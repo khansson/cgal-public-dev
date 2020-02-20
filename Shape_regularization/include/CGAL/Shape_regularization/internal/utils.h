@@ -25,7 +25,7 @@
 // #include <CGAL/license/Shape_regularization.h>
 
 namespace CGAL {
-namespace Regularization {
+namespace Shape_regularization {
 namespace internal {
 
   template<typename Point_2>
@@ -90,7 +90,7 @@ namespace internal {
 
 
 } // internal
-} // Regularization
+} // Shape_regularization
 } // CGAL
 
 #endif // CGAL_LEVELS_OF_DETAIL_INTERNAL_UTILS_H
