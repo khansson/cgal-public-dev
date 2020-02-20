@@ -25,9 +25,13 @@
 // #include <CGAL/license/Shape_regularization.h>
 
 #include <CGAL/Shape_regularization/Shape_regularization.h>
-#include <CGAL/Shape_regularization/Delaunay_neighbor_query_2.h> 
-#include <CGAL/Shape_regularization/Angle_regularization_2.h>
-#include <CGAL/Shape_regularization/Ordinate_regularization_2.h>
-#include <CGAL/Shape_regularization/Parallel_groups_2.h>
+#include <CGAL/Shape_regularization/Polygon_regularization_2.h>
+
+#include <CGAL/Shape_regularization/Segment_regularization_2/Delaunay_neighbor_query_2.h> 
+#include <CGAL/Shape_regularization/Segment_regularization_2/Angle_regularization_2.h>
+#include <CGAL/Shape_regularization/Segment_regularization_2/Ordinate_regularization_2.h>
+#include <CGAL/Shape_regularization/Segment_regularization_2/Parallel_groups_2.h>
+
+#include <CGAL/Shape_regularization/regularize_planes.h>
 
 #endif // CGAL_SHAPE_REGULARIZATION_HEADERS

@@ -62,5 +62,4 @@ CGAL provides two particular regularization types: angle regularization of 2D se
 
 ### Utilities ###
 - `CGAL::Regularization::Parallel_groups_2<GeomTraits, InputRange, SegmentMap>`
-
 */

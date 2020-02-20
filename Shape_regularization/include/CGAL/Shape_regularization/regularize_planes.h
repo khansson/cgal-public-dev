@@ -519,6 +519,8 @@ void subgraph_mutually_orthogonal_clusters (std::vector<Plane_cluster<Traits> >&
 // Public section
 // ----------------------------------------------------------------------------
 
+namespace Shape_regularization {
+
 /// \ingroup PkgShapeDetectionRef
   
   /*! 
@@ -814,6 +816,8 @@ void regularize_planes (const PointRange& points,
                      regularize_coplanarity, regularize_axis_symmetry,
                      tolerance_angle, tolerance_coplanarity, symmetry_direction);
 }
+
+} // namespace Shape_regularization
 
 #ifdef CGAL_TYPENAME_FOR_MSC
 #undef CGAL_TYPENAME_FOR_MSC

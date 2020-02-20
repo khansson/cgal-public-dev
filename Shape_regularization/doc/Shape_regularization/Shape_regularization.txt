@@ -13,6 +13,7 @@ Example of the Shape regularization algorithm for angle regularization. See
 
 \authors Jean-Philippe Bauchet, Florent Lafarge, Gennadii Sytov, Dmitry Anisimov
 
+
 \section ShapeRegularization_introduction Introduction
 
 The shape regularization algorithm is based on the "Global regularization" algorithm
@@ -31,6 +32,7 @@ Two particular instances of this algorithm are provided:
 - \ref ShapeRegularization_3d_regularization "3D" regularization of planes;
 
 Other instances can be added by the user, as explained below.
+
 
 \section ShapeRegularization_framework Framework
 
@@ -72,6 +74,7 @@ function value between 2 neighbor items.
 \subsection ShapeRegularization_examples Examples
 
 Here will be examples.
+
 
 \section ShapeRegularization_2d_regularization 2D Regularization
 
@@ -133,8 +136,6 @@ The entire `InputRange` is provided to the Angle regularization class as one gro
 The angle regularization bound is set to \f$40^{\circ}\f$. The `CGAL::Exact_predicates_inexact_constructions_kernel`
 Kernel is used in the following example:
 
-\cgalExample{Shape_regularization/example_angles_100_segments.cpp}
-
 \subsection ShapeRegularization_2d_ordinate_regularization Ordinate Regularization
 
 This class re-aligns segments to preserve collinearity. 
@@ -171,8 +172,6 @@ is used to obtain groups of parallel segments within the \f$1^{\circ}\f$ bound.
 The ordinate regularization bound is set to \f$0.25\f$. The `CGAL::Simple_cartesian<double>` Kernel is used
 in the following example:
 
-\cgalExample{Shape_regularization/example_ordinates_100_segments.cpp}
-
 \subsection ShapeRegularization_2d_examples Examples
 
 The following examples demonstrate the usage of the shape regularization algorithm for 
@@ -192,8 +191,6 @@ A set of 2D segments before the shape regularization.
 A set of 2D segments after the shape regularization.
 \cgalFigureEnd
 
-\cgalExample{Shape_regularization/example_15_segments.cpp}
-
 \subsubsection ShapeRegularization_2d_examples_advance Real data example
 
 This example contains 65 2D segments which are constructed from a set of 2D points obtained from the
@@ -210,8 +207,6 @@ A set of 2D segments before the shape regularization.
 \cgalFigureBegin{Real_data_example_after, example_real_data_after.png}
 A set of 2D segments after the shape regularization.
 \cgalFigureEnd
-
-\cgalExample{Shape_regularization/example_real_data.cpp}
 
 \subsection ShapeRegularization_2d_performance Performance
 
@@ -236,6 +231,7 @@ The table below contains information about the described examples above:
 <tr class="markdownTableBody">
 <td class="markdownTableBodyCenter">example_real_data  </td><td class="markdownTableBodyCenter">65  </td><td class="markdownTableBodyCenter">65 </td><td class="markdownTableBodyCenter">64  </td><td class="markdownTableBodyCenter">0.001873   </td><td class="markdownTableBodyCenter">0.000396  </td></tr>
 </table>
+
 
 \section ShapeRegularization_3d_regularization 3D Regularization
 
@@ -282,11 +278,30 @@ of \f$0.1^{\circ}\f$ and etc.
 
 The user can acces the parallel groups using the `CGAL::Regularization::Parallel_groups_2::parallel_groups()` function.
 
+
+\section Shape_detection_PlaneRegularization Plane Regularization
+
+Shape detection applies to man-made scenes or objects such as urban scenes or scans of mechanical parts. 
+Such scenes often contain a wide range of geometric regularities such as parallelism, orthogonality, or symmetry. 
+This package offers a function to reinforce four types of regularities for planar shapes, `CGAL::Shape_regularization::regularize_planes()`:
+
+- Planes that are near *parallel* are made parallel: normal vectors of planes that form angles smaller than a user-defined threshold are made exactly equal;
+- Parallel planes that are near *coplanar* are made exactly coplanar;
+- Planes that are near *orthogonal* are made exactly orthogonal;
+- Planes that are near *symmetrical* with respect to a user-defined axis are made exactly symmetrical.
+
+The user can choose to regularize only one or several of these four properties (see CGAL::Shape_regularization::regularize_planes()). 
+The process is greedy and based on a hierarchical decomposition (coplanar clusters are subgroups of parallel clusters, 
+which are subgroups of axis-symmetric and orthogonal clusters) as described by Verdie et al. \cgalCite{cgal:vla-lod-15}
+
+
 \section ShapeRegularization_history History
 
 The shape regularization algorithm on a 2D segment set was first implemented by Jean-Philippe Bauchet 
 under the supervision of Florent Lafarge and then generalized by Gennadii Sytov during the Google Summer 
-of Code 2019 under the supervision of Dmitry Anisimov.
+of Code 2019 under the supervision of Dmitry Anisimov. Plane regularization was added by Simon Giraudot 
+based on the prototype version developed by Florent Lafarge.
+
 
 \section ShapeRegularization_acknowledgement Acknowledgement
 

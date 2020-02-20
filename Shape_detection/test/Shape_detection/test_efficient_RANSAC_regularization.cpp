@@ -3,7 +3,7 @@
 #include <CGAL/property_map.h>
 
 #include <CGAL/Shape_detection/Efficient_RANSAC.h>
-#include <CGAL/Regularization/regularize_planes.h>
+#include <CGAL/Shape_regularization/regularize_planes.h>
 #include <CGAL/Random.h>
 #include <CGAL/Aff_transformation_3.h>
 
@@ -159,24 +159,26 @@ int main()
     
     // Test regularization.
     Efficient_ransac::Plane_range planes = ransac.planes();
-    CGAL::regularize_planes (points,
-                             Point_map(),
-                             planes,
-                             CGAL::Shape_detection::Plane_map<Traits>(),
-                             CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
-                             true, false, false, false, 5.);
+    CGAL::Shape_regularization::regularize_planes(
+      points,
+      Point_map(),
+      planes,
+      CGAL::Shape_detection::Plane_map<Traits>(),
+      CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
+      true, false, false, false, 5.);
     
     std::vector<Plane> after = get_ransac_planes(ransac);
 
     std::cerr << " * Nothing should change now..." << std::endl;
     check_planes_unchanged (before, after);
     
-    CGAL::regularize_planes (points,
-                             Point_map(),
-                             planes,
-                             CGAL::Shape_detection::Plane_map<Traits>(),
-                             CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
-                             true, false, false, false, 15.);
+    CGAL::Shape_regularization::regularize_planes(
+      points,
+      Point_map(),
+      planes,
+      CGAL::Shape_detection::Plane_map<Traits>(),
+      CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
+      true, false, false, false, 15.);
     
     after = get_ransac_planes(ransac);
 
@@ -205,24 +207,26 @@ int main()
     std::vector<Plane> before = get_ransac_planes(ransac);
 
     Efficient_ransac::Plane_range planes = ransac.planes();
-    CGAL::regularize_planes (points,
-                             Point_map(),
-                             planes,
-                             CGAL::Shape_detection::Plane_map<Traits>(),
-                             CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
-                             false, true, false, true, 5.);
+    CGAL::Shape_regularization::regularize_planes(
+      points,
+      Point_map(),
+      planes,
+      CGAL::Shape_detection::Plane_map<Traits>(),
+      CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
+      false, true, false, true, 5.);
 
     std::vector<Plane> after = get_ransac_planes(ransac);
 
     std::cerr << " * Nothing should change now..." << std::endl;
     check_planes_unchanged (before, after);
     
-    CGAL::regularize_planes (points,
-                             Point_map(),
-                             planes,
-                             CGAL::Shape_detection::Plane_map<Traits>(),
-                             CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
-                             false, true, false, true, 15.);
+    CGAL::Shape_regularization::regularize_planes(
+      points,
+      Point_map(),
+      planes,
+      CGAL::Shape_detection::Plane_map<Traits>(),
+      CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
+      false, true, false, true, 15.);
 
     after = get_ransac_planes(ransac);
 
@@ -250,24 +254,26 @@ int main()
     std::vector<Plane> before = get_ransac_planes(ransac);
 
     Efficient_ransac::Plane_range planes = ransac.planes();
-    CGAL::regularize_planes (points,
-                             Point_map(),
-                             planes,
-                             CGAL::Shape_detection::Plane_map<Traits>(),
-                             CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
-                             true, false, true, false, 5., 0.1);
+    CGAL::Shape_regularization::regularize_planes(
+      points,
+      Point_map(),
+      planes,
+      CGAL::Shape_detection::Plane_map<Traits>(),
+      CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
+      true, false, true, false, 5., 0.1);
 
     std::vector<Plane> after = get_ransac_planes(ransac);
 
     std::cerr << " * Nothing should change now..." << std::endl;
     check_planes_unchanged (before, after);
     
-    CGAL::regularize_planes (points,
-                             Point_map(),
-                             planes,
-                             CGAL::Shape_detection::Plane_map<Traits>(),
-                             CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
-                             true, false, true, false, 5., 0.3);
+    CGAL::Shape_regularization::regularize_planes(
+      points,
+      Point_map(),
+      planes,
+      CGAL::Shape_detection::Plane_map<Traits>(),
+      CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
+      true, false, true, false, 5., 0.3);
 
     after = get_ransac_planes(ransac);
 
@@ -299,24 +305,26 @@ int main()
 
     std::vector<Plane> before = get_ransac_planes(ransac);
     Efficient_ransac::Plane_range planes = ransac.planes();
-    CGAL::regularize_planes (points,
-                             Point_map(),
-                             planes,
-                             CGAL::Shape_detection::Plane_map<Traits>(),
-                             CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
-                             false, false, false, true, 5., 0.01, Vector(1., 0., 0.));
+    CGAL::Shape_regularization::regularize_planes(
+      points,
+      Point_map(),
+      planes,
+      CGAL::Shape_detection::Plane_map<Traits>(),
+      CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
+      false, false, false, true, 5., 0.01, Vector(1., 0., 0.));
 
     std::vector<Plane> after = get_ransac_planes(ransac);
 
     std::cerr << " * Nothing should change now..." << std::endl;
     check_planes_unchanged (before, after);
     
-    CGAL::regularize_planes (points,
-                             Point_map(),
-                             planes,
-                             CGAL::Shape_detection::Plane_map<Traits>(),
-                             CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
-                             false, false, false, true, 15., 0.01, Vector(1., 0., 0.));
+    CGAL::Shape_regularization::regularize_planes(
+      points,
+      Point_map(),
+      planes,
+      CGAL::Shape_detection::Plane_map<Traits>(),
+      CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
+      false, false, false, true, 15., 0.01, Vector(1., 0., 0.));
 
     after = get_ransac_planes(ransac);
 

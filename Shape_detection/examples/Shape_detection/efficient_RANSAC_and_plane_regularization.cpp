@@ -12,7 +12,7 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 
 #include <CGAL/Shape_detection/Efficient_RANSAC.h>
-#include <CGAL/Regularization/regularize_planes.h>
+#include <CGAL/Shape_regularization/regularize_planes.h>
 
 // Type declarations.
 typedef CGAL::Exact_predicates_inexact_constructions_kernel  Kernel;
@@ -51,16 +51,17 @@ int main(int argc, char** argv) {
   Efficient_ransac::Plane_range planes = efficient_ransac.planes();
 
   // Regularize detected planes.
-  CGAL::regularize_planes(points,
-                          Point_map(),
-                          planes,
-                          CGAL::Shape_detection::Plane_map<Traits>(),
-                          CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
-                          true,  // regularize parallelism
-                          true,  // regularize orthogonality
-                          false, // do not regularize coplanarity
-                          true,  // regularize Z-symmetry (default)
-                          10);   // 10 degrees of tolerance for parallelism / orthogonality
+  CGAL::Shape_regularization::regularize_planes(
+    points,
+    Point_map(),
+    planes,
+    CGAL::Shape_detection::Plane_map<Traits>(),
+    CGAL::Shape_detection::Point_to_shape_index_map<Traits>(points, planes),
+    true,  // regularize parallelism
+    true,  // regularize orthogonality
+    false, // do not regularize coplanarity
+    true,  // regularize Z-symmetry (default)
+    10);   // 10 degrees of tolerance for parallelism / orthogonality
   
   return EXIT_SUCCESS;
 }
