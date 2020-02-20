@@ -1,0 +1,66 @@
+/*!
+\defgroup PkgShapeRegularizationRef Shape Regularization Reference
+
+\defgroup PkgShape_regularizationConcepts Concepts
+\ingroup PkgShapeRegularizationRef
+
+Concepts used for the parameters of the `CGAL::Regularization::Shape_regularization`.
+
+\defgroup PkgShape_regularization2D_regularization 2D Regularization
+\ingroup PkgShapeRegularizationRef
+
+Models that can be used with the `CGAL::Regularization::Shape_regularization`
+for shape regularization in a segment set.
+
+\defgroup PkgShape_regularization3D_regularization 3D Regularization
+\ingroup PkgShapeRegularizationRef
+
+Here will be a section on the 3D regularization.
+
+\defgroup PkgShape_regularization_utilities Utilities
+\ingroup PkgShapeRegularizationRef
+
+Utility classes that can be used with the `CGAL::Regularization::Shape_regularization`.
+
+\addtogroup PkgShapeRegularizationRef
+
+\cgalPkgDescriptionBegin{Shape Regularization, PkgShapeRegularizationRef}
+\cgalPkgPicture{example_angles_100_segments_120x120.png}
+
+\cgalPkgSummaryBegin
+\cgalPkgAuthors{Jean-Philippe Bauchet, Florent Lafarge, Gennadii Sytov, Dmitry Anisimov}
+\cgalPkgDesc{This CGAL package implements a global regularization algorithm from the "KIPPI: Kinetic Polygonal Partitioning of Images" article
+written by Jean-Philippe Bauchet and Florent Lafarge at Inria. The shape regularization algorithm
+works with a set of 2 and 3 dimensional items to preserve parallelism, orthogonality and collinearity relationships. 
+CGAL provides two particular regularization types: angle regularization of 2D segments and ordinate regularization of 2D segments.}
+\cgalPkgManuals{Chapter_Shape_regularization, PkgShapeRegularizationRef}
+\cgalPkgSummaryEnd
+
+\cgalPkgShortInfoBegin
+\cgalPkgSince{5.1}
+\cgalPkgDependsOn{\ref PkgSolverInterface}
+\cgalPkgBib{cgal:as-sr}
+\cgalPkgLicense{\ref licensesGPL "GPL"}
+\cgalPkgDemo{Polyhedron demo,polyhedron_3.zip}
+\cgalPkgShortInfoEnd
+
+\cgalPkgDescriptionEnd
+
+## Shape Regularization ##
+
+### Concepts ###
+- `NeighborQuery`
+- `RegularizationType`
+
+### Algorithm ###
+- `CGAL::Regularization::Shape_regularization<GeomTraits, InputRange, NeighborQuery, RegularizationType>`
+
+### 2D regularization ###
+- `CGAL::Regularization::Delaunay_neighbor_query_2<GeomTraits, InputRange, Segment_map>`
+- `CGAL::Regularization::Angle_regularization_2<GeomTraits, InputRange, SegmentMap>`
+- `CGAL::Regularization::Ordinate_regularization_2<GeomTraits, InputRange, SegmentMap>`
+
+### Utilities ###
+- `CGAL::Regularization::Parallel_groups_2<GeomTraits, InputRange, SegmentMap>`
+
+*/
