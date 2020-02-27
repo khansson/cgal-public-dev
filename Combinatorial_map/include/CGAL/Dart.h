@@ -15,8 +15,8 @@
 #include <CGAL/assertions.h>
 #include <CGAL/tags.h>
 #include <CGAL/tuple.h>
-#include <bitset>
 #include <CGAL/Cell_attribute.h>
+
 
 namespace CGAL {
 
@@ -97,8 +97,14 @@ namespace CGAL {
       public Refs::template Attribute_const_handle<i>
     {};
 
-    /// The number of used marks.
+
     static const size_type NB_MARKS = Refs::NB_MARKS;
+    static const size_type NB_THREAD_LIMIT = Refs::NB_THREAD_LIMIT;
+    static const size_type NB_MARKS_PER_THREAD = Refs::NB_MARKS_PER_THREAD;
+
+    
+
+    typedef typename Refs::mark_storage mark_storage;
 
     /// The dimension of the combinatorial map.
     static const unsigned int dimension = d;
@@ -162,13 +168,13 @@ namespace CGAL {
     /** Return all the marks of this dart.
      * @return the marks.
      */
-     std::bitset<NB_MARKS> get_marks() const
+     mark_storage get_marks() const
     { return mmarks; }
 
     /** Set simultaneously all the marks of this dart to a given value.
      * @param amarks the value of the marks.
      */
-     void set_marks(const std::bitset<NB_MARKS>& amarks) const
+     void set_marks(const mark_storage& amarks) const
     { mmarks = amarks; }
 
     /// @return a handle on the i-attribute
@@ -194,7 +200,7 @@ namespace CGAL {
     Dart_handle mf[dimension+1];
 
     /// Values of Boolean marks.
-    mutable std::bitset<NB_MARKS> mmarks;
+    mutable mark_storage mmarks;
 
     /// Attributes enabled
     typename Helper::Attribute_handles mattribute_handles;

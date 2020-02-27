@@ -479,13 +479,14 @@ namespace CGAL {
             typename Basic_iterator=typename It::Basic_iterator>
   struct CMap_range
   {
+    typedef Map_ CMap;
     typedef It iterator;
     typedef Const_it const_iterator;
-    CMap_range(Map_ &amap, typename Map_::Dart_handle adart) :
-      mmap(amap), mdart(adart), msize(0)
+    CMap_range(Map_ &amap, typename Map_::Dart_handle adart, typename CMap::size_type thread_id = Map_::NB_THREAD_LIMIT) :
+      mmap(amap), mdart(adart), msize(0), thread_id(thread_id)
     {}
-    iterator begin()             { return iterator(mmap,mdart); }
-    iterator end()               { return iterator(mmap,mmap.null_handle); }
+    iterator begin()             { return iterator(mmap,mdart,thread_id); }
+    iterator end()               { return iterator(mmap,mmap.null_handle,thread_id); }
     const_iterator begin() const { return const_iterator(mmap,mdart); }
     const_iterator end() const   { return const_iterator(mmap,mmap.null_handle); }
     typename Map_::size_type size() const
@@ -501,6 +502,7 @@ namespace CGAL {
     Map_ & mmap;
     typename Map_::Dart_handle mdart;
     mutable typename Map_::size_type msize;
+    typename Map_::size_type thread_id;
   };
   //****************************************************************************
   template <typename Map_, typename It, typename Const_it>

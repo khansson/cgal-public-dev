@@ -49,6 +49,7 @@ namespace CGAL {
 
     typedef typename Base::Dart_handle Dart_handle;
     typedef typename Base::Map Map;
+    typedef typename Base::Map::size_type size_type;
 
   protected:
     /// Unmark all the marked darts during the iterator.
@@ -78,9 +79,10 @@ namespace CGAL {
 
   public:
     /// Main constructor.
-    CMap_cell_iterator(Map& amap, Dart_handle adart):
-      Ite(amap, adart, amap.get_new_mark()),
-      mcell_mark_number(amap.get_new_mark())
+    CMap_cell_iterator(Map& amap, Dart_handle adart, size_type thread_id =Map::NB_THREAD_LIMIT):
+      Ite(amap, adart, amap.get_new_mark(thread_id)),
+      mcell_mark_number(amap.get_new_mark(thread_id)),
+      thread_id(thread_id)
     {
       CGAL_static_assertion( (boost::is_same<typename Ite::Basic_iterator,
                               Tag_true>::value) );
@@ -94,8 +96,8 @@ namespace CGAL {
     {
       if (this->mmap->get_number_of_times_mark_reserved(mcell_mark_number)==1)
         unmark_treated_darts();
-      this->mmap->free_mark(mcell_mark_number);
-      this->mmap->free_mark(this->mmark_number);
+      this->mmap->free_mark(mcell_mark_number,thread_id);
+      this->mmap->free_mark(this->mmark_number,thread_id);
       this->mcell_mark_number = Map::INVALID_MARK; // To avoid basic class to try to unmark darts.
       this->mmark_number = Map::INVALID_MARK; // To avoid basic class to try to unmark darts.
     }
@@ -103,7 +105,8 @@ namespace CGAL {
     /// Copy constructor.
     CMap_cell_iterator(const Self& aiterator):
       Ite(aiterator),
-      mcell_mark_number(aiterator.mcell_mark_number)
+      mcell_mark_number(aiterator.mcell_mark_number),
+      thread_id(aiterator.thread_id)
     {
       this->mmap->share_a_mark(this->mmark_number);
       this->mmap->share_a_mark(this->mcell_mark_number);
@@ -155,6 +158,7 @@ namespace CGAL {
   private:
     /// A mark used to mark treated cells.
     typename Map::size_type mcell_mark_number;
+    typename Map::size_type thread_id;
   };
   //****************************************************************************
   /* Class CMap_cell_iterator<Map,Ite,i,dim,Tag_false>: to iterate onto the
@@ -170,6 +174,7 @@ namespace CGAL {
 
     typedef typename Base::Dart_handle Dart_handle;
     typedef typename Base::Map Map;
+    typedef typename Base::Map::size_type size_type;
 
   protected:
     /// Unmark all the marked darts during the iterator.
@@ -192,9 +197,10 @@ namespace CGAL {
 
   public:
     /// Main constructor.
-    CMap_cell_iterator(Map& amap, Dart_handle adart):
+    CMap_cell_iterator(Map& amap, Dart_handle adart, size_type thread_id = Map::NB_THREAD_LIMIT):
       Ite(amap, adart),
-      mmark_number(amap.get_new_mark())
+      mmark_number(amap.get_new_mark(thread_id)),
+      thread_id(thread_id)
     {
       CGAL_static_assertion( (boost::is_same<typename Ite::Basic_iterator,
                               Tag_true>::value) );
@@ -207,14 +213,15 @@ namespace CGAL {
     {
       if (this->mmap->get_number_of_times_mark_reserved(mmark_number)==1)
         unmark_treated_darts();
-      this->mmap->free_mark(mmark_number);
+      this->mmap->free_mark(mmark_number,thread_id);
       this->mmark_number = Map::INVALID_MARK; // To avoid basic class to try to unmark darts.
     }
 
     /// Copy constructor.
     CMap_cell_iterator(const Self& aiterator):
       Ite(aiterator),
-      mmark_number(aiterator.mmark_number)
+      mmark_number(aiterator.mmark_number),
+      thread_id(aiterator.thread_id)
     { this->mmap->share_a_mark(mmark_number); }
 
     /// Assignment operator.
@@ -260,6 +267,8 @@ namespace CGAL {
   private:
     /// A mark used to mark treated cells.
     typename Map::size_type mmark_number;
+    typename Map::size_type thread_id;
+
   };
   //****************************************************************************
   /* Class CMap_cell_iterator<Map,CMap_dart_iterator_basic_of_all<Map>,
@@ -277,6 +286,7 @@ namespace CGAL {
 
     typedef typename Base::Dart_handle Dart_handle;
     typedef typename Base::Map Map;
+    typedef typename Base::Map::size_type size_type;
 
   protected:
     /// Unmark all the marked darts during the iterator.
@@ -299,9 +309,10 @@ namespace CGAL {
 
   public:
     /// Main constructor.
-    CMap_cell_iterator(Map& amap):
+    CMap_cell_iterator(Map& amap, size_type thread_id =Map::NB_THREAD_LIMIT):
       Base(amap),
-      mmark_number(amap.get_new_mark())
+      mmark_number(amap.get_new_mark(thread_id)),
+      thread_id(thread_id)
     {
       CGAL_static_assertion( (boost::is_same<typename Base::Basic_iterator,
                               Tag_true>::value) );
@@ -310,9 +321,10 @@ namespace CGAL {
     }
 
    /// Constructor with a dart in parameter (for end iterator).
-    CMap_cell_iterator(Map& amap, Dart_handle adart):
-      Base(amap, adart),
-      mmark_number(amap.get_new_mark())
+    CMap_cell_iterator(Map& amap, Dart_handle adart, size_type thread_id =Map::NB_THREAD_LIMIT):
+      Base(amap, adart,thread_id),
+      mmark_number(amap.get_new_mark(thread_id)),
+      thread_id(thread_id)
     {
       if (adart!=this->mmap->null_handle)
         mark_cell<Map,i,dim>(amap, (*this), mmark_number);
@@ -323,14 +335,15 @@ namespace CGAL {
     {
       if (this->mmap->get_number_of_times_mark_reserved(mmark_number)==1)
         unmark_treated_darts();
-      this->mmap->free_mark(mmark_number);
+      this->mmap->free_mark(mmark_number, thread_id);
       this->mmark_number = Map::INVALID_MARK; // To avoid basic class to try to unmark darts.
     }
 
     /// Copy constructor.
     CMap_cell_iterator(const Self& aiterator):
       Base(aiterator),
-      mmark_number(aiterator.mmark_number)
+      mmark_number(aiterator.mmark_number),
+      thread_id(aiterator.thread_id)
     { this->mmap->share_a_mark(mmark_number); }
 
     /// Assignment operator.
@@ -376,6 +389,7 @@ namespace CGAL {
   private:
     /// A mark used to mark treated cells.
     typename Map::size_type mmark_number;
+    typename Map::size_type thread_id;
   };
   //****************************************************************************
   /* Class CMap_one_dart_per_incident_cell_iterator<Map,i,j,dim>: to iterate
@@ -397,13 +411,14 @@ namespace CGAL {
 
     typedef typename Base::Dart_handle Dart_handle;
     typedef typename Base::Map Map;
+    typedef typename Base::Map::size_type size_type;
 
     typedef Tag_false Use_mark;
     typedef Tag_false Basic_iterator;
 
     /// Main constructor.
-    CMap_one_dart_per_incident_cell_iterator(Map& amap, Dart_handle adart):
-      Base(amap, adart)
+    CMap_one_dart_per_incident_cell_iterator(Map& amap, Dart_handle adart, size_type thread_id =Map::NB_THREAD_LIMIT):
+      Base(amap, adart, thread_id)
     {}
   };
   //****************************************************************************
@@ -424,16 +439,17 @@ namespace CGAL {
 
     typedef typename Base::Dart_handle Dart_handle;
     typedef typename Base::Map Map;
+    typedef typename Base::Map::size_type size_type;
 
     typedef Tag_false Use_mark;
     typedef Tag_false Basic_iterator;
 
     /// Main constructor.
-    CMap_one_dart_per_cell_iterator(Map& amap): Base(amap)
+    CMap_one_dart_per_cell_iterator(Map& amap, size_type thread_id =Map::NB_THREAD_LIMIT): Base(amap, thread_id)
     {}
     /// Constructor with a dart in parameter (for end iterator).
-    CMap_one_dart_per_cell_iterator(Map& amap, Dart_handle adart):
-	     Base(amap, adart)
+    CMap_one_dart_per_cell_iterator(Map& amap, Dart_handle adart, size_type thread_id =Map::NB_THREAD_LIMIT):
+	     Base(amap, adart, thread_id)
     {}
   };
 //****************************************************************************

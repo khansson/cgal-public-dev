@@ -15,7 +15,7 @@
 #include <CGAL/Compact_container.h>
 #include <CGAL/Dart.h>
 #include <CGAL/Handle_hash_function.h>
-#include <bitset>
+#include <CGAL/Mark_management.h>
 
 #include <boost/config.hpp>
 #if  (BOOST_GCC >= 40900)
@@ -94,8 +94,22 @@ namespace CGAL {
       public Helper::template Attribute_const_range<i>
     {};
 
+  
+
+
+  ///Number of Marks Per Thead
+    static const size_type NB_MARKS_PER_THREAD = 8;
+
+    ///Number of threads which cannot be supported
+    static const size_type NB_THREAD_LIMIT = 8;
+
     /// Number of marks
-    static const size_type NB_MARKS = 32;
+    static const size_type NB_MARKS = NB_MARKS_PER_THREAD * NB_THREAD_LIMIT;
+
+    typedef  PartitionedBitset<NB_MARKS_PER_THREAD,NB_THREAD_LIMIT> mark_storage;
+
+
+
 
     /// The dimension of the combinatorial map.
     static const unsigned int dimension = d_;
@@ -132,13 +146,13 @@ namespace CGAL {
 
     /// Set simultaneously all the marks of this dart to a given value.
     void set_dart_marks(Dart_const_handle ADart,
-                        const std::bitset<NB_MARKS>& amarks) const
+                        const mark_storage& amarks) const
     {
       CGAL_assertion( ADart!=nullptr );
       ADart->set_marks(amarks);
     }
     /// Return all the marks of a dart.
-    std::bitset<NB_MARKS> get_dart_marks(Dart_const_handle ADart) const
+    mark_storage get_dart_marks(Dart_const_handle ADart) const
     {
       CGAL_assertion( ADart!=nullptr );
       return ADart->get_marks();
