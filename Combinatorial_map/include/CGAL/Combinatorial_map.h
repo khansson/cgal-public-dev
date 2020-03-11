@@ -45,6 +45,8 @@
 #include <boost/graph/graph_traits.hpp>
 #include <CGAL/boost/graph/helpers.h>
 
+#include <functional>
+
 #include <CGAL/config.h>
 
 #include <CGAL/Mark_management.h>
@@ -61,6 +63,8 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
 #endif
 
 namespace CGAL {
+
+  
   // functions to allow the call to next/opposite by ADL
   template <typename G, typename Desc>
   auto CM_ADL_next(Desc&& d, G&& g) {
@@ -138,6 +142,7 @@ namespace CGAL {
     typedef typename Base::mark_storage mark_storage;
 
     size_type NB_THREADS;
+   
 
 
 
@@ -208,6 +213,9 @@ namespace CGAL {
       this->init_storage();
 
       NB_THREADS = 0;
+
+
+      get_thread_id = [](){return NB_THREAD_LIMIT;};
       
       for(auto& elem : m_mark_stacks)
       {
@@ -235,17 +243,16 @@ namespace CGAL {
     }
 
 /**
- * @brief Set the number of threads the map can support for iteration calls
- * 
+ * @brief Set the number of threads the map can support for iteration calls * 
  * @param size_type 
  */
-    void set_number_of_threads(size_type number_of_threads)
+    void set_number_of_threads(size_type number_of_threads, std::function<int()> thread_id_function = [](){return NB_THREAD_LIMIT;} )
     {
 
       CGAL_assertion(number_of_threads < NB_THREAD_LIMIT );
 
 
-     
+      get_thread_id = thread_id_function;
 
       if(number_of_threads == NB_THREADS)
       {
@@ -288,9 +295,11 @@ namespace CGAL {
 
     }
 
-    size_type get_thread_index (size_type thread_id) const
-    {
+    std::function<int()> get_thread_id;
 
+    size_type get_thread_index () const
+    {
+      size_type thread_id = get_thread_id();
 
       if (thread_id == NB_THREAD_LIMIT)
       {
@@ -1001,12 +1010,12 @@ namespace CGAL {
      * @return the index of the new mark.
      * @pre mnb_used_marks < NB_MARKS
      */
-    size_type get_new_mark(size_type thread_id = NB_THREAD_LIMIT) const
+    size_type get_new_mark() const
     {
       
 
 
-      size_type thread_index = get_thread_index(thread_id);
+      size_type thread_index = get_thread_index();
 
      
       size_type m = m_mark_stacks.at(thread_index).create_mark();
@@ -1162,7 +1171,7 @@ namespace CGAL {
     /** Free a given mark, previously calling unmark_all_darts.
      * @param amark the given mark.
      */
-    void free_mark(size_type amark, size_type thread_id = NB_THREAD_LIMIT) const
+    void free_mark(size_type amark) const
     {
       CGAL_assertion( is_reserved(amark) );
 
@@ -1174,7 +1183,7 @@ namespace CGAL {
 
       unmark_all(amark);
 
-      size_type thread_index = get_thread_index(thread_id);
+      size_type thread_index = get_thread_index();
       
 
       m_mark_stacks.at(thread_index).free_mark(amark);
@@ -3228,8 +3237,8 @@ namespace CGAL {
        CGAL::CMap_one_dart_per_incident_cell_const_iterator<Self,i,j,dim> >
       Base;
 
-      One_dart_per_incident_cell_range(Self &amap, Dart_handle adart, size_type thread_id = Base::CMap::NB_THREAD_LIMIT):
-        Base(amap, adart, thread_id)
+      One_dart_per_incident_cell_range(Self &amap, Dart_handle adart):
+        Base(amap, adart)
       {}
     };
     //**************************************************************************
@@ -3300,8 +3309,8 @@ namespace CGAL {
     /// @return a range on the i-cells incindent to the given j-cell.
     template<unsigned int i, unsigned int j, int dim>
     One_dart_per_incident_cell_range<i,j,dim>
-    one_dart_per_incident_cell(Dart_handle adart, size_type thread_id = NB_THREAD_LIMIT)
-    { return One_dart_per_incident_cell_range<i,j,dim>(*this,adart, thread_id); }
+    one_dart_per_incident_cell(Dart_handle adart)
+    { return One_dart_per_incident_cell_range<i,j,dim>(*this,adart); }
     //--------------------------------------------------------------------------
     template<unsigned int i, unsigned int j, int dim>
     One_dart_per_incident_cell_const_range<i,j,dim>
@@ -3310,8 +3319,8 @@ namespace CGAL {
     //--------------------------------------------------------------------------
     template<unsigned int i, unsigned int j>
     One_dart_per_incident_cell_range<i,j,Self::dimension>
-    one_dart_per_incident_cell(Dart_handle adart, size_type thread_id = NB_THREAD_LIMIT)
-    { return one_dart_per_incident_cell<i,j,Self::dimension>(adart, thread_id); }
+    one_dart_per_incident_cell(Dart_handle adart)
+    { return one_dart_per_incident_cell<i,j,Self::dimension>(adart); }
     //--------------------------------------------------------------------------
     template<unsigned int i, unsigned int j>
     One_dart_per_incident_cell_const_range<i,j,Self::dimension>

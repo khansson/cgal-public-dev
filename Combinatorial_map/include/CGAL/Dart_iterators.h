@@ -1647,7 +1647,7 @@ namespace CGAL {
     typedef typename Base::Dart_handle Dart_handle;
 
     /// Main constructor.
-    CMap_dart_iterator_of_orbit_generic(Map& amap, Dart_handle adart1, typename Map_::size_type thread_id = Map_::NB_THREAD_LIMIT):
+    CMap_dart_iterator_of_orbit_generic(Map& amap, Dart_handle adart1):
       Base(amap, adart1)
     {}
   };
@@ -1663,7 +1663,7 @@ namespace CGAL {
     typedef typename Base::Dart_handle Dart_handle;
     
     /// Main constructor.
-    CMap_dart_iterator_of_orbit(Map_& amap, Dart_handle adart, typename Map_::size_type thread_id = Map_::NB_THREAD_LIMIT):
+    CMap_dart_iterator_of_orbit(Map_& amap, Dart_handle adart):
       Base(amap, adart)
     {}
   };
@@ -1683,7 +1683,7 @@ namespace CGAL {
     typedef typename Base::Map Map;
     
     /// Main constructor.
-    CMap_dart_iterator_of_cell(Map& amap, Dart_handle adart1, typename Map_::size_type thread_id = Map_::NB_THREAD_LIMIT):
+    CMap_dart_iterator_of_cell(Map& amap, Dart_handle adart1):
       Base(amap, adart1)
     {}
   };
